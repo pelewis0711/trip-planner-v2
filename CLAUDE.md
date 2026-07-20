@@ -1,0 +1,69 @@
+# Trip Planner v2 — Project Memory (CLAUDE.md)
+
+## Who you're working with
+
+Parker Lewis — junior at University of Illinois Urbana-Champaign (Financial Planning concentration, Econ minor). Studying abroad at Anglo-American University, Prague, **Jan 24 – May 24, 2027**. Fraternity president, bartender, club VP — busy, efficient, finance-minded.
+
+**He has never written code.** This changes how you work:
+
+- Explain what you're doing in plain English, briefly, as you go. No unexplained jargon.
+- Before any significant build step or architectural choice, ask him **multiple-choice questions** (he strongly prefers picking from options over open-ended questions).
+- Small steps. Working software after every session. Commit + deploy after every working change.
+- If he pastes an error, diagnose before editing. Show him how to verify fixes himself (what URL to open, what to click).
+- Be concise and direct. He hates filler.
+
+## What we're building
+
+Rebuild `reference-v1-app.html` (a working 187KB single-file app — the source of truth for all features and formulas) as a modern, hosted, multi-user web app.
+
+**Stack (decided):** Next.js (App Router) + TypeScript + Tailwind, deployed on Vercel free tier. Supabase free tier for Postgres + auth. PWA via service worker. Amadeus Self-Service API (free tier) for live flight prices. Git + GitHub from day one.
+
+**Never modify or delete `reference-v1-app.html`.** When in doubt about how a feature should behave, open it and read the implementation.
+
+## Phase roadmap (build strictly in order — app must be usable after each phase)
+
+- [ ] **Phase 0 — Port.** Reproduce v1 feature-for-feature in Next.js/TS with real components. Trip data → typed data module. State in localStorage (same as v1) plus JSON import so his existing plans carry over. Deploy to Vercel.
+- [ ] **Phase 1 — Accounts.** Supabase email/Google auth. Plans move from localStorage to Postgres (keep localStorage as offline cache). Anonymous visitors can still play; signing up keeps their work.
+- [ ] **Phase 2 — Sharing.** Share a plan via link (read-only or collaborate). Friend plans appear in Compare. Per-trip votes/comments. Friends at other schools can set their own home city + semester dates (editable slots — v1 hard-codes AAU's).
+- [ ] **Phase 3 — Live prices.** Amadeus flight-offers lookup per leg, cached server-side (respect free-tier rate limits). Live price shown next to the estimate with a "last checked" stamp; estimates remain the fallback everywhere. Lodging has no good free API — keep tier estimates + deep links with dates.
+- [ ] **Phase 4 — PWA.** Installable on phone; itinerary, calendar, and booked actuals work offline; syncs when back online. He'll be using this on trains in Europe.
+- [ ] **Phase 5 — Trip discovery.** "Find me more trips" — an API route that uses an LLM to propose trips NOT in the catalog matching his filters/dates/budget, returned in the exact trip schema, human-approved before joining the catalog.
+
+## v1 feature inventory (everything below must survive the port)
+
+Five tabs: Overview · Trip Catalog · My Calendar · Itinerary & Totals · Plans & Compare.
+
+1. **212-trip catalog**, 43 countries, 11 regions. Trip schema: `{id, n(name), c(country), reg, co:[lat,lon], t:[types], cats:[categories], m:[best months], g(suggested nights), ci(cost index 1-5), wx(weather), w(blurb), a:[[activity,price]...], f:[[signature food,price]...]}`. Lodging/travel are NOT in the data — derived at runtime.
+2. **9 multi-select filter groups** (region, best-time, travel-time-from-home [dynamic], weather, cost, trip type, length, activity type, country) + text search. OR within group, AND across groups.
+3. **16 calendar slots** (13 weekends, St. Patrick's midweek Mar 16–18, spring break Mar 26–Apr 4, post-finals May 15–24) with weekend-list AND month-grid views. Drag-drop, tap-to-place, tap-slot picker. Multi-stop trips per slot (ordered cities, auto-routed).
+4. **Cost model** (per-person USD): `CI_BASE={1:{lodg:13,food:12},2:{20,18},3:{28,24},4:{38,32},5:{52,42}}`. 4 lodging tiers/night: hostel(b), Airbnb split(1.5b), private(2.1b), boutique(3.6b). 3 food tiers/day: street(b), mid(1.8b), foodie(2.9b). days = nights+1. Activities & signature foods are individually checkable one-offs that do NOT scale with nights (deliberate).
+5. **Auto travel routing**: HOME → stops → HOME. Great-circle km; ≤60km local $0; ≤350km train/bus max(14, 0.11·km); else flight max(40, 35+0.028·km). The 0.028 was calibrated against real budget fares — don't "fix" it upward.
+6. **Real-world pricing layer**: seasonal multipliers (St. Pat's Dublin flights ×2.2, other holiday-week flights ×1.15; spring-break flights ×1.5, rail ×1.15; post-finals beach flights ×1.3), per-plan bag setting (none / cabin +$28 / checked +$45 per flight), secondary-airport transfer fees (Paris-Beauvais $22, Milan-Bergamo $14, Barcelona $18, London $16, Brussels $18, Rome $9, Stockholm $16, Venice $12, Vienna-Bratislava $14, Frankfurt-Hahn $20, Oslo-Torp $18). Legs carry pricing-note strings.
+7. **Feasibility warnings** (non-blocking, red/amber): nights exceed slot days; total transit hours > days×4; stop off-season for the slot month.
+8. **Schengen 90/180 tracker**: days = Σ(nights+1) per stop in a Schengen country other than the home country (study-visa country exempt). Amber >80, red >90. UK nations, Ireland, Cyprus, most Balkans, Morocco, Turkey are non-Schengen; Andorra/Monaco count as Schengen.
+9. **Budget features**: per-plan budget cap with remaining/over; per-slot "booked actuals" (travel/lodging/food/activities) that blend with estimates and show variance; 20 selectable home-base cities that reprice everything.
+10. **Multi-plan system**: auto-save, new/duplicate/rename/delete, JSON export/import for sharing, side-by-side compare table (green lowest / red highest per row).
+11. **Booking links with dates**: per-leg Google Flights (dated), lodging links with check-in/out prefilled (sequential allocation from slot start by nights), GetYourGuide/Viator/Tiqets per city + per-activity, Google Maps "best <dish> <city>" per signature food, when-to-book cheat sheet + per-slot timing tips.
+12. **Excel export per plan** (SheetJS): Budget / Travel Plan / Calendar-Months / Calendar-Weekends / Booking Links sheets, with actuals, variance, flags, Schengen row, live hyperlinks.
+
+## Decisions already made — do not re-litigate
+
+Activities don't scale with nights. Start plans empty. Warnings never block or delete user choices. Estimates are conservative on purpose (Schengen counter over-counts, +12% buffer, Eurail $296 shown as optional). Both calendar views stay. Itemized per-item pricing stays. Bag default = cabin. Declined features: daily transit line-items, Eurail as a toggle, auto-backup nudges, crowd-level/popularity filters.
+
+## Known simplifications (fine to improve WITH his sign-off, never silently)
+
+Seasonal multipliers are calibrated guesses. Stop dates assume departure on slot start. Schengen counter ignores non-slot travel. Flight estimates assume direct budget routes exist.
+
+## His non-negotiable trips (keep working well in recommendations)
+
+Dublin for St. Patrick's (Mar 17, 2027 — midweek), Marrakech, Rome, Paris.
+
+## Session protocol
+
+At the start of each session: state which phase is active. At the end: update the roadmap checkboxes above and append any new decisions to this file. He may say "commit and deploy" — that means: git commit with a clear message, push, verify the Vercel build succeeded, give him the URL.
+
+## Phase 0 build notes (in progress)
+
+Building per the staged plan in `/Users/pelewis0711/.claude/plans/glittery-waddling-storm.md`: scaffold → data extraction → calc engine → Overview/Catalog → Calendar → Itinerary → Plans/Compare → Excel export → mobile polish. Each stage commits + deploys. Parker chose to **modernize the visual design** (Tailwind, cleaner spacing) rather than pixel-match v1's CSS — same dark theme spirit, same functionality. Stack additions beyond the original decision: npm, Vitest for calc-engine tests, Zustand for global state, `xlsx` npm package for Excel export (replacing v1's CDN-loaded SheetJS).
+
+Note: this project's Next.js version has breaking changes vs. older Next.js — `AGENTS.md` (generated by create-next-app) points to `node_modules/next/dist/docs/` for the current APIs/conventions. Check there before writing routing/data-fetching code that might rely on stale patterns.
