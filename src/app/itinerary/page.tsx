@@ -5,6 +5,8 @@ import { useActivePlan, usePlanStore } from "@/lib/store/plan";
 import { getSlotsForPlan } from "@/lib/calc/semester";
 import { makeCtx } from "@/lib/calc/context";
 import { blendedTotals, grandTotals } from "@/lib/calc/costs";
+import { liveAdjustedGrandTotals } from "@/lib/calc/livePricing";
+import { useLivePriceStore } from "@/lib/store/livePrices";
 import { schengenDays, schengenStatus } from "@/lib/calc/schengen";
 import { BAGS, type BagOption } from "@/lib/calc/pricing";
 import SummaryBar from "@/components/itinerary/SummaryBar";
@@ -15,21 +17,25 @@ const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
 
 export default function ItineraryPage() {
   const activePlan = useActivePlan();
-  const { home, placements, bag, budget } = activePlan;
+  const { home, placements, bag, budget, useLivePrices } = activePlan;
   const setBag = usePlanStore((s) => s.setBag);
   const setBudget = usePlanStore((s) => s.setBudget);
+  const setUseLivePrices = usePlanStore((s) => s.setUseLivePrices);
+  const livePrices = useLivePriceStore((s) => s.prices);
 
   const [editingBudget, setEditingBudget] = useState(false);
   const [budgetInput, setBudgetInput] = useState("");
 
   const ctx = useMemo(() => makeCtx(home, bag), [home, bag]);
-  const g = grandTotals(placements, ctx);
+  const slots = useMemo(() => getSlotsForPlan(activePlan), [activePlan]);
+  const semesterYear = activePlan.semester ? Number(activePlan.semester.start.slice(0, 4)) : 2027;
+  const g = useLivePrices
+    ? liveAdjustedGrandTotals(placements, ctx, slots, semesterYear, livePrices)
+    : grandTotals(placements, ctx);
   const bt = blendedTotals(placements, ctx);
   const schD = schengenDays(placements, home, ctx.tripOf);
   const schStatus = schengenStatus(schD);
-  const slots = useMemo(() => getSlotsForPlan(activePlan), [activePlan]);
   const ordered = slots.filter((s) => placements[s.id]?.stops.length);
-  const semesterYear = activePlan.semester ? Number(activePlan.semester.start.slice(0, 4)) : 2027;
   const contingency = g.total * 0.12;
   const remaining = budget !== null ? budget - bt.blend : null;
 
@@ -175,6 +181,16 @@ export default function ItineraryPage() {
               {remaining < 0 ? `OVER budget by ${money(-remaining)}` : `${money(remaining)} remaining`}
             </span>
           )}
+
+          <label className="flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 font-semibold text-zinc-300">
+            <input
+              type="checkbox"
+              checked={!!useLivePrices}
+              onChange={(e) => setUseLivePrices(e.target.checked)}
+              className="accent-sky-500"
+            />
+            ✈️ Use live flight prices
+          </label>
         </div>
 
         <div className="mt-3 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-2.5 text-[12.5px] text-amber-200">

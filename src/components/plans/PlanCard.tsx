@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { Plan } from "@/lib/store/plan";
 import { planGrandTotals } from "@/lib/planTotals";
 import { exportPlanXlsx } from "@/lib/excel";
+import { useLivePriceStore } from "@/lib/store/livePrices";
 import SharePanel from "./SharePanel";
 import SemesterPanel from "./SemesterPanel";
 
@@ -43,11 +44,12 @@ export default function PlanCard({
   const overBudget = plan.budget !== null && g.total > plan.budget;
   const isOwner = !plan.ownerId || plan.ownerId === currentUserId;
   const isCollaboration = !plan.readOnly && plan.ownerId && plan.ownerId !== currentUserId;
+  const livePrices = useLivePriceStore((s) => s.prices);
 
   const handleExportXlsx = async () => {
     setBuildingXlsx(true);
     try {
-      await exportPlanXlsx(plan);
+      await exportPlanXlsx(plan, livePrices);
     } catch {
       alert("Something went wrong building the Excel file. Try again in a moment.");
     } finally {

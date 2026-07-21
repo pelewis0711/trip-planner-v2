@@ -25,6 +25,9 @@ export interface Plan {
   // custom semester dates/breaks — undefined means "use the default AAU
   // Spring 2027 SLOTS list unchanged" (see src/lib/calc/semester.ts)
   semester?: SemesterConfig;
+  // when true, totals use live flight prices (where fetched) in place of
+  // the estimate for flight legs — see src/lib/calc/livePricing.ts
+  useLivePrices?: boolean;
 
   // account sync / sharing (all optional — absent for plans that have never
   // touched Supabase, e.g. anonymous local-only use)
@@ -80,6 +83,7 @@ interface PlanStoreState {
   setBag: (bag: BagOption) => void;
   setBudget: (budget: number | null) => void;
   setHome: (home: string) => void;
+  setUseLivePrices: (useLivePrices: boolean) => void;
 
   // plan management
   newPlan: (name?: string) => string;
@@ -244,6 +248,7 @@ export const usePlanStore = create<PlanStoreState>()(
       setBag: (bag) => set((state) => withActive(state, () => ({ bag }))),
       setBudget: (budget) => set((state) => withActive(state, () => ({ budget }))),
       setHome: (home) => set((state) => withActive(state, () => ({ home: HOMES[home] ? home : "Prague" }))),
+      setUseLivePrices: (useLivePrices) => set((state) => withActive(state, () => ({ useLivePrices }))),
 
       newPlan: (name) => {
         const id = uid();
