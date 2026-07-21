@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { HOMES } from "@/data/homes";
 import { makeCtx } from "@/lib/calc/context";
 import { grandTotals } from "@/lib/calc/costs";
+import OfflineIndicator from "./OfflineIndicator";
 
 const NAV = [
   { href: "/", label: "Overview" },
@@ -125,6 +126,7 @@ export default function Header() {
           })}
         </nav>
 
+        <OfflineIndicator />
         {authControl}
         <div className="hidden sm:block">{totalPill}</div>
       </div>
