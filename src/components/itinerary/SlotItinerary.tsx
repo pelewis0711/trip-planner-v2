@@ -30,18 +30,20 @@ export default function SlotItinerary({
   placement,
   ctx,
   home,
+  year = 2027,
 }: {
   slot: Slot;
   placement: Placement;
   ctx: PlannerCtx;
   home: string;
+  year?: number;
 }) {
   const setActual = usePlanStore((s) => s.setActual);
 
   const stops = placement.stops;
   const costs = slotCosts(slot.id, stops, ctx);
   const warnings = slotWarnings(slot, stops, costs.legs, ctx.tripOf);
-  const sd = stopDates(slot, stops);
+  const sd = stopDates(slot, stops, year);
   const multi = stops.length > 1;
   const actuals = slotActuals(placement);
   const booked = actualEntered(placement);

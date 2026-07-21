@@ -3,7 +3,8 @@
 // frozen on an old, unpatched build) instead of a CDN <script> loaded at runtime.
 import type { CellObject } from "xlsx";
 import type { Plan } from "@/lib/store/plan";
-import { SLOTS, type Slot } from "@/data/slots";
+import type { Slot } from "@/data/slots";
+import { getSlotsForPlan } from "@/lib/calc/semester";
 import { makeCtx } from "@/lib/calc/context";
 import {
   actualEntered,
@@ -29,9 +30,10 @@ import {
 
 type Row = (string | number | CellObject)[];
 
-const MONTH_NAMES: Record<number, string> = {
-  1: "January 2027", 2: "February 2027", 3: "March 2027", 4: "April 2027", 5: "May 2027",
-};
+const MONTH_NAMES = [
+  "", "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
 
 const XL = (label: string, url: string): CellObject => ({
   v: label,
@@ -46,7 +48,8 @@ const XM = (n: number): CellObject => ({
 
 export function buildXlsxSheets(plan: Plan) {
   const ctx = makeCtx(plan.home, plan.bag);
-  const ordered = SLOTS.filter((s) => plan.placements[s.id]?.stops.length);
+  const slots = getSlotsForPlan(plan);
+  const ordered = slots.filter((s) => plan.placements[s.id]?.stops.length);
   const routeOf = (s: Slot) =>
     plan.placements[s.id].stops.map((st) => ctx.tripOf(st.tripId)?.n ?? "?").join(" → ");
   const nightsOf = (s: Slot) =>
@@ -156,26 +159,33 @@ export function buildXlsxSheets(plan: Plan) {
   if (!ordered.length) tp.push(["(No trips scheduled yet.)"]);
 
   /* ---- Sheet 3: Calendar (month grid) ---- */
+  // Slot.s/.e are [month, day] with no year, so a custom semester's year
+  // and month range are pulled from its ISO start/end (assumed to fall
+  // within a single calendar year — true for any one study-abroad term).
+  const semYear = plan.semester ? Number(plan.semester.start.slice(0, 4)) : 2027;
+  const semStartMonth = plan.semester ? Number(plan.semester.start.slice(5, 7)) : 1;
+  const semEndMonth = plan.semester ? Number(plan.semester.end.slice(5, 7)) : 5;
+
   const cal: Row[] = [
-    [`SEMESTER CALENDAR — Spring 2027 (${plan.name || "Plan"})`],
+    [`SEMESTER CALENDAR — ${semYear} (${plan.name || "Plan"})`],
     ["Trips appear on every day they cover."],
     [],
   ];
   const daySlot = (d: Date): string | null => {
-    for (const s of SLOTS) {
-      const sd = new Date(2027, s.s[0] - 1, s.s[1]);
-      const ed = new Date(2027, s.e[0] - 1, s.e[1]);
+    for (const s of slots) {
+      const sd = new Date(semYear, s.s[0] - 1, s.s[1]);
+      const ed = new Date(semYear, s.e[0] - 1, s.e[1]);
       if (d >= sd && d <= ed && plan.placements[s.id]?.stops.length) return routeOf(s);
     }
     return null;
   };
-  for (let m = 1; m <= 5; m++) {
-    cal.push([MONTH_NAMES[m]]);
+  for (let m = semStartMonth; m <= semEndMonth; m++) {
+    cal.push([`${MONTH_NAMES[m]} ${semYear}`]);
     cal.push(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]);
-    const dim = new Date(2027, m, 0).getDate();
+    const dim = new Date(semYear, m, 0).getDate();
     let week: string[] = ["", "", "", "", "", "", ""];
     for (let d = 1; d <= dim; d++) {
-      const dt = new Date(2027, m - 1, d);
+      const dt = new Date(semYear, m - 1, d);
       const dow = (dt.getDay() + 6) % 7;
       const r = daySlot(dt);
       week[dow] = r ? `${d} · ${r}` : String(d);
@@ -191,9 +201,9 @@ export function buildXlsxSheets(plan: Plan) {
   const wk: Row[] = [
     [`SLOT-BY-SLOT CALENDAR — ${plan.name || "Plan"}`],
     [],
-    ["Slot", "Dates (2027)", "Type", "Note", "Route", "Places", "Nights", "Cost", "Warnings"],
+    ["Slot", `Dates (${semYear})`, "Type", "Note", "Route", "Places", "Nights", "Cost", "Warnings"],
   ];
-  SLOTS.forEach((s) => {
+  slots.forEach((s) => {
     const filled = plan.placements[s.id]?.stops.length;
     const c = filled ? slotCosts(s.id, plan.placements[s.id].stops, ctx) : null;
     wk.push([
@@ -215,7 +225,7 @@ export function buildXlsxSheets(plan: Plan) {
   const legsWithDates = (s: Slot) => {
     const stops = plan.placements[s.id].stops;
     const legs = slotCosts(s.id, stops, ctx).legs;
-    const sd = stopDates(s, stops);
+    const sd = stopDates(s, stops, semYear);
     return legs.map((l, i) => ({ ...l, d: legDateFor(sd, stops.length, legs.length, i) }));
   };
 
@@ -251,7 +261,7 @@ export function buildXlsxSheets(plan: Plan) {
   lk.push([], ["🛏️ LODGING — links open with your dates pre-filled"], ["Slot", "City", "Check-in", "Check-out", "Nights", "Tier chosen", "Search 1", "Search 2", "Search 3"]);
   let anyStay = false;
   ordered.forEach((s) => {
-    const sd = stopDates(s, plan.placements[s.id].stops);
+    const sd = stopDates(s, plan.placements[s.id].stops, semYear);
     plan.placements[s.id].stops.forEach((st, i) => {
       if (st.nights < 1) return;
       const t = ctx.tripOf(st.tripId);

@@ -8,6 +8,9 @@ export const MO_SHORT: Record<number, string> = {
   7: "Jul", 8: "Aug", 9: "Sep", 10: "Oct", 11: "Nov", 12: "Dec",
 };
 
+// A fixed year is fine here regardless of the plan's actual semester year --
+// this only measures the span's length in days, and both endpoints use the
+// same year so it cancels out (as long as the span doesn't cross Dec 31).
 export function slotSpanDays(s: Slot): number {
   const a = new Date(2027, s.s[0] - 1, s.s[1]);
   const b = new Date(2027, s.e[0] - 1, s.e[1]);
@@ -19,8 +22,12 @@ export interface StopDates {
   out: Date;
 }
 
-export function stopDates(slot: Slot, stops: Stop[]): StopDates[] {
-  let cur = new Date(2027, slot.s[0] - 1, slot.s[1]);
+// `year` matters here -- these dates flow into real booking links (Google
+// Flights, lodging check-in/out), so pass the plan's actual semester year
+// for custom semesters. Defaults to 2027 (AAU Spring 2027, the only year
+// plans without a custom `semester` ever need).
+export function stopDates(slot: Slot, stops: Stop[], year = 2027): StopDates[] {
+  let cur = new Date(year, slot.s[0] - 1, slot.s[1]);
   return stops.map((st) => {
     const inD = new Date(cur);
     const outD = new Date(cur);

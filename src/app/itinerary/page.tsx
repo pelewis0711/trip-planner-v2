@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { SLOTS } from "@/data/slots";
 import { useActivePlan, usePlanStore } from "@/lib/store/plan";
+import { getSlotsForPlan } from "@/lib/calc/semester";
 import { makeCtx } from "@/lib/calc/context";
 import { blendedTotals, grandTotals } from "@/lib/calc/costs";
 import { schengenDays, schengenStatus } from "@/lib/calc/schengen";
@@ -14,7 +14,8 @@ import CheatSheet from "@/components/itinerary/CheatSheet";
 const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
 
 export default function ItineraryPage() {
-  const { home, placements, bag, budget } = useActivePlan();
+  const activePlan = useActivePlan();
+  const { home, placements, bag, budget } = activePlan;
   const setBag = usePlanStore((s) => s.setBag);
   const setBudget = usePlanStore((s) => s.setBudget);
 
@@ -26,7 +27,9 @@ export default function ItineraryPage() {
   const bt = blendedTotals(placements, ctx);
   const schD = schengenDays(placements, home, ctx.tripOf);
   const schStatus = schengenStatus(schD);
-  const ordered = SLOTS.filter((s) => placements[s.id]?.stops.length);
+  const slots = useMemo(() => getSlotsForPlan(activePlan), [activePlan]);
+  const ordered = slots.filter((s) => placements[s.id]?.stops.length);
+  const semesterYear = activePlan.semester ? Number(activePlan.semester.start.slice(0, 4)) : 2027;
   const contingency = g.total * 0.12;
   const remaining = budget !== null ? budget - bt.blend : null;
 
@@ -192,7 +195,14 @@ export default function ItineraryPage() {
       </h3>
       <div className="space-y-4">
         {ordered.map((slot) => (
-          <SlotItinerary key={slot.id} slot={slot} placement={placements[slot.id]} ctx={ctx} home={home} />
+          <SlotItinerary
+            key={slot.id}
+            slot={slot}
+            placement={placements[slot.id]}
+            ctx={ctx}
+            home={home}
+            year={semesterYear}
+          />
         ))}
       </div>
     </div>

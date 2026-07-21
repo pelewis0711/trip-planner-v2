@@ -9,6 +9,7 @@ import { TRIPS, type Trip } from "@/data/trips";
 import { HOMES } from "@/data/homes";
 import type { BagOption } from "@/lib/calc/pricing";
 import type { Placement, Placements, SlotActuals, Stop } from "@/lib/calc/types";
+import type { SemesterConfig } from "@/lib/calc/semester";
 
 const TRIP_BY_ID = new Map(TRIPS.map((t) => [t.id, t]));
 
@@ -21,6 +22,19 @@ export interface Plan {
   placements: Placements;
   created: number;
   updated: number;
+  // custom semester dates/breaks — undefined means "use the default AAU
+  // Spring 2027 SLOTS list unchanged" (see src/lib/calc/semester.ts)
+  semester?: SemesterConfig;
+
+  // account sync / sharing (all optional — absent for plans that have never
+  // touched Supabase, e.g. anonymous local-only use)
+  ownerId?: string; // account that owns this plan once it's been synced
+  readOnly?: boolean; // true for a friend's plan pulled in view-only (Compare only, never synced)
+  shareViewToken?: string | null;
+  shareCollabToken?: string | null;
+  collaboratorIds?: string[];
+  lastEditedBy?: string | null; // email, for display
+  lastEditedAt?: number | null;
 }
 
 function defaultStop(t: Trip): Stop {
@@ -83,6 +97,15 @@ interface PlanStoreState {
   // last-write-wins merge of Supabase rows into local plans; returns ids of
   // local plans that came out newer/missing on the remote side (need upload)
   mergeRemote: (remotePlans: Plan[]) => string[];
+  // shallow-merge arbitrary fields into any plan by id (sharing/sync metadata)
+  // -- does NOT bump `updated`, so patching sync metadata never re-triggers a sync
+  patchPlan: (id: string, patch: Partial<Plan>) => void;
+  // like patchPlan, but for real content edits from a specific plan card
+  // (not necessarily the active plan) -- bumps `updated` so it syncs
+  setSemesterFor: (id: string, semester: SemesterConfig | undefined) => void;
+  // add/refresh a friend's plan pulled in via a share link — always readOnly
+  addSharedPlan: (plan: Plan) => void;
+  removeSharedPlan: (id: string) => void;
 }
 
 function withStop(
@@ -260,6 +283,17 @@ export const usePlanStore = create<PlanStoreState>()(
               placements: JSON.parse(JSON.stringify(src.placements)),
               created: now,
               updated: now,
+              // a duplicate is always your own fresh, unshared, unsynced
+              // plan -- never inherit the source's ownership/sharing state
+              // (critical for a readOnly shared plan: without this the copy
+              // would stay permanently read-only and never sync)
+              ownerId: undefined,
+              readOnly: undefined,
+              shareViewToken: undefined,
+              shareCollabToken: undefined,
+              collaboratorIds: undefined,
+              lastEditedBy: undefined,
+              lastEditedAt: undefined,
             },
           },
         }));
@@ -297,7 +331,8 @@ export const usePlanStore = create<PlanStoreState>()(
         }),
 
       switchPlan: (id) =>
-        set((state) => (state.plans[id] ? { activeId: id } : state)),
+        // read-only shared plans are Compare-only, never editable/active
+        set((state) => (state.plans[id] && !state.plans[id].readOnly ? { activeId: id } : state)),
 
       importPlans: (incoming) =>
         set((state) => {
@@ -348,6 +383,35 @@ export const usePlanStore = create<PlanStoreState>()(
           })
           .map((p) => p.id);
       },
+
+      patchPlan: (id, patch) =>
+        set((state) => {
+          const p = state.plans[id];
+          if (!p) return state;
+          return { plans: { ...state.plans, [id]: { ...p, ...patch } } };
+        }),
+
+      setSemesterFor: (id, semester) =>
+        set((state) => {
+          const p = state.plans[id];
+          if (!p) return state;
+          return { plans: { ...state.plans, [id]: { ...p, semester, updated: Date.now() } } };
+        }),
+
+      addSharedPlan: (plan) =>
+        set((state) => ({
+          plans: { ...state.plans, [plan.id]: { ...plan, readOnly: true } },
+        })),
+
+      removeSharedPlan: (id) =>
+        // read-only shared plans can never be the active plan (switchPlan
+        // refuses them), so there's no activeId fallback to handle here
+        set((state) => {
+          if (!state.plans[id]?.readOnly) return state;
+          const next = { ...state.plans };
+          delete next[id];
+          return { plans: next, compareIds: state.compareIds.filter((cid) => cid !== id) };
+        }),
     }),
     {
       name: "activePlan",
