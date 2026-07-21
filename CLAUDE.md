@@ -23,7 +23,7 @@ Rebuild `reference-v1-app.html` (a working 187KB single-file app — the source 
 ## Phase roadmap (build strictly in order — app must be usable after each phase)
 
 - [x] **Phase 0 — Port.** Reproduce v1 feature-for-feature in Next.js/TS with real components. Trip data → typed data module. State in localStorage (same as v1) plus JSON import so his existing plans carry over. Deploy to Vercel. *(Done — live at trip-planner-v2-gamma.vercel.app.)*
-- [ ] **Phase 1 — Accounts.** Supabase email/Google auth. Plans move from localStorage to Postgres (keep localStorage as offline cache). Anonymous visitors can still play; signing up keeps their work.
+- [x] **Phase 1 — Accounts.** Supabase email/Google auth. Plans move from localStorage to Postgres (keep localStorage as offline cache). Anonymous visitors can still play; signing up keeps their work. *(Done — merged and verified live on trip-planner-v2-gamma.vercel.app; both email magic link and Google sign-in confirmed working.)*
 - [ ] **Phase 2 — Sharing.** Share a plan via link (read-only or collaborate). Friend plans appear in Compare. Per-trip votes/comments. Friends at other schools can set their own home city + semester dates (editable slots — v1 hard-codes AAU's).
 - [ ] **Phase 3 — Live prices.** Amadeus flight-offers lookup per leg, cached server-side (respect free-tier rate limits). Live price shown next to the estimate with a "last checked" stamp; estimates remain the fallback everywhere. Lodging has no good free API — keep tier estimates + deep links with dates.
 - [ ] **Phase 4 — PWA.** Installable on phone; itinerary, calendar, and booked actuals work offline; syncs when back online. He'll be using this on trains in Europe.
@@ -74,9 +74,11 @@ Note: this project's Next.js version has breaking changes vs. older Next.js — 
 
 Testing note: Playwright's fullPage screenshots produce misleading artifacts around `position: sticky`/`fixed` elements (duplicated headers, apparently "blank" content underneath) — not real bugs. Verify with a viewport-only screenshot or direct DOM inspection before trusting what a fullPage screenshot seems to show.
 
-## Phase 1 — in progress (PR open, not yet merged/deployed)
+## Phase 1 — complete
 
-Built on branch `worktree-phase1-accounts`: Supabase client/server utilities (`src/lib/supabase/`), a custom-styled `/login` page (email magic link + Google OAuth), `src/app/auth/callback/route.ts`, an `AuthSync` client component that auto-merges local plans into the account on first sign-in and then keeps Postgres in sync (write-through, debounced), and a new `plans` table with RLS (`supabase/migrations/0001_plans.sql`).
+Built on branch `worktree-phase1-accounts` (merged via PR #1): Supabase client/server utilities (`src/lib/supabase/`), a custom-styled `/login` page (email magic link + Google OAuth), `src/app/auth/callback/route.ts`, an `AuthSync` client component that auto-merges local plans into the account on first sign-in and then keeps Postgres in sync (write-through, debounced), and a new `plans` table with RLS (`supabase/migrations/0001_plans.sql`).
+
+**Gotcha hit during setup, worth knowing for Phase 2/3**: Supabase's **Authentication → URL Configuration → Site URL** defaults to `http://localhost:3000` and silently overrides any `redirectTo`/`emailRedirectTo` passed from the client if the target URL isn't in the **Redirect URLs** allow-list — sign-in "worked" (no error) but bounced back to localhost instead of the live site. Fixed by setting Site URL to `https://trip-planner-v2-gamma.vercel.app` and adding `https://trip-planner-v2-gamma.vercel.app/auth/callback` to the allow-list. Any new deploy domain (custom domain, etc.) will need the same treatment.
 
 Decisions made this session:
 - **Passwordless email auth** (magic link via `signInWithOtp`), not password-based — simpler UX, no forgot-password flow to build. Google OAuth alongside it.
@@ -86,10 +88,4 @@ Decisions made this session:
 
 **Confirmed via `node_modules/next/dist/docs`**: this Next.js version (16.2.10) renamed the `middleware.ts` file convention to `proxy.ts` (function name `proxy`, not `middleware`) — don't write a `middleware.ts` file, it won't run. Session-cookie refresh logic lives in `src/proxy.ts` / `src/lib/supabase/proxy.ts`.
 
-**Manual steps before this is live** (none of these can be done from the CLI):
-1. Run `supabase/migrations/0001_plans.sql` in the Supabase dashboard's SQL Editor.
-2. Enable Google as an auth provider in Supabase (Authentication → Providers → Google), which requires creating a Google OAuth Client ID/Secret in Google Cloud Console first.
-3. Add the two env vars above to the Vercel project settings.
-4. Merge the PR, verify the Vercel build, then smoke-test sign-in end to end.
-
-Next: finish Phase 1 manual setup + merge, then Phase 2 (sharing).
+Next: Phase 2 (sharing) — see roadmap above.
