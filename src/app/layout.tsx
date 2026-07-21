@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Header from "@/components/Header";
 import AuthSync from "@/components/AuthSync";
+import CustomTripsSync from "@/components/CustomTripsSync";
 import RegisterServiceWorker from "@/components/RegisterServiceWorker";
 import InstallPrompt from "@/components/InstallPrompt";
 import "./globals.css";
@@ -43,6 +44,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col bg-zinc-950 text-zinc-100">
         <RegisterServiceWorker />
         <AuthSync />
+        <CustomTripsSync />
         <Header />
         <InstallPrompt />
         <main className="flex flex-1 flex-col">{children}</main>

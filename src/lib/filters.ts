@@ -81,12 +81,12 @@ export interface FilterGroup {
   opts: FilterOption[];
 }
 
-export function buildFilterGroups(): FilterGroup[] {
+export function buildFilterGroups(trips: Trip[] = TRIPS): FilterGroup[] {
   return [
     {
       key: "region",
       label: "Region",
-      opts: [...new Set(TRIPS.map((t) => t.reg))].sort().map((r) => ({ val: r, label: r })),
+      opts: [...new Set(trips.map((t) => t.reg))].sort().map((r) => ({ val: r, label: r })),
     },
     {
       key: "time",
@@ -150,12 +150,12 @@ export function buildFilterGroups(): FilterGroup[] {
     {
       key: "cat",
       label: "Activity type",
-      opts: [...new Set(TRIPS.flatMap((t) => t.cats))].sort().map((c) => ({ val: c, label: c })),
+      opts: [...new Set(trips.flatMap((t) => t.cats))].sort().map((c) => ({ val: c, label: c })),
     },
     {
       key: "country",
       label: "Country",
-      opts: [...new Set(TRIPS.map((t) => t.c))].sort().map((c) => ({ val: c, label: c })),
+      opts: [...new Set(trips.map((t) => t.c))].sort().map((c) => ({ val: c, label: c })),
     },
   ];
 }
