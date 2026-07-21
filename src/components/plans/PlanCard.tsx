@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Plan } from "@/lib/store/plan";
 import { planGrandTotals } from "@/lib/planTotals";
+import { exportPlanXlsx } from "@/lib/excel";
 
 const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
 
@@ -29,8 +30,20 @@ export default function PlanCard({
 }) {
   const [renaming, setRenaming] = useState(false);
   const [nameInput, setNameInput] = useState(plan.name);
+  const [buildingXlsx, setBuildingXlsx] = useState(false);
   const g = planGrandTotals(plan);
   const overBudget = plan.budget !== null && g.total > plan.budget;
+
+  const handleExportXlsx = async () => {
+    setBuildingXlsx(true);
+    try {
+      await exportPlanXlsx(plan);
+    } catch {
+      alert("Something went wrong building the Excel file. Try again in a moment.");
+    } finally {
+      setBuildingXlsx(false);
+    }
+  };
 
   return (
     <div
@@ -116,6 +129,14 @@ export default function PlanCard({
           className="rounded-md border border-zinc-700 px-2.5 py-1 text-[11.5px] font-semibold text-zinc-300 hover:border-zinc-500"
         >
           Share .json
+        </button>
+        <button
+          type="button"
+          onClick={handleExportXlsx}
+          disabled={buildingXlsx}
+          className="rounded-md border border-zinc-700 px-2.5 py-1 text-[11.5px] font-semibold text-zinc-300 hover:border-zinc-500 disabled:opacity-50"
+        >
+          {buildingXlsx ? "Building…" : "📊 Excel"}
         </button>
         <button
           type="button"
