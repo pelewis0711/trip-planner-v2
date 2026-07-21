@@ -24,6 +24,7 @@ export default function CatalogPage() {
   const { home } = useActivePlan();
   const [filters, setFilters] = useState(emptyFilters());
   const [query, setQuery] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
 
   const homeCoord = HOMES[home] || HOMES.Prague;
   const ctx = useMemo(() => makeCtx(home), [home]);
@@ -68,20 +69,31 @@ export default function CatalogPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="🔎 Search city, country, or region…"
-          className="min-w-[220px] flex-1 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600"
+          className="w-full min-w-[220px] flex-1 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 sm:w-auto"
         />
         <button
           type="button"
-          onClick={clearAll}
-          className="rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-zinc-400 hover:border-emerald-500/50 hover:text-zinc-100"
+          onClick={() => setShowFilters((s) => !s)}
+          className="rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:border-emerald-500/50"
         >
-          Clear all filters{activeCount ? ` (${activeCount})` : ""}
+          ⚙ Filters {activeCount ? `(${activeCount})` : ""} {showFilters ? "▲" : "▼"}
         </button>
+        {activeCount > 0 && (
+          <button
+            type="button"
+            onClick={clearAll}
+            className="rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-zinc-400 hover:border-emerald-500/50 hover:text-zinc-100"
+          >
+            Clear all
+          </button>
+        )}
       </div>
 
-      <div className="mt-3">
-        <FilterPanel groups={GROUPS} filters={filters} onToggle={toggle} />
-      </div>
+      {showFilters && (
+        <div className="mt-3">
+          <FilterPanel groups={GROUPS} filters={filters} onToggle={toggle} />
+        </div>
+      )}
 
       {visible.length === 0 ? (
         <div className="mt-8 rounded-xl border border-dashed border-zinc-800 p-10 text-center text-zinc-500">

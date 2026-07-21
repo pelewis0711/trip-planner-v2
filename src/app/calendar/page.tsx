@@ -19,6 +19,15 @@ export default function CalendarPage() {
   const [view, setView] = useState<"weekend" | "month">("weekend");
   const [armedId, setArmedId] = useState<string | null>(null);
   const [editingSlotId, setEditingSlotId] = useState<string | null>(null);
+  const [trayOpen, setTrayOpen] = useState(false);
+
+  const handleArm = (tripId: string) => {
+    setArmedId((cur) => {
+      const next = cur === tripId ? null : tripId;
+      if (next) setTrayOpen(false); // just armed something — collapse the tray on mobile so the slots are visible
+      return next;
+    });
+  };
 
   const ctx = useMemo(() => makeCtx(home, bag), [home, bag]);
 
@@ -65,8 +74,19 @@ export default function CalendarPage() {
         </div>
       )}
 
+      <button
+        type="button"
+        onClick={() => setTrayOpen((o) => !o)}
+        className="mt-4 flex w-full items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm font-semibold text-zinc-200 lg:hidden"
+      >
+        <span>🧳 {trayOpen ? "Hide trip list" : "Browse trips to add"}</span>
+        <span className="text-zinc-500">{trayOpen ? "▲" : "▼"}</span>
+      </button>
+
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[280px_1fr]">
-        <TripTray home={home} armedId={armedId} onArm={(id) => setArmedId((cur) => (cur === id ? null : id))} onDragStart={() => {}} />
+        <div className={`${trayOpen ? "block" : "hidden"} lg:block`}>
+          <TripTray home={home} armedId={armedId} onArm={handleArm} onDragStart={() => {}} />
+        </div>
 
         <div>
           <div className="flex flex-wrap items-center gap-2">

@@ -22,7 +22,9 @@ function Row({
 
   return (
     <tr className="border-b border-zinc-800/60">
-      <td className="sticky left-0 bg-zinc-900 px-3 py-2 text-left text-zinc-400">{label}</td>
+      <td className="sticky left-0 w-[96px] shrink-0 bg-zinc-900 px-2.5 py-2 text-left text-zinc-400 sm:w-auto sm:px-3">
+        {label}
+      </td>
       {values.map((v, i) => {
         const cls =
           valid.length > 1 && v === best
@@ -31,7 +33,7 @@ function Row({
               ? "text-rose-400"
               : "text-zinc-300";
         return (
-          <td key={i} className={`px-3 py-2 text-right ${cls}`}>
+          <td key={i} className={`min-w-[92px] px-2.5 py-2 text-right sm:px-3 ${cls}`}>
             {Number.isNaN(v) ? "—" : fmt(v)}
           </td>
         );
@@ -76,12 +78,14 @@ export default function CompareTable({
         Side-by-side comparison{" "}
         <span className="text-xs font-normal text-zinc-500">— green = lowest, red = highest</span>
       </h3>
-      <table className="w-full min-w-[560px] border-collapse text-xs">
+      <table className="w-full min-w-[420px] border-collapse text-xs">
         <thead>
           <tr className="border-b-2 border-zinc-800">
-            <th className="sticky left-0 bg-zinc-900 px-3 py-2 text-left text-sm text-zinc-200">Plan</th>
+            <th className="sticky left-0 w-[96px] shrink-0 bg-zinc-900 px-2.5 py-2 text-left text-sm text-zinc-200 sm:w-auto sm:px-3">
+              Plan
+            </th>
             {chosen.map((p) => (
-              <th key={p.id} className="px-3 py-2 text-right text-sm text-zinc-200">
+              <th key={p.id} className="min-w-[92px] px-2.5 py-2 text-right text-sm text-zinc-200 sm:px-3">
                 {p.name}
                 {p.id === activeId && (
                   <span className="ml-1.5 rounded-full bg-emerald-500 px-1.5 py-0.5 text-[10px] font-bold text-zinc-950">
@@ -99,9 +103,11 @@ export default function CompareTable({
             </td>
           </tr>
           <tr className="border-b border-zinc-800/60">
-            <td className="sticky left-0 bg-zinc-900 px-3 py-2 text-left text-zinc-400">Home base</td>
+            <td className="sticky left-0 w-[96px] shrink-0 bg-zinc-900 px-2.5 py-2 text-left text-zinc-400 sm:w-auto sm:px-3">
+              Home base
+            </td>
             {chosen.map((p) => (
-              <td key={p.id} className="px-3 py-2 text-right text-zinc-300">
+              <td key={p.id} className="min-w-[92px] px-2.5 py-2 text-right text-zinc-300 sm:px-3">
                 {p.home}
               </td>
             ))}
@@ -134,11 +140,11 @@ export default function CompareTable({
           {slotRows.length ? (
             slotRows.map(({ slot, cells }) => (
               <tr key={slot.id} className="border-b border-zinc-800/60">
-                <td className="sticky left-0 bg-zinc-900 px-3 py-2 text-left text-zinc-400">
+                <td className="sticky left-0 w-[96px] shrink-0 bg-zinc-900 px-2.5 py-2 text-left text-zinc-400 sm:w-auto sm:px-3">
                   {slot.label} <span className="text-zinc-600">{slot.date}</span>
                 </td>
                 {cells.map((c, i) => (
-                  <td key={i} className="px-3 py-2 text-left text-[11px] whitespace-normal text-zinc-300">
+                  <td key={i} className="min-w-[92px] px-2.5 py-2 text-left text-[11px] whitespace-normal text-zinc-300 sm:px-3">
                     {c ?? <span className="text-zinc-600">—</span>}
                   </td>
                 ))}
