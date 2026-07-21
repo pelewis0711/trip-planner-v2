@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { TRIPS } from "@/data/trips";
 import { HOMES } from "@/data/homes";
 import { useActivePlan } from "@/lib/store/plan";
+import { useCustomTripsStore } from "@/lib/store/customTrips";
 import {
   activeFilterCount,
   buildFilterGroups,
@@ -15,19 +16,28 @@ import { tripBaseTotal } from "@/lib/calc/costs";
 import { makeCtx } from "@/lib/calc/context";
 import FilterPanel from "@/components/FilterPanel";
 import TripCard from "@/components/TripCard";
-
-const GROUPS = buildFilterGroups();
-const TRIP_BY_ID = new Map(TRIPS.map((t) => [t.id, t]));
-const coordsOf = (id: string) => TRIP_BY_ID.get(id)?.co;
+import DiscoverPanel from "@/components/discover/DiscoverPanel";
 
 export default function CatalogPage() {
   const { home } = useActivePlan();
+  const customTrips = useCustomTripsStore((s) => s.trips);
   const [filters, setFilters] = useState(emptyFilters());
   const [query, setQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [showDiscover, setShowDiscover] = useState(false);
 
   const homeCoord = HOMES[home] || HOMES.Prague;
-  const ctx = useMemo(() => makeCtx(home), [home]);
+  // makeCtx reads custom trips from the store internally (not as an arg),
+  // so this dep is what tells the memo to recompute when they change
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const ctx = useMemo(() => makeCtx(home), [home, customTrips]);
+  const allTrips = useMemo(
+    () => (Object.keys(customTrips).length ? [...TRIPS, ...Object.values(customTrips)] : TRIPS),
+    [customTrips]
+  );
+  const tripById = useMemo(() => new Map(allTrips.map((t) => [t.id, t])), [allTrips]);
+  const coordsOf = (id: string) => tripById.get(id)?.co;
+  const groups = useMemo(() => buildFilterGroups(allTrips), [allTrips]);
 
   const toggle = (key: FilterKey, val: string) => {
     setFilters((prev) => {
@@ -44,9 +54,9 @@ export default function CatalogPage() {
   };
 
   const visible = useMemo(
-    () => TRIPS.filter((t) => tripMatches(t, filters, query, homeCoord, coordsOf)),
+    () => allTrips.filter((t) => tripMatches(t, filters, query, homeCoord, coordsOf)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [filters, query, home]
+    [allTrips, filters, query, home]
   );
 
   const activeCount = activeFilterCount(filters, query);
@@ -55,7 +65,7 @@ export default function CatalogPage() {
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5">
         <h2 className="text-xl font-semibold text-zinc-50">
-          Trip Catalog <span className="text-sm font-normal text-zinc-500">— {visible.length} of {TRIPS.length} options</span>
+          Trip Catalog <span className="text-sm font-normal text-zinc-500">— {visible.length} of {allTrips.length} options</span>
         </h2>
         <p className="mt-1 text-sm text-zinc-400">
           Prices are per person, round-trip from {home}, mid-range estimates. Head to{" "}
@@ -87,11 +97,24 @@ export default function CatalogPage() {
             Clear all
           </button>
         )}
+        <button
+          type="button"
+          onClick={() => setShowDiscover((s) => !s)}
+          className="ml-auto rounded-full border border-emerald-500/50 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/20"
+        >
+          ✨ Discover more trips {showDiscover ? "▲" : "▼"}
+        </button>
       </div>
+
+      {showDiscover && (
+        <div className="mt-3">
+          <DiscoverPanel filters={filters} query={query} onClose={() => setShowDiscover(false)} />
+        </div>
+      )}
 
       {showFilters && (
         <div className="mt-3">
-          <FilterPanel groups={GROUPS} filters={filters} onToggle={toggle} />
+          <FilterPanel groups={groups} filters={filters} onToggle={toggle} />
         </div>
       )}
 

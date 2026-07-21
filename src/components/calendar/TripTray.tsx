@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { TRIPS } from "@/data/trips";
 import { HOMES } from "@/data/homes";
+import { useCustomTripsStore } from "@/lib/store/customTrips";
 import {
   activeFilterCount,
   buildFilterGroups,
@@ -11,10 +12,6 @@ import {
   type FilterKey,
 } from "@/lib/filters";
 import FilterPanel from "@/components/FilterPanel";
-
-const GROUPS = buildFilterGroups();
-const TRIP_BY_ID = new Map(TRIPS.map((t) => [t.id, t]));
-const coordsOf = (id: string) => TRIP_BY_ID.get(id)?.co;
 
 export default function TripTray({
   home,
@@ -27,11 +24,19 @@ export default function TripTray({
   onArm: (tripId: string) => void;
   onDragStart: (tripId: string) => void;
 }) {
+  const customTrips = useCustomTripsStore((s) => s.trips);
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState(emptyFilters());
   const [showFilters, setShowFilters] = useState(false);
 
   const homeCoord = HOMES[home] || HOMES.Prague;
+  const allTrips = useMemo(
+    () => (Object.keys(customTrips).length ? [...TRIPS, ...Object.values(customTrips)] : TRIPS),
+    [customTrips]
+  );
+  const tripById = useMemo(() => new Map(allTrips.map((t) => [t.id, t])), [allTrips]);
+  const coordsOf = (id: string) => tripById.get(id)?.co;
+  const groups = useMemo(() => buildFilterGroups(allTrips), [allTrips]);
 
   const toggle = (key: FilterKey, val: string) => {
     setFilters((prev) => {
@@ -43,9 +48,9 @@ export default function TripTray({
   };
 
   const visible = useMemo(
-    () => TRIPS.filter((t) => tripMatches(t, filters, query, homeCoord, coordsOf)),
+    () => allTrips.filter((t) => tripMatches(t, filters, query, homeCoord, coordsOf)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [filters, query, home]
+    [allTrips, filters, query, home]
   );
 
   const activeCount = activeFilterCount(filters, query);
@@ -71,7 +76,7 @@ export default function TripTray({
       </button>
       {showFilters && (
         <div className="mt-2">
-          <FilterPanel groups={GROUPS} filters={filters} onToggle={toggle} compact />
+          <FilterPanel groups={groups} filters={filters} onToggle={toggle} compact />
         </div>
       )}
 
