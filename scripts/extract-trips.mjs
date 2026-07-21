@@ -17,7 +17,6 @@ function extractValue(startMarker, endMarker, prefixToStrip) {
   let slice = html.slice(startIdx, endIdx);
   slice = slice.slice(prefixToStrip.length).trim();
   if (slice.endsWith(";")) slice = slice.slice(0, -1).trim();
-  // eslint-disable-next-line no-new-func
   return new Function(`"use strict"; return (${slice});`)();
 }
 

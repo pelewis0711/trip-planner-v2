@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import { legEstimate } from "../routing";
 import { pricedLegs } from "../pricing";
 import { schengenDays } from "../schengen";
-import { makeCtx } from "../context";
 import type { Placements, Stop } from "../types";
 import { HOMES } from "@/data/homes";
 import { TRIPS } from "@/data/trips";
@@ -28,7 +27,6 @@ describe("routing", () => {
 
 describe("seasonal pricing", () => {
   it("applies the St. Patrick's x2.2 Dublin multiplier", () => {
-    const ctx = makeCtx("Prague", "none");
     const leg = { from: "Prague", to: dublin.n, ...legEstimate(HOMES.Prague, dublin.co), kind: "out" as const };
     const [priced] = pricedLegs("sSP", [leg], "none", TRIPS);
     expect(leg.cost).toBe(76);
