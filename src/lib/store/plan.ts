@@ -50,6 +50,8 @@ interface PlanStoreState {
   plans: Record<string, Plan>;
   activeId: string;
   compareIds: string[];
+  // signed-in user id, set by AuthSync — not persisted to localStorage
+  userId: string | null;
 
   // mutate the ACTIVE plan
   addStop: (slotId: string, tripId: string) => void;
@@ -75,6 +77,12 @@ interface PlanStoreState {
   toggleCompare: (id: string) => void;
   compareAll: () => void;
   clearCompare: () => void;
+
+  // account sync
+  setUserId: (userId: string | null) => void;
+  // last-write-wins merge of Supabase rows into local plans; returns ids of
+  // local plans that came out newer/missing on the remote side (need upload)
+  mergeRemote: (remotePlans: Plan[]) => string[];
 }
 
 function withStop(
@@ -114,6 +122,7 @@ export const usePlanStore = create<PlanStoreState>()(
       plans: { [DEFAULT_ID]: DEFAULT_PLAN },
       activeId: DEFAULT_ID,
       compareIds: [],
+      userId: null,
 
       addStop: (slotId, tripId) =>
         set((state) =>
@@ -318,10 +327,36 @@ export const usePlanStore = create<PlanStoreState>()(
         })),
       compareAll: () => set((state) => ({ compareIds: Object.keys(state.plans) })),
       clearCompare: () => set({ compareIds: [] }),
+
+      setUserId: (userId) => set({ userId }),
+
+      mergeRemote: (remotePlans) => {
+        set((state) => {
+          const plans = { ...state.plans };
+          remotePlans.forEach((rp) => {
+            const local = plans[rp.id];
+            if (!local || rp.updated > local.updated) plans[rp.id] = rp;
+          });
+          return { plans };
+        });
+
+        const remoteById = new Map(remotePlans.map((p) => [p.id, p]));
+        return Object.values(get().plans)
+          .filter((p) => {
+            const remote = remoteById.get(p.id);
+            return !remote || p.updated > remote.updated;
+          })
+          .map((p) => p.id);
+      },
     }),
     {
       name: "activePlan",
       version: 1,
+      partialize: (state) => ({
+        plans: state.plans,
+        activeId: state.activeId,
+        compareIds: state.compareIds,
+      }),
       migrate: (persisted, version) => {
         const state = (persisted ?? {}) as Record<string, unknown>;
         if (version >= 1 && state.plans) return state as unknown as PlanStoreState;

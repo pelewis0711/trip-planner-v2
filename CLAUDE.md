@@ -74,4 +74,22 @@ Note: this project's Next.js version has breaking changes vs. older Next.js — 
 
 Testing note: Playwright's fullPage screenshots produce misleading artifacts around `position: sticky`/`fixed` elements (duplicated headers, apparently "blank" content underneath) — not real bugs. Verify with a viewport-only screenshot or direct DOM inspection before trusting what a fullPage screenshot seems to show.
 
-Next: Phase 1 (Supabase accounts, plans move to Postgres) — see roadmap above.
+## Phase 1 — in progress (PR open, not yet merged/deployed)
+
+Built on branch `worktree-phase1-accounts`: Supabase client/server utilities (`src/lib/supabase/`), a custom-styled `/login` page (email magic link + Google OAuth), `src/app/auth/callback/route.ts`, an `AuthSync` client component that auto-merges local plans into the account on first sign-in and then keeps Postgres in sync (write-through, debounced), and a new `plans` table with RLS (`supabase/migrations/0001_plans.sql`).
+
+Decisions made this session:
+- **Passwordless email auth** (magic link via `signInWithOtp`), not password-based — simpler UX, no forgot-password flow to build. Google OAuth alongside it.
+- **Auto-merge on sign-in** (not a confirmation prompt): the moment someone signs in, their local plans are merged into their account automatically, last-write-wins by each plan's `updated` timestamp.
+- **localStorage stays authoritative for anonymous use** — Postgres is a sync target, not a replacement. `activeId`/`compareIds` (per-device UI state) are NOT synced, only `plans` (home/bag/budget/placements) are.
+- Supabase project: `ngrwkofyvaspcweptbyp`. Anon key lives in `.env.local` (gitignored) — same two vars need adding to Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+
+**Confirmed via `node_modules/next/dist/docs`**: this Next.js version (16.2.10) renamed the `middleware.ts` file convention to `proxy.ts` (function name `proxy`, not `middleware`) — don't write a `middleware.ts` file, it won't run. Session-cookie refresh logic lives in `src/proxy.ts` / `src/lib/supabase/proxy.ts`.
+
+**Manual steps before this is live** (none of these can be done from the CLI):
+1. Run `supabase/migrations/0001_plans.sql` in the Supabase dashboard's SQL Editor.
+2. Enable Google as an auth provider in Supabase (Authentication → Providers → Google), which requires creating a Google OAuth Client ID/Secret in Google Cloud Console first.
+3. Add the two env vars above to the Vercel project settings.
+4. Merge the PR, verify the Vercel build, then smoke-test sign-in end to end.
+
+Next: finish Phase 1 manual setup + merge, then Phase 2 (sharing).

@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useActivePlan, usePlanStore } from "@/lib/store/plan";
+import { useAuthStore } from "@/lib/store/auth";
+import { createClient } from "@/lib/supabase/client";
 import { HOMES } from "@/data/homes";
 import { makeCtx } from "@/lib/calc/context";
 import { grandTotals } from "@/lib/calc/costs";
@@ -17,11 +19,40 @@ const NAV = [
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const { id, home, bag, placements } = useActivePlan();
   const setHome = usePlanStore((s) => s.setHome);
   const switchPlan = usePlanStore((s) => s.switchPlan);
   const plans = usePlanStore((s) => s.plans);
+  const user = useAuthStore((s) => s.user);
+  const authLoading = useAuthStore((s) => s.loading);
   const total = grandTotals(placements, makeCtx(home, bag)).total;
+
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.refresh();
+  }
+
+  const authControl = authLoading ? null : user ? (
+    <div className="flex shrink-0 items-center gap-2 text-xs">
+      <span className="hidden max-w-[140px] truncate text-zinc-400 sm:inline">{user.email}</span>
+      <button
+        type="button"
+        onClick={handleSignOut}
+        className="rounded-lg border border-zinc-800 px-2.5 py-1.5 font-medium text-zinc-400 transition-colors hover:border-red-500/50 hover:text-red-300"
+      >
+        Sign out
+      </button>
+    </div>
+  ) : (
+    <Link
+      href="/login"
+      className="shrink-0 rounded-lg border border-zinc-800 px-2.5 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:border-emerald-500/50 hover:text-zinc-100"
+    >
+      Sign in
+    </Link>
+  );
 
   const planIds = Object.keys(plans).sort((a, b) => plans[b].updated - plans[a].updated);
   const totalPill = (
@@ -94,6 +125,7 @@ export default function Header() {
           })}
         </nav>
 
+        {authControl}
         <div className="hidden sm:block">{totalPill}</div>
       </div>
     </header>
