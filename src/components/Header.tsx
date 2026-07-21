@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useHomeStore } from "@/lib/store/home";
+import { usePlanStore } from "@/lib/store/plan";
 import { HOMES } from "@/data/homes";
+import { makeCtx } from "@/lib/calc/context";
+import { grandTotals } from "@/lib/calc/costs";
 
 const NAV = [
   { href: "/", label: "Overview" },
@@ -17,6 +20,9 @@ export default function Header() {
   const pathname = usePathname();
   const home = useHomeStore((s) => s.home);
   const setHome = useHomeStore((s) => s.setHome);
+  const placements = usePlanStore((s) => s.placements);
+  const bag = usePlanStore((s) => s.bag);
+  const total = grandTotals(placements, makeCtx(home, bag)).total;
 
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur">
@@ -62,6 +68,10 @@ export default function Header() {
             );
           })}
         </nav>
+
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-zinc-300">
+          Total: <span className="text-emerald-400">${Math.round(total).toLocaleString()}</span>
+        </div>
       </div>
     </header>
   );

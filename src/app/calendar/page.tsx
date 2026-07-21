@@ -1,5 +1,151 @@
-import ComingSoon from "@/components/ComingSoon";
+"use client";
+
+import { useMemo, useState } from "react";
+import { SLOTS } from "@/data/slots";
+import { useHomeStore } from "@/lib/store/home";
+import { usePlanStore } from "@/lib/store/plan";
+import { makeCtx } from "@/lib/calc/context";
+import { schengenDays, schengenStatus } from "@/lib/calc/schengen";
+import TripTray from "@/components/calendar/TripTray";
+import SlotCard from "@/components/calendar/SlotCard";
+import MonthGrid from "@/components/calendar/MonthGrid";
+import EditModal from "@/components/calendar/EditModal";
 
 export default function CalendarPage() {
-  return <ComingSoon title="My Calendar" stage="Stage 4" />;
+  const home = useHomeStore((s) => s.home);
+  const bag = usePlanStore((s) => s.bag);
+  const placements = usePlanStore((s) => s.placements);
+  const addStop = usePlanStore((s) => s.addStop);
+  const removeStop = usePlanStore((s) => s.removeStop);
+  const clearAll = usePlanStore((s) => s.clearAll);
+
+  const [view, setView] = useState<"weekend" | "month">("weekend");
+  const [armedId, setArmedId] = useState<string | null>(null);
+  const [editingSlotId, setEditingSlotId] = useState<string | null>(null);
+
+  const ctx = useMemo(() => makeCtx(home, bag), [home, bag]);
+
+  const filledCount = Object.keys(placements).length;
+  const schD = schengenDays(placements, home, ctx.tripOf);
+  const schStatus = schengenStatus(schD);
+
+  const activate = (slotId: string) => {
+    if (armedId) {
+      addStop(slotId, armedId);
+      setArmedId(null);
+    } else if (placements[slotId]?.stops.length) {
+      setEditingSlotId(slotId);
+    }
+  };
+
+  const dropTrip = (slotId: string, tripId: string) => {
+    addStop(slotId, tripId);
+    setArmedId(null);
+  };
+
+  const editingSlot = editingSlotId ? SLOTS.find((s) => s.id === editingSlotId) : undefined;
+
+  return (
+    <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6">
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5">
+        <h2 className="text-xl font-semibold text-zinc-50">My Calendar</h2>
+        <p className="mt-1 text-sm text-zinc-400">
+          Tap a trip in the tray then tap a slot, or drag it onto one. Drop several trips on one slot
+          for multi-city stretches like spring break — travel routes automatically from {home}.
+        </p>
+      </div>
+
+      {armedId && (
+        <div className="mt-3 flex items-center gap-3 rounded-xl border border-emerald-500 bg-emerald-500/10 px-4 py-2.5 text-sm font-medium text-emerald-300">
+          <span>✓ {ctx.tripOf(armedId)?.n} armed — tap a slot to add it</span>
+          <button
+            type="button"
+            onClick={() => setArmedId(null)}
+            className="ml-auto rounded-md border border-emerald-500/60 px-2.5 py-1 text-xs font-semibold"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[280px_1fr]">
+        <TripTray home={home} armedId={armedId} onArm={(id) => setArmedId((cur) => (cur === id ? null : id))} onDragStart={() => {}} />
+
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex overflow-hidden rounded-lg border border-zinc-800">
+              {(["weekend", "month"] as const).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setView(v)}
+                  className={`px-4 py-2 text-xs font-semibold ${
+                    view === v ? "bg-emerald-500 text-zinc-950" : "bg-zinc-900 text-zinc-400"
+                  }`}
+                >
+                  {v === "weekend" ? "Weekend list" : "Month calendar"}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => filledCount && confirm("Clear all placed trips?") && clearAll()}
+              className="rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-zinc-400 hover:border-rose-500/50 hover:text-rose-300"
+            >
+              Clear all
+            </button>
+            <span className="text-xs text-zinc-500">
+              {filledCount ? `${filledCount} of ${SLOTS.length} slots filled` : "all slots empty — tap or drag to begin"}
+              {filledCount > 0 && (
+                <>
+                  {" · "}
+                  <span
+                    className={
+                      schStatus === "red"
+                        ? "font-bold text-rose-400"
+                        : schStatus === "amber"
+                          ? "font-semibold text-amber-400"
+                          : ""
+                    }
+                  >
+                    🛂 {schD}/90 Schengen days
+                  </span>
+                </>
+              )}
+            </span>
+          </div>
+
+          <div className="mt-4">
+            {view === "weekend" ? (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                {SLOTS.map((slot) => (
+                  <SlotCard
+                    key={slot.id}
+                    slot={slot}
+                    placement={placements[slot.id]}
+                    ctx={ctx}
+                    armed={!!armedId}
+                    onActivate={() => activate(slot.id)}
+                    onDropTrip={(tripId) => dropTrip(slot.id, tripId)}
+                    onEdit={() => setEditingSlotId(slot.id)}
+                    onRemoveStop={(idx) => removeStop(slot.id, idx)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <MonthGrid
+                slots={SLOTS}
+                placements={placements}
+                armed={!!armedId}
+                onActivate={activate}
+                onDropTrip={dropTrip}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+
+      {editingSlot && <EditModal slot={editingSlot} ctx={ctx} onClose={() => setEditingSlotId(null)} />}
+    </div>
+  );
 }
