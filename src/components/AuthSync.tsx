@@ -8,25 +8,37 @@ import { usePlanStore, type Plan } from "@/lib/store/plan";
 import { fetchProfileEmails } from "@/lib/supabase/profiles";
 import { planToInsertRow, rowToPlan, savePlanData, type PlanRow } from "@/lib/supabase/sharing";
 
+interface SyncResult {
+  succeeded: string[];
+  failed: string[];
+}
+
 /** Inserts brand-new plans (never synced -- no ownerId yet) and pushes
  * content edits for already-synced plans through update_plan_data (so
  * owner-or-collaborator RLS applies correctly and last_edited_by/at get
  * stamped). Patches each local plan with whatever sharing/edit metadata
- * comes back. Shared by the initial post-sign-in merge and the ongoing
- * write-through sync below. */
-async function syncPlansUp(supabase: SupabaseClient, userId: string, plans: Plan[]) {
+ * comes back. Returns which plan ids made it and which didn't (offline,
+ * etc.) so the caller can queue failures for a later retry. Shared by the
+ * initial post-sign-in merge, the ongoing write-through sync, and the
+ * offline-queue flush below. */
+async function syncPlansUp(supabase: SupabaseClient, userId: string, plans: Plan[]): Promise<SyncResult> {
   const brandNew = plans.filter((p) => !p.ownerId);
   const existing = plans.filter((p) => p.ownerId);
+  const succeeded: string[] = [];
+  const failed: string[] = [];
 
   if (brandNew.length) {
     const { data, error } = await supabase
       .from("plans")
       .insert(brandNew.map((p) => planToInsertRow(userId, p)))
       .select();
-    if (error) console.error("Failed to create plan(s) in Supabase", error);
-    else if (data) {
+    if (error) {
+      console.error("Failed to create plan(s) in Supabase", error);
+      failed.push(...brandNew.map((p) => p.id));
+    } else if (data) {
       const rows = data as PlanRow[];
       const emails = await fetchProfileEmails(supabase, rows.map((r) => r.user_id));
+      const returnedIds = new Set<string>();
       rows.forEach((row) => {
         const p = rowToPlan(row, emails);
         usePlanStore.getState().patchPlan(row.id, {
@@ -35,6 +47,11 @@ async function syncPlansUp(supabase: SupabaseClient, userId: string, plans: Plan
           shareCollabToken: p.shareCollabToken,
           collaboratorIds: p.collaboratorIds,
         });
+        returnedIds.add(row.id);
+        succeeded.push(row.id);
+      });
+      brandNew.forEach((p) => {
+        if (!returnedIds.has(p.id)) failed.push(p.id);
       });
     }
   }
@@ -55,15 +72,39 @@ async function syncPlansUp(supabase: SupabaseClient, userId: string, plans: Plan
           lastEditedBy: updated.lastEditedBy,
           lastEditedAt: updated.lastEditedAt,
         });
+        succeeded.push(p.id);
+      } else {
+        failed.push(p.id);
       }
     })
   );
+
+  return { succeeded, failed };
+}
+
+/** Retries whatever's still queued in pendingSyncIds (edits made while
+ * offline -- most commonly a booked actual typed in on a train). Plans that
+ * got deleted locally before ever syncing just get dropped from the queue,
+ * nothing to retry. */
+async function flushPendingSync(supabase: SupabaseClient, userId: string) {
+  const ids = usePlanStore.getState().pendingSyncIds;
+  if (!ids.length) return;
+
+  const plans = usePlanStore.getState().plans;
+  const toRetry = ids.map((id) => plans[id]).filter((p): p is Plan => !!p && !p.readOnly);
+  const gone = ids.filter((id) => !plans[id]);
+  if (gone.length) usePlanStore.getState().clearPendingSync(gone);
+  if (!toRetry.length) return;
+
+  const { succeeded } = await syncPlansUp(supabase, userId, toRetry);
+  if (succeeded.length) usePlanStore.getState().clearPendingSync(succeeded);
 }
 
 /** Mounted once in the root layout. Tracks Supabase auth state, merges local
  * plans into the account on sign-in (both plans you own and ones you
- * collaborate on), and keeps Postgres in sync with localStorage (the
- * offline cache / source of truth for anonymous use) afterwards. */
+ * collaborate on), keeps Postgres in sync with localStorage (the offline
+ * cache / source of truth for anonymous use) afterwards, and queues +
+ * retries any edit that fails to sync while offline. */
 export default function AuthSync() {
   const setUser = useAuthStore((s) => s.setUser);
   const mergedRef = useRef(false);
@@ -109,8 +150,12 @@ export default function AuthSync() {
 
       if (toUploadIds.length) {
         const plans = usePlanStore.getState().plans;
-        await syncPlansUp(supabase, userId, toUploadIds.map((id) => plans[id]));
+        const { failed } = await syncPlansUp(supabase, userId, toUploadIds.map((id) => plans[id]));
+        if (failed.length) usePlanStore.getState().markPendingSync(failed);
       }
+
+      // pick up anything that was queued from a previous offline session
+      flushPendingSync(supabase, userId);
     }
 
     supabase.auth.getSession().then(({ data }) => {
@@ -153,7 +198,14 @@ export default function AuthSync() {
         const next = state.plans;
 
         const changed = Object.values(next).filter((p) => prev[p.id] !== p && !p.readOnly);
-        if (changed.length) await syncPlansUp(supabase, userId, changed);
+        if (changed.length) {
+          const { succeeded, failed } = await syncPlansUp(supabase, userId, changed);
+          if (succeeded.length) usePlanStore.getState().clearPendingSync(succeeded);
+          // offline (or any other failure) -- queue for retry rather than
+          // silently dropping the edit; local data is already safe in
+          // localStorage either way
+          if (failed.length) usePlanStore.getState().markPendingSync(failed);
+        }
 
         // only the owner's own deletions propagate -- a collaborator
         // removing their local copy of a shared plan just drops it locally
@@ -169,6 +221,27 @@ export default function AuthSync() {
     return () => {
       unsubscribe();
       if (timer) clearTimeout(timer);
+    };
+  }, []);
+
+  // retry the offline queue on reconnect -- 'online' fires most of the
+  // time, but a periodic fallback covers the cases (common in installed
+  // PWAs) where it doesn't
+  useEffect(() => {
+    const supabase = createClient();
+
+    const tryFlush = () => {
+      const userId = usePlanStore.getState().userId;
+      if (userId && navigator.onLine) flushPendingSync(supabase, userId);
+    };
+
+    window.addEventListener("online", tryFlush);
+    const interval = setInterval(tryFlush, 30_000);
+    tryFlush();
+
+    return () => {
+      window.removeEventListener("online", tryFlush);
+      clearInterval(interval);
     };
   }, []);
 

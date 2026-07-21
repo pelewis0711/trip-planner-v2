@@ -69,6 +69,9 @@ interface PlanStoreState {
   compareIds: string[];
   // signed-in user id, set by AuthSync — not persisted to localStorage
   userId: string | null;
+  // ids of plans with edits that failed to sync (offline) and are waiting
+  // to retry — persisted so a queued edit survives closing the app offline
+  pendingSyncIds: string[];
 
   // mutate the ACTIVE plan
   addStop: (slotId: string, tripId: string) => void;
@@ -110,6 +113,10 @@ interface PlanStoreState {
   // add/refresh a friend's plan pulled in via a share link — always readOnly
   addSharedPlan: (plan: Plan) => void;
   removeSharedPlan: (id: string) => void;
+
+  // offline sync queue
+  markPendingSync: (ids: string[]) => void;
+  clearPendingSync: (ids: string[]) => void;
 }
 
 function withStop(
@@ -150,6 +157,7 @@ export const usePlanStore = create<PlanStoreState>()(
       activeId: DEFAULT_ID,
       compareIds: [],
       userId: null,
+      pendingSyncIds: [],
 
       addStop: (slotId, tripId) =>
         set((state) =>
@@ -417,6 +425,11 @@ export const usePlanStore = create<PlanStoreState>()(
           delete next[id];
           return { plans: next, compareIds: state.compareIds.filter((cid) => cid !== id) };
         }),
+
+      markPendingSync: (ids) =>
+        set((state) => ({ pendingSyncIds: Array.from(new Set([...state.pendingSyncIds, ...ids])) })),
+      clearPendingSync: (ids) =>
+        set((state) => ({ pendingSyncIds: state.pendingSyncIds.filter((id) => !ids.includes(id)) })),
     }),
     {
       name: "activePlan",
@@ -425,6 +438,7 @@ export const usePlanStore = create<PlanStoreState>()(
         plans: state.plans,
         activeId: state.activeId,
         compareIds: state.compareIds,
+        pendingSyncIds: state.pendingSyncIds,
       }),
       migrate: (persisted, version) => {
         const state = (persisted ?? {}) as Record<string, unknown>;
