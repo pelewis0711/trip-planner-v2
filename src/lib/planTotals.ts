@@ -1,7 +1,6 @@
 import type { Plan } from "@/lib/store/plan";
 import { makeCtx } from "@/lib/calc/context";
 import { grandTotals, type GrandTotals } from "@/lib/calc/costs";
-import { SLOTS } from "@/data/slots";
 
 export interface PlanGrandTotals extends GrandTotals {
   nights: number;
@@ -30,5 +29,3 @@ export function planSlotSummary(plan: Plan, slotId: string): string | null {
     })
     .join(" → ");
 }
-
-export const COMPARE_SLOTS = SLOTS;

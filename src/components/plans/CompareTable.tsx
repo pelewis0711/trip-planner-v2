@@ -1,7 +1,8 @@
 "use client";
 
 import type { Plan } from "@/lib/store/plan";
-import { planGrandTotals, planSlotSummary, COMPARE_SLOTS } from "@/lib/planTotals";
+import { planGrandTotals, planSlotSummary } from "@/lib/planTotals";
+import { unionSlots } from "@/lib/calc/semester";
 
 const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
 
@@ -66,11 +67,16 @@ export default function CompareTable({
   const chosen = planIds.map((id) => plans[id]).filter(Boolean);
   const totals = chosen.map(planGrandTotals);
 
-  const slotRows = COMPARE_SLOTS.map((s) => {
+  // plans being compared can have different semesters (a friend's custom
+  // dates vs. the default AAU ones), so slot rows are the union across all
+  // of them rather than one fixed list — for same-semester plans (the usual
+  // case) this is exactly the same rows as before.
+  const compareSlots = unionSlots(chosen);
+  const slotRows = compareSlots.map((s) => {
     const cells = chosen.map((p) => planSlotSummary(p, s.id));
     if (cells.every((c) => !c)) return null;
     return { slot: s, cells };
-  }).filter(Boolean) as { slot: (typeof COMPARE_SLOTS)[number]; cells: (string | null)[] }[];
+  }).filter(Boolean) as { slot: (typeof compareSlots)[number]; cells: (string | null)[] }[];
 
   return (
     <div className="overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">

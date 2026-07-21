@@ -16,16 +16,16 @@ Parker Lewis — junior at University of Illinois Urbana-Champaign (Financial Pl
 
 Rebuild `reference-v1-app.html` (a working 187KB single-file app — the source of truth for all features and formulas) as a modern, hosted, multi-user web app.
 
-**Stack (decided):** Next.js (App Router) + TypeScript + Tailwind, deployed on Vercel free tier. Supabase free tier for Postgres + auth. PWA via service worker. Amadeus Self-Service API (free tier) for live flight prices. Git + GitHub from day one.
+**Stack (decided):** Next.js (App Router) + TypeScript + Tailwind, deployed on Vercel free tier. Supabase free tier for Postgres + auth. PWA via service worker. Travelpayouts/Aviasales Data API (free) for live flight prices — **not** Amadeus, whose self-service program was decommissioned July 17, 2026 before Phase 3 started; see Phase 3 section below. Git + GitHub from day one.
 
 **Never modify or delete `reference-v1-app.html`.** When in doubt about how a feature should behave, open it and read the implementation.
 
 ## Phase roadmap (build strictly in order — app must be usable after each phase)
 
 - [x] **Phase 0 — Port.** Reproduce v1 feature-for-feature in Next.js/TS with real components. Trip data → typed data module. State in localStorage (same as v1) plus JSON import so his existing plans carry over. Deploy to Vercel. *(Done — live at trip-planner-v2-gamma.vercel.app.)*
-- [ ] **Phase 1 — Accounts.** Supabase email/Google auth. Plans move from localStorage to Postgres (keep localStorage as offline cache). Anonymous visitors can still play; signing up keeps their work.
-- [ ] **Phase 2 — Sharing.** Share a plan via link (read-only or collaborate). Friend plans appear in Compare. Per-trip votes/comments. Friends at other schools can set their own home city + semester dates (editable slots — v1 hard-codes AAU's).
-- [ ] **Phase 3 — Live prices.** Amadeus flight-offers lookup per leg, cached server-side (respect free-tier rate limits). Live price shown next to the estimate with a "last checked" stamp; estimates remain the fallback everywhere. Lodging has no good free API — keep tier estimates + deep links with dates.
+- [x] **Phase 1 — Accounts.** Supabase email/Google auth. Plans move from localStorage to Postgres (keep localStorage as offline cache). Anonymous visitors can still play; signing up keeps their work. *(Done — merged and verified live on trip-planner-v2-gamma.vercel.app; both email magic link and Google sign-in confirmed working.)*
+- [x] **Phase 2 — Sharing.** Share a plan via link (read-only or collaborate). Friend plans appear in Compare. Per-trip votes/comments. Friends at other schools can set their own home city + semester dates (editable slots — v1 hard-codes AAU's). *(Built — needs `0002_sharing.sql` run + Vercel deploy before it's live; see Phase 2 section below.)*
+- [x] **Phase 3 — Live prices.** Flight-offers lookup per leg, cached server-side (respect free-tier rate limits). Live price shown next to the estimate with a "last checked" stamp; estimates remain the fallback everywhere. Lodging has no good free API — keep tier estimates + deep links with dates. *(Built — needs `0003_flight_prices.sql` run + `TRAVELPAYOUTS_API_TOKEN` in Vercel + deploy; see Phase 3 section below. Uses Travelpayouts, not Amadeus — see why.)*
 - [ ] **Phase 4 — PWA.** Installable on phone; itinerary, calendar, and booked actuals work offline; syncs when back online. He'll be using this on trains in Europe.
 - [ ] **Phase 5 — Trip discovery.** "Find me more trips" — an API route that uses an LLM to propose trips NOT in the catalog matching his filters/dates/budget, returned in the exact trip schema, human-approved before joining the catalog.
 
@@ -74,9 +74,11 @@ Note: this project's Next.js version has breaking changes vs. older Next.js — 
 
 Testing note: Playwright's fullPage screenshots produce misleading artifacts around `position: sticky`/`fixed` elements (duplicated headers, apparently "blank" content underneath) — not real bugs. Verify with a viewport-only screenshot or direct DOM inspection before trusting what a fullPage screenshot seems to show.
 
-## Phase 1 — in progress (PR open, not yet merged/deployed)
+## Phase 1 — complete
 
-Built on branch `worktree-phase1-accounts`: Supabase client/server utilities (`src/lib/supabase/`), a custom-styled `/login` page (email magic link + Google OAuth), `src/app/auth/callback/route.ts`, an `AuthSync` client component that auto-merges local plans into the account on first sign-in and then keeps Postgres in sync (write-through, debounced), and a new `plans` table with RLS (`supabase/migrations/0001_plans.sql`).
+Built on branch `worktree-phase1-accounts` (merged via PR #1): Supabase client/server utilities (`src/lib/supabase/`), a custom-styled `/login` page (email magic link + Google OAuth), `src/app/auth/callback/route.ts`, an `AuthSync` client component that auto-merges local plans into the account on first sign-in and then keeps Postgres in sync (write-through, debounced), and a new `plans` table with RLS (`supabase/migrations/0001_plans.sql`).
+
+**Gotcha hit during setup, worth knowing for Phase 2/3**: Supabase's **Authentication → URL Configuration → Site URL** defaults to `http://localhost:3000` and silently overrides any `redirectTo`/`emailRedirectTo` passed from the client if the target URL isn't in the **Redirect URLs** allow-list — sign-in "worked" (no error) but bounced back to localhost instead of the live site. Fixed by setting Site URL to `https://trip-planner-v2-gamma.vercel.app` and adding `https://trip-planner-v2-gamma.vercel.app/auth/callback` to the allow-list. Any new deploy domain (custom domain, etc.) will need the same treatment.
 
 Decisions made this session:
 - **Passwordless email auth** (magic link via `signInWithOtp`), not password-based — simpler UX, no forgot-password flow to build. Google OAuth alongside it.
@@ -86,10 +88,40 @@ Decisions made this session:
 
 **Confirmed via `node_modules/next/dist/docs`**: this Next.js version (16.2.10) renamed the `middleware.ts` file convention to `proxy.ts` (function name `proxy`, not `middleware`) — don't write a `middleware.ts` file, it won't run. Session-cookie refresh logic lives in `src/proxy.ts` / `src/lib/supabase/proxy.ts`.
 
-**Manual steps before this is live** (none of these can be done from the CLI):
-1. Run `supabase/migrations/0001_plans.sql` in the Supabase dashboard's SQL Editor.
-2. Enable Google as an auth provider in Supabase (Authentication → Providers → Google), which requires creating a Google OAuth Client ID/Secret in Google Cloud Console first.
-3. Add the two env vars above to the Vercel project settings.
-4. Merge the PR, verify the Vercel build, then smoke-test sign-in end to end.
+## Phase 2 — built, needs migration + deploy to go live
 
-Next: finish Phase 1 manual setup + merge, then Phase 2 (sharing).
+Branch `phase2-sharing`. Migration: `supabase/migrations/0002_sharing.sql` (run once in the Supabase SQL Editor, same as 0001). No new secrets needed — sharing works entirely through Postgres RPC functions callable with the existing anon key.
+
+**How sharing works**: `plans` gained `share_view_token`/`share_collab_token` (nullable — null means that kind of sharing is off) and `collaborator_ids uuid[]`. A view link works with **no login at all** — `get_shared_plan(token)` is a `security definer` function granted to the `anon` role that returns only the one row matching the token, same trust model as a Google Docs link. A collab link requires signing in; `join_plan_as_collaborator(token)` appends the caller's `auth.uid()` to `collaborator_ids`, after which normal RLS (`owner OR auth.uid() = ANY(collaborator_ids)`) grants ongoing access — no need to keep re-using the link. Toggling sharing on/off and reading `collaborator_ids` is owner-only, enforced inside each RPC (not by the broader table RLS, which deliberately also allows collaborators to view/edit content) so a collaborator can never rotate a share link or add/remove other collaborators.
+
+Content saves for **both** owners and collaborators go through `update_plan_data()` (a plain, non-definer SQL function, so it's still checked against the row's own RLS) instead of a raw client-side `upsert` — this is what stamps `last_edited_by`/`last_edited_at` server-side and is also what makes collaborator edits work at all: an `upsert`'s `ON CONFLICT DO UPDATE` path is checked against the **INSERT** policy too (owner-only), which would silently block every collaborator save if the client tried to upsert directly. `AuthSync` now branches: brand-new plans (no `ownerId` yet) get a plain `insert`; already-synced plans (own or collaborated) go through `update_plan_data`.
+
+`profiles` is a public mirror of `auth.users(id, email)`, kept in sync by an `on_auth_user_created` trigger — needed because the client can't query `auth.users` directly, and the UI needs emails to show "last edited by" / comment authors / collaborator counts.
+
+Votes (`plan_votes`, fixed 5-emoji palette, one per user per slot, upsert-to-replace) and comments (`plan_comments`, flat list, delete-own-only) are both scoped to owner-or-collaborators only, matching the spec's "from collaborators" wording — a view-only visitor doesn't see them. They live in Calendar's `EditModal` (per-slot detail view), not the slot-grid cards, so opening the calendar doesn't fire 16 queries at once.
+
+**Editable semesters**: `Plan.semester` is `undefined` by default, which means "use the exact hand-authored `SLOTS` list, unchanged" — zero behavior/regression risk for Parker's existing AAU plan. Setting it (via the per-plan-card "📅 Semester" panel, owner-only) switches that one plan to slots generated from its own start/end + custom breaks (`src/lib/calc/semester.ts`). Compare's per-slot rows now use the **union** of slots across the plans being compared (`unionSlots`), since two plans can have entirely different slot sets once semesters diverge — for same-semester plans (the common case) this is identical to the old fixed list. Booking-link dates (`stopDates`) and the Excel month-grid now take the plan's actual semester year instead of hardcoding 2027.
+
+**Read-only shared plans** (added via "Add to my Compare") live in the same `plans` map as your own, marked `readOnly: true`. `switchPlan` refuses to activate them (Compare-only, by design — no read-only mode was built for Calendar/Itinerary, to keep scope bounded) and the write-through sync skips them entirely. `duplicatePlan` explicitly strips `ownerId`/`readOnly`/share tokens/`collaboratorIds` from the copy — without that, duplicating a shared plan would silently produce a copy that's permanently stuck read-only and never syncs (caught and fixed during this build, before it shipped).
+
+**Known simplification**: leaving a collaboration isn't wired up (removing yourself from `collaborator_ids`) — only the owner can revoke access, by disabling collab sharing entirely (which clears the whole list). Fine to add later with his sign-off.
+
+Next: run the migration + Vercel env are already set from Phase 1, so this should just need the SQL run + PR merge. Then Phase 3 (live prices).
+
+**PR queue as of Phase 3**: three branches are built and pushed but none are merged into `main` yet — `phase1-wrapup` (docs only, trivial), `phase2-sharing` (needs `0002_sharing.sql`), `phase3-live-prices` (needs `0003_flight_prices.sql` + a Vercel env var). Merge in that order since later ones build on earlier ones.
+
+## Phase 3 — built, needs migration + env var + deploy to go live
+
+Branch `phase3-live-prices`. Migration: `supabase/migrations/0003_flight_prices.sql`. New Vercel env var: `TRAVELPAYOUTS_API_TOKEN` (server-only — do **not** prefix with `NEXT_PUBLIC_`, it must never reach the browser; already in `.env.local` for local dev).
+
+**Provider switch, mid-project**: the original plan was Amadeus Self-Service. Amadeus announced in February 2026 that the self-service portal was closing, paused new registrations in spring 2026, and fully decommissioned it (existing keys included) on July 17, 2026 — three days before Phase 3 work started, so there was never a walkthrough to give. Researched alternatives and picked **Travelpayouts/Aviasales Data API** instead: free, no card, no approval/traffic-minimum gate (that only applies to their separate real-time Search API), and it's real fare data (cheapest fares actual Aviasales users found on a route in the last 2–7 days) rather than a sandbox. Trade-off, told to Parker upfront: it's "cheapest recently-found fare for this route," not a guaranteed exact-date match — for dates far in the future (most of Spring 2027 still is, from where this was built) many route/date combos will simply have no cached data yet and fall back to the estimate. Coverage should improve as departure dates get closer.
+
+**How it works**: `/api/flights/price?origin=&destination=&date=` (Route Handler, the *only* thing holding `TRAVELPAYOUTS_API_TOKEN` — never called from client code with the token). Checks `flight_price_cache` (Postgres, 24h TTL, keyed by origin+destination+date, globally shared across all users since flight prices aren't user-specific) before ever calling Travelpayouts; writes go through `upsert_flight_price()` (security definer, same reasoning as Phase 2's RPC-only-writes pattern) so the free-tier token's usage stays bounded by real cache misses, not by how many people are looking at the app. A negative result (route found, no fares) is cached too, so a dead route doesn't get re-queried every page load.
+
+**City → airport mapping**: `src/data/iata.ts`, compiled by a research agent from general knowledge (not extracted from a source file like the other `src/data/*` files — spot-check before fully trusting). 209 of 214 catalog+home cities mapped; 5 left genuinely unmapped because there's no defensible single answer: **Dolomites (Bolzano), Black Forest, Andorra, Mostar, Ios**. A live price silently isn't offered for those — the estimate is the only number, same as any leg whose IATA lookup fails. A number of the 209 are "nearest reasonable airport" substitutions for region/valley-style catalog names (e.g. Cinque Terre → Pisa) flagged at moderate confidence in the file's comments — worth a skim if a specific one looks off.
+
+**Calc engine stays untouched on purpose**: `slotCosts()`/`grandTotals()` (tested, Phase 0) are pure estimates, unchanged. `src/lib/calc/livePricing.ts` is a separate overlay layer (`liveSlotCosts`, `liveAdjustedGrandTotals`) that swaps in a live price for flight legs where one's been fetched and falls back to the estimate everywhere else (train/bus, local, unmapped city, not-yet-fetched). The per-plan **"use live prices" toggle** (`Plan.useLivePrices`, Itinerary page) decides which one the UI actually displays/sums — off by default, so nothing changes for a plan that's never touched the feature.
+
+Fetched prices live in a session-only Zustand store (`useLivePriceStore`, not persisted) — every page load re-asks `/api/flights/price`, which is cheap since it's almost always a Postgres read, not a real Travelpayouts call. `SlotItinerary` triggers the fetch per flight leg on mount; the page-level grand total and the Excel export both read from the same store, so **Excel only includes live numbers for legs you've already viewed on the Itinerary page in this session** — a real limitation, told to Parker rather than hidden.
+
+Next: run the migration, add the Vercel env var, merge the PR queue (see note above), then Phase 4 (PWA).

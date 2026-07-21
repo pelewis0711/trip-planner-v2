@@ -22,6 +22,9 @@ import {
 import { usePlanStore } from "@/lib/store/plan";
 import type { SlotActuals } from "@/lib/calc/types";
 import { actualEntered, blendedSlot, hasVal, slotActuals } from "@/lib/calc/costs";
+import { liveSlotCosts } from "@/lib/calc/livePricing";
+import { useLivePriceStore } from "@/lib/store/livePrices";
+import LiveFlightPrice from "./LiveFlightPrice";
 
 const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
 
@@ -30,18 +33,25 @@ export default function SlotItinerary({
   placement,
   ctx,
   home,
+  year = 2027,
+  useLive = false,
 }: {
   slot: Slot;
   placement: Placement;
   ctx: PlannerCtx;
   home: string;
+  year?: number;
+  useLive?: boolean;
 }) {
   const setActual = usePlanStore((s) => s.setActual);
+  const livePrices = useLivePriceStore((s) => s.prices);
 
   const stops = placement.stops;
-  const costs = slotCosts(slot.id, stops, ctx);
+  const costs = useLive
+    ? liveSlotCosts(slot.id, slot, stops, ctx, year, livePrices)
+    : { ...slotCosts(slot.id, stops, ctx), liveLegIndexes: new Set<number>() };
   const warnings = slotWarnings(slot, stops, costs.legs, ctx.tripOf);
-  const sd = stopDates(slot, stops);
+  const sd = stopDates(slot, stops, year);
   const multi = stops.length > 1;
   const actuals = slotActuals(placement);
   const booked = actualEntered(placement);
@@ -75,7 +85,12 @@ export default function SlotItinerary({
             {multi ? ` · ${stops.length} places` : ""}
           </span>
         </div>
-        <span className="text-lg font-extrabold text-emerald-400">{money(costs.total)}</span>
+        <span className="text-lg font-extrabold text-emerald-400">
+          {money(costs.total)}
+          {costs.liveLegIndexes.size > 0 && (
+            <span className="ml-1.5 align-middle text-[10px] font-bold text-sky-400">LIVE</span>
+          )}
+        </span>
       </div>
 
       <div className="mt-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-[12.5px] text-zinc-400">
@@ -247,11 +262,13 @@ export default function SlotItinerary({
           {flightLegs.length > 0 && (
             <BookCol title="✈️ Flights">
               {flightLegs.map((l, i) => (
-                <BookLink
-                  key={i}
-                  label={`${l.from} → ${l.to}${l.d ? ` (${nice(l.d)})` : ""}`}
-                  href={googleFlightsUrl(l.from, l.to, l.d)}
-                />
+                <div key={i} className="mb-1.5">
+                  <BookLink
+                    label={`${l.from} → ${l.to}${l.d ? ` (${nice(l.d)})` : ""}`}
+                    href={googleFlightsUrl(l.from, l.to, l.d)}
+                  />
+                  <LiveFlightPrice from={l.from} to={l.to} date={l.d} />
+                </div>
               ))}
               <div className="mt-1 flex flex-wrap gap-1.5 text-[10.5px]">
                 <a href={STATIC_LINKS.skyscanner} target="_blank" rel="noopener" className="text-blue-400">

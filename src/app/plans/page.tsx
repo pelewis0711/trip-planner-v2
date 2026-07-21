@@ -1,12 +1,16 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { usePlanStore } from "@/lib/store/plan";
+import { useAuthStore } from "@/lib/store/auth";
 import { downloadPlanJson, parsePlanFile } from "@/lib/planIO";
+import { extractShareToken } from "@/lib/supabase/sharedLink";
 import PlanCard from "@/components/plans/PlanCard";
 import CompareTable from "@/components/plans/CompareTable";
 
 export default function PlansPage() {
+  const router = useRouter();
   const plans = usePlanStore((s) => s.plans);
   const activeId = usePlanStore((s) => s.activeId);
   const compareIds = usePlanStore((s) => s.compareIds);
@@ -19,8 +23,11 @@ export default function PlansPage() {
   const toggleCompare = usePlanStore((s) => s.toggleCompare);
   const compareAll = usePlanStore((s) => s.compareAll);
   const clearCompare = usePlanStore((s) => s.clearCompare);
+  const removeSharedPlan = usePlanStore((s) => s.removeSharedPlan);
+  const currentUserId = useAuthStore((s) => s.user?.id);
 
   const fileInput = useRef<HTMLInputElement>(null);
+  const [friendLink, setFriendLink] = useState("");
 
   const ids = Object.keys(plans).sort((a, b) => plans[b].updated - plans[a].updated);
   const validCompareIds = compareIds.filter((id) => plans[id]);
@@ -38,6 +45,16 @@ export default function PlansPage() {
 
   const handleDelete = (id: string) => {
     if (confirm(`Delete "${plans[id].name}"? This can't be undone.`)) deletePlan(id);
+  };
+
+  const handleOpenFriendLink = () => {
+    const token = extractShareToken(friendLink);
+    if (!token) {
+      alert("That doesn't look like a share link — paste the full link a friend sent you.");
+      return;
+    }
+    setFriendLink("");
+    router.push(`/shared/${token}`);
   };
 
   return (
@@ -91,6 +108,25 @@ export default function PlansPage() {
             Clear comparison
           </button>
         </div>
+
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-zinc-800 pt-3">
+          <span className="text-xs font-semibold text-zinc-400">🔗 Have a friend&apos;s share link?</span>
+          <input
+            type="text"
+            value={friendLink}
+            onChange={(e) => setFriendLink(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleOpenFriendLink()}
+            placeholder="Paste the link they sent you"
+            className="min-w-0 flex-1 rounded-md border border-zinc-800 bg-zinc-950 px-2.5 py-1.5 text-xs text-zinc-100 placeholder:text-zinc-600"
+          />
+          <button
+            type="button"
+            onClick={handleOpenFriendLink}
+            className="rounded-md border border-zinc-700 bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:border-emerald-500/50"
+          >
+            Open
+          </button>
+        </div>
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -100,12 +136,14 @@ export default function PlansPage() {
             plan={plans[id]}
             isActive={id === activeId}
             isCompared={validCompareIds.includes(id)}
+            currentUserId={currentUserId}
             onOpen={() => switchPlan(id)}
             onDuplicate={() => duplicatePlan(id)}
             onRename={(name) => name.trim() && renamePlan(id, name)}
             onExport={() => downloadPlanJson(plans[id])}
             onDelete={() => handleDelete(id)}
             onToggleCompare={() => toggleCompare(id)}
+            onRemoveShared={() => removeSharedPlan(id)}
           />
         ))}
       </div>

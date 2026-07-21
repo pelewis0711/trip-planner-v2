@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { SLOTS } from "@/data/slots";
 import { useActivePlan, usePlanStore } from "@/lib/store/plan";
+import { getSlotsForPlan } from "@/lib/calc/semester";
 import { makeCtx } from "@/lib/calc/context";
 import { schengenDays, schengenStatus } from "@/lib/calc/schengen";
 import TripTray from "@/components/calendar/TripTray";
@@ -11,7 +11,9 @@ import MonthGrid from "@/components/calendar/MonthGrid";
 import EditModal from "@/components/calendar/EditModal";
 
 export default function CalendarPage() {
-  const { home, bag, placements } = useActivePlan();
+  const activePlan = useActivePlan();
+  const { home, bag, placements } = activePlan;
+  const slots = useMemo(() => getSlotsForPlan(activePlan), [activePlan]);
   const addStop = usePlanStore((s) => s.addStop);
   const removeStop = usePlanStore((s) => s.removeStop);
   const clearAll = usePlanStore((s) => s.clearAll);
@@ -49,7 +51,7 @@ export default function CalendarPage() {
     setArmedId(null);
   };
 
-  const editingSlot = editingSlotId ? SLOTS.find((s) => s.id === editingSlotId) : undefined;
+  const editingSlot = editingSlotId ? slots.find((s) => s.id === editingSlotId) : undefined;
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6">
@@ -112,7 +114,7 @@ export default function CalendarPage() {
               Clear all
             </button>
             <span className="text-xs text-zinc-500">
-              {filledCount ? `${filledCount} of ${SLOTS.length} slots filled` : "all slots empty — tap or drag to begin"}
+              {filledCount ? `${filledCount} of ${slots.length} slots filled` : "all slots empty — tap or drag to begin"}
               {filledCount > 0 && (
                 <>
                   {" · "}
@@ -135,7 +137,7 @@ export default function CalendarPage() {
           <div className="mt-4">
             {view === "weekend" ? (
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                {SLOTS.map((slot) => (
+                {slots.map((slot) => (
                   <SlotCard
                     key={slot.id}
                     slot={slot}
@@ -151,7 +153,7 @@ export default function CalendarPage() {
               </div>
             ) : (
               <MonthGrid
-                slots={SLOTS}
+                slots={slots}
                 placements={placements}
                 armed={!!armedId}
                 onActivate={activate}
