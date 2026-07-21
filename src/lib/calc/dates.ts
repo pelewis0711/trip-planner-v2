@@ -30,6 +30,16 @@ export function stopDates(slot: Slot, stops: Stop[]): StopDates[] {
   });
 }
 
+// Which date a leg "happens on", for dated booking links (reference-v1-app.html:1596).
+// Out-leg -> first stop's check-in. Back-leg -> last stop's check-out.
+// Inter-leg -> that stop's check-in.
+export function legDateFor(sd: StopDates[], nStops: number, legCount: number, i: number): Date | null {
+  if (!sd.length) return null;
+  if (i === 0) return sd[0].in;
+  if (i === legCount - 1) return sd[nStops - 1].out;
+  return sd[Math.min(i, nStops - 1)].in;
+}
+
 export const iso = (d: Date) =>
   d.getFullYear() +
   "-" +

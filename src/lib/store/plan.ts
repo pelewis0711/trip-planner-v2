@@ -26,6 +26,7 @@ function defaultStop(t: Trip): Stop {
 interface PlanState {
   placements: Placements;
   bag: BagOption;
+  budget: number | null;
   addStop: (slotId: string, tripId: string) => void;
   removeStop: (slotId: string, stopIndex: number) => void;
   updateStop: (slotId: string, stopIndex: number, patch: Partial<Stop>) => void;
@@ -36,6 +37,7 @@ interface PlanState {
   clearAll: () => void;
   setActual: (slotId: string, key: keyof SlotActuals, value: number | null) => void;
   setBag: (bag: BagOption) => void;
+  setBudget: (budget: number | null) => void;
 }
 
 function withStop(
@@ -55,6 +57,7 @@ export const usePlanStore = create<PlanState>()(
     (set) => ({
       placements: {},
       bag: "cabin",
+      budget: null,
 
       addStop: (slotId, tripId) =>
         set((state) => {
@@ -135,6 +138,8 @@ export const usePlanStore = create<PlanState>()(
         }),
 
       setBag: (bag) => set({ bag }),
+
+      setBudget: (budget) => set({ budget }),
     }),
     { name: "activePlan" }
   )
