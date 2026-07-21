@@ -2,8 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { SLOTS } from "@/data/slots";
-import { useHomeStore } from "@/lib/store/home";
-import { usePlanStore } from "@/lib/store/plan";
+import { useActivePlan, usePlanStore } from "@/lib/store/plan";
 import { makeCtx } from "@/lib/calc/context";
 import { schengenDays, schengenStatus } from "@/lib/calc/schengen";
 import TripTray from "@/components/calendar/TripTray";
@@ -12,9 +11,7 @@ import MonthGrid from "@/components/calendar/MonthGrid";
 import EditModal from "@/components/calendar/EditModal";
 
 export default function CalendarPage() {
-  const home = useHomeStore((s) => s.home);
-  const bag = usePlanStore((s) => s.bag);
-  const placements = usePlanStore((s) => s.placements);
+  const { home, bag, placements } = useActivePlan();
   const addStop = usePlanStore((s) => s.addStop);
   const removeStop = usePlanStore((s) => s.removeStop);
   const clearAll = usePlanStore((s) => s.clearAll);

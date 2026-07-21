@@ -1,7 +1,7 @@
 "use client";
 
 import type { Slot } from "@/data/slots";
-import { usePlanStore } from "@/lib/store/plan";
+import { useActivePlan, usePlanStore } from "@/lib/store/plan";
 import type { PlannerCtx } from "@/lib/calc/context";
 import { daysOf, foodTiers, lodgingTiers } from "@/lib/calc/cost";
 import { slotCosts } from "@/lib/calc/costs";
@@ -15,7 +15,7 @@ export default function EditModal({
   ctx: PlannerCtx;
   onClose: () => void;
 }) {
-  const placements = usePlanStore((s) => s.placements);
+  const { placements } = useActivePlan();
   const removeStop = usePlanStore((s) => s.removeStop);
   const updateStop = usePlanStore((s) => s.updateStop);
   const toggleAct = usePlanStore((s) => s.toggleAct);

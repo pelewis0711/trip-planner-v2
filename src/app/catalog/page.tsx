@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { TRIPS } from "@/data/trips";
 import { HOMES } from "@/data/homes";
-import { useHomeStore } from "@/lib/store/home";
+import { useActivePlan } from "@/lib/store/plan";
 import {
   activeFilterCount,
   buildFilterGroups,
@@ -21,7 +21,7 @@ const TRIP_BY_ID = new Map(TRIPS.map((t) => [t.id, t]));
 const coordsOf = (id: string) => TRIP_BY_ID.get(id)?.co;
 
 export default function CatalogPage() {
-  const home = useHomeStore((s) => s.home);
+  const { home } = useActivePlan();
   const [filters, setFilters] = useState(emptyFilters());
   const [query, setQuery] = useState("");
 
@@ -57,8 +57,8 @@ export default function CatalogPage() {
           Trip Catalog <span className="text-sm font-normal text-zinc-500">— {visible.length} of {TRIPS.length} options</span>
         </h2>
         <p className="mt-1 text-sm text-zinc-400">
-          Prices are per person, round-trip from {home}, mid-range estimates. Add-to-calendar arrives
-          in the next stage.
+          Prices are per person, round-trip from {home}, mid-range estimates. Head to{" "}
+          <b className="text-zinc-200">My Calendar</b> to drop a trip onto a slot.
         </p>
       </div>
 

@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useHomeStore } from "@/lib/store/home";
-import { usePlanStore } from "@/lib/store/plan";
+import { useActivePlan, usePlanStore } from "@/lib/store/plan";
 import { HOMES } from "@/data/homes";
 import { makeCtx } from "@/lib/calc/context";
 import { grandTotals } from "@/lib/calc/costs";
@@ -18,11 +17,13 @@ const NAV = [
 
 export default function Header() {
   const pathname = usePathname();
-  const home = useHomeStore((s) => s.home);
-  const setHome = useHomeStore((s) => s.setHome);
-  const placements = usePlanStore((s) => s.placements);
-  const bag = usePlanStore((s) => s.bag);
+  const { id, home, bag, placements } = useActivePlan();
+  const setHome = usePlanStore((s) => s.setHome);
+  const switchPlan = usePlanStore((s) => s.switchPlan);
+  const plans = usePlanStore((s) => s.plans);
   const total = grandTotals(placements, makeCtx(home, bag)).total;
+
+  const planIds = Object.keys(plans).sort((a, b) => plans[b].updated - plans[a].updated);
 
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur">
@@ -45,6 +46,22 @@ export default function Header() {
             {Object.keys(HOMES).map((h) => (
               <option key={h} value={h}>
                 {h}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-xs font-medium text-zinc-400">
+          <span aria-hidden>📋</span>
+          <span className="hidden sm:inline">Plan</span>
+          <select
+            value={id}
+            onChange={(e) => switchPlan(e.target.value)}
+            className="max-w-[140px] rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-sm font-semibold text-zinc-100"
+          >
+            {planIds.map((pid) => (
+              <option key={pid} value={pid}>
+                {plans[pid].name}
               </option>
             ))}
           </select>

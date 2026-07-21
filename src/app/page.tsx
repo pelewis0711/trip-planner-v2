@@ -1,6 +1,6 @@
 "use client";
 
-import { useHomeStore } from "@/lib/store/home";
+import { useActivePlan } from "@/lib/store/plan";
 import { TRIPS } from "@/data/trips";
 
 const REGIONS = new Set(TRIPS.map((t) => t.reg)).size;
@@ -37,7 +37,7 @@ const RECS = [
 ] as const;
 
 export default function OverviewPage() {
-  const home = useHomeStore((s) => s.home);
+  const { home } = useActivePlan();
   const isPrague = home === "Prague";
 
   return (

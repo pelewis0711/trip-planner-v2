@@ -2,8 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { SLOTS } from "@/data/slots";
-import { useHomeStore } from "@/lib/store/home";
-import { usePlanStore } from "@/lib/store/plan";
+import { useActivePlan, usePlanStore } from "@/lib/store/plan";
 import { makeCtx } from "@/lib/calc/context";
 import { blendedTotals, grandTotals } from "@/lib/calc/costs";
 import { schengenDays, schengenStatus } from "@/lib/calc/schengen";
@@ -15,11 +14,8 @@ import CheatSheet from "@/components/itinerary/CheatSheet";
 const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
 
 export default function ItineraryPage() {
-  const home = useHomeStore((s) => s.home);
-  const placements = usePlanStore((s) => s.placements);
-  const bag = usePlanStore((s) => s.bag);
+  const { home, placements, bag, budget } = useActivePlan();
   const setBag = usePlanStore((s) => s.setBag);
-  const budget = usePlanStore((s) => s.budget);
   const setBudget = usePlanStore((s) => s.setBudget);
 
   const [editingBudget, setEditingBudget] = useState(false);
