@@ -186,7 +186,9 @@ export function buildXlsxSheets(plan: Plan, livePrices: Record<string, LivePrice
       const ft = foodTiers(t.ci)[st.fd];
       const dys = daysOf(st.nights);
       tp.push(["", "", "Food", `${ft[0]} × ${dys}d`, XM(ft[1] * dys)]);
-      t.f.forEach(([name, price], i) => { if (st.sig[i]) tp.push(["", "", "Signature food", name, XM(price)]); });
+      // Bucket list -- reference price only, already covered by the Food
+      // tier row above; not summed into SLOT TOTAL (see costs.ts slotCosts).
+      t.f.forEach(([name, price], i) => { if (st.sig[i]) tp.push(["", "", "Bucket list (ref, not counted)", name, XM(price)]); });
       t.a.forEach(([name, price], i) => { if (st.act[i]) tp.push(["", "", "Activity", name, price ? XM(price) : "free"]); });
     });
     tp.push(["", "SLOT TOTAL", "", "", "", "", XM(c.total)]);
@@ -321,7 +323,7 @@ export function buildXlsxSheets(plan: Plan, livePrices: Record<string, LivePrice
     });
   });
 
-  lk.push([], ["🍽️ FOOD — where to find each signature dish (Google Maps search)"], ["Slot", "City", "Dish", "Est. price", "Link"]);
+  lk.push([], ["🍽️ BUCKET LIST — where to find each dish (Google Maps search)"], ["Slot", "City", "Dish", "Ref. price (covered by food tier)", "Link"]);
   let anyFood = false;
   ordered.forEach((s) => {
     plan.placements[s.id].stops.forEach((st) => {
@@ -335,7 +337,7 @@ export function buildXlsxSheets(plan: Plan, livePrices: Record<string, LivePrice
       });
     });
   });
-  if (!anyFood) lk.push(["(no signature foods selected)"]);
+  if (!anyFood) lk.push(["(no bucket-list dishes selected)"]);
 
   lk.push(
     [], ["⏰ WHEN TO BOOK — cheat sheet"],

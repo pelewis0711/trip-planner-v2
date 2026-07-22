@@ -6,11 +6,14 @@ import { generateSlots, getSlotsForPlan, DEFAULT_SEMESTER } from "../semester";
 import { smartDefaultSemester, postFinalsBreak } from "../onboarding";
 import type { Placements, Stop } from "../types";
 import type { Plan } from "@/lib/store/plan";
-import { usePlanStore } from "@/lib/store/plan";
+import { usePlanStore, presetActivityChecks } from "@/lib/store/plan";
 import { useCustomHomesStore } from "@/lib/store/customHomes";
 import { HOMES } from "@/data/homes";
 import { SLOTS } from "@/data/slots";
 import { TRIPS } from "@/data/trips";
+import { slotCosts, tripPriceRange } from "../costs";
+import { makeCtx } from "../context";
+import { foodTiers, daysOf } from "../cost";
 
 const rome = TRIPS.find((t) => t.id === "rome")!;
 const dublin = TRIPS.find((t) => t.id === "dublin")!;
@@ -112,5 +115,51 @@ describe("Phase 6: plan store onboarding defaults", () => {
     const created = usePlanStore.getState().plans[id];
     expect(created.home).toBe("Barcelona");
     expect(created.semester).toEqual(customSemester);
+  });
+});
+
+describe("Phase 7: food-model fix (no double-count)", () => {
+  it("slotCosts does not add checked signature-dish prices on top of the food tier", () => {
+    const ctx = makeCtx("Prague");
+    // rome.f has priced entries (e.g. a $28 trattoria dinner) -- check all of them
+    const stop: Stop = { tripId: "rome", nights: 2, act: [], sig: rome.f.map(() => true), l: 0, fd: 0 };
+    const withDishesChecked = slotCosts("s06", [stop], ctx);
+
+    const stopNoDishes: Stop = { tripId: "rome", nights: 2, act: [], sig: rome.f.map(() => false), l: 0, fd: 0 };
+    const withoutDishesChecked = slotCosts("s06", [stopNoDishes], ctx);
+
+    // food total must be identical whether or not bucket-list dishes are checked
+    expect(withDishesChecked.food).toBe(withoutDishesChecked.food);
+    // and it should equal exactly the tier rate x days, nothing more
+    expect(withDishesChecked.food).toBe(foodTiers(rome.ci)[0][1] * daysOf(2));
+  });
+});
+
+describe("Phase 7: trip price range", () => {
+  it("floor excludes all activities, ceiling includes every activity's price", () => {
+    const ctx = makeCtx("Prague");
+    const range = tripPriceRange(rome, ctx);
+    const allActivityCost = rome.a.reduce((s, [, price]) => s + price, 0);
+    expect(range.ceiling - range.floor).toBe(allActivityCost);
+    expect(range.ceiling).toBeGreaterThanOrEqual(range.floor);
+  });
+});
+
+describe("Phase 7: activity presets", () => {
+  it("highlights/balanced/everything/none produce the right checked-index counts", () => {
+    expect(presetActivityChecks(20, "none").filter(Boolean).length).toBe(0);
+    expect(presetActivityChecks(20, "highlights").filter(Boolean).length).toBe(3);
+    expect(presetActivityChecks(20, "balanced").filter(Boolean).length).toBe(10);
+    expect(presetActivityChecks(20, "everything").filter(Boolean).length).toBe(20);
+  });
+
+  it("highlights never exceeds the actual activity count for a short list", () => {
+    expect(presetActivityChecks(2, "highlights").filter(Boolean).length).toBe(2);
+    expect(presetActivityChecks(0, "highlights").filter(Boolean).length).toBe(0);
+  });
+
+  it("presets check the first N in authored order (priority order), not an arbitrary subset", () => {
+    const checks = presetActivityChecks(6, "balanced");
+    expect(checks).toEqual([true, true, true, false, false, false]);
   });
 });

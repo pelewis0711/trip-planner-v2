@@ -13,7 +13,7 @@ import {
   tripMatches,
   type FilterKey,
 } from "@/lib/filters";
-import { tripBaseTotal } from "@/lib/calc/costs";
+import { tripPriceRange } from "@/lib/calc/costs";
 import { makeCtx } from "@/lib/calc/context";
 import FilterPanel from "@/components/FilterPanel";
 import TripCard from "@/components/TripCard";
@@ -126,9 +126,10 @@ export default function CatalogPage() {
         </div>
       ) : (
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {visible.map((t) => (
-            <TripCard key={t.id} trip={t} price={tripBaseTotal(t, ctx)} />
-          ))}
+          {visible.map((t) => {
+            const { floor, ceiling } = tripPriceRange(t, ctx);
+            return <TripCard key={t.id} trip={t} floor={floor} ceiling={ceiling} />;
+          })}
         </div>
       )}
     </div>

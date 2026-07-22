@@ -25,9 +25,9 @@ export function slotCosts(slotId: string, stops: Stop[], ctx: PlannerCtx): SlotC
     t.a.forEach(([, price], i) => {
       if (st.act[i]) act += price;
     });
-    t.f.forEach(([, price], i) => {
-      if (st.sig[i]) food += price;
-    });
+    // Signature dishes are a $0 bucket list (Phase 7) -- the food tier below
+    // is already the whole day's eating budget, so a checked dish doesn't
+    // add anything on top of it. See CLAUDE.md's Phase 7 section.
     const ft = foodTiers(t.ci)[st.fd];
     const lt = lodgingTiers(t.ci)[st.l];
     if (ft) food += ft[1] * daysOf(st.nights);
@@ -47,15 +47,40 @@ export function slotCosts(slotId: string, stops: Stop[], ctx: PlannerCtx): SlotC
   return { act, food, lodg, travel, total: act + food + lodg + travel, legs };
 }
 
+export interface PriceRange {
+  floor: number;
+  ceiling: number;
+}
+
 // Solo round-trip estimate from home at the trip's recommended nights — used
-// on catalog cards. Uses the cheapest (index 0) lodging/food tier.
-export function tripBaseTotal(t: Trip, ctx: PlannerCtx): number {
+// on catalog cards (Phase 7: a range, not one number, since activities start
+// unchecked and each is optional). Both ends use the same cheapest (index 0)
+// lodging/food tier and the same travel estimate; only activities vary --
+// floor checks none, ceiling checks all of them. Signature-dish prices never
+// enter either number (bucket-list items, see slotCosts above).
+export function tripPriceRange(t: Trip, ctx: PlannerCtx): PriceRange {
+  let base = 0;
+  base += 2 * legEstimate(ctx.homeCoord, ctx.coordsOf(t.id)).cost;
+  base += foodTiers(t.ci)[0][1] * daysOf(t.g);
+  base += lodgingTiers(t.ci)[0][1] * t.g;
+
+  const allActivities = t.a.reduce((s, [, price]) => s + price, 0);
+  return { floor: base, ceiling: base + allActivities };
+}
+
+// A single placed stop's "current total" -- same solo-round-trip shape as
+// tripPriceRange (so it's directly comparable to that floor/ceiling), but
+// using the stop's actually-selected lodging/food tiers and checked
+// activities instead of always the cheapest tier / nothing. Shown next to
+// the range so a placed trip reads as "$340 of $210-$480", not just a range.
+export function stopCurrentEstimate(t: Trip, st: Stop, ctx: PlannerCtx): number {
   let s = 0;
-  t.a.forEach(([, price]) => (s += price));
-  t.f.forEach(([, price]) => (s += price));
   s += 2 * legEstimate(ctx.homeCoord, ctx.coordsOf(t.id)).cost;
-  s += foodTiers(t.ci)[0][1] * daysOf(t.g);
-  s += lodgingTiers(t.ci)[0][1] * t.g;
+  s += foodTiers(t.ci)[st.fd][1] * daysOf(st.nights);
+  s += lodgingTiers(t.ci)[st.l][1] * st.nights;
+  t.a.forEach(([, price], i) => {
+    if (st.act[i]) s += price;
+  });
   return s;
 }
 

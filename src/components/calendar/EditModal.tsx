@@ -1,12 +1,19 @@
 "use client";
 
 import type { Slot } from "@/data/slots";
-import { useActivePlan, usePlanStore } from "@/lib/store/plan";
+import { useActivePlan, usePlanStore, type ActivityPreset } from "@/lib/store/plan";
 import { useAuthStore } from "@/lib/store/auth";
 import type { PlannerCtx } from "@/lib/calc/context";
 import { daysOf, foodTiers, lodgingTiers } from "@/lib/calc/cost";
-import { slotCosts } from "@/lib/calc/costs";
+import { slotCosts, tripPriceRange, stopCurrentEstimate } from "@/lib/calc/costs";
 import SlotCollab from "./SlotCollab";
+
+const PRESETS: [ActivityPreset, string][] = [
+  ["none", "None"],
+  ["highlights", "Highlights"],
+  ["balanced", "Balanced"],
+  ["everything", "Everything"],
+];
 
 export default function EditModal({
   slot,
@@ -24,6 +31,7 @@ export default function EditModal({
   const updateStop = usePlanStore((s) => s.updateStop);
   const toggleAct = usePlanStore((s) => s.toggleAct);
   const toggleSig = usePlanStore((s) => s.toggleSig);
+  const applyActivityPreset = usePlanStore((s) => s.applyActivityPreset);
   const moveStop = usePlanStore((s) => s.moveStop);
 
   const stops = placements[slot.id]?.stops ?? [];
@@ -64,6 +72,8 @@ export default function EditModal({
             const lTiers = lodgingTiers(t.ci);
             const fTiers = foodTiers(t.ci);
             const days = daysOf(st.nights);
+            const range = tripPriceRange(t, ctx);
+            const current = stopCurrentEstimate(t, st, ctx);
 
             return (
               <div key={i} className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3.5">
@@ -101,6 +111,16 @@ export default function EditModal({
                       Remove
                     </button>
                   </div>
+                </div>
+
+                <div className="mt-1.5 text-[11.5px]">
+                  <span className="text-zinc-500">Range </span>
+                  <span className="font-semibold text-zinc-300">
+                    ${Math.round(range.floor)}–${Math.round(range.ceiling)}
+                  </span>
+                  <br />
+                  <span className="text-zinc-500">Current </span>
+                  <span className="font-semibold text-emerald-400">${Math.round(current)}</span>
                 </div>
 
                 <div className="mt-3 flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-xs">
@@ -145,19 +165,34 @@ export default function EditModal({
                 />
 
                 {t.a.length > 0 && (
-                  <CheckList
-                    label="🎟️ Activities"
-                    items={t.a}
-                    checked={st.act}
-                    onToggle={(idx) => toggleAct(slot.id, i, idx)}
-                  />
+                  <>
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {PRESETS.map(([preset, label]) => (
+                        <button
+                          key={preset}
+                          type="button"
+                          onClick={() => applyActivityPreset(slot.id, i, preset)}
+                          className="rounded-full border border-zinc-700 px-2.5 py-0.5 text-[11px] font-semibold text-zinc-300 hover:border-emerald-500/50 hover:text-emerald-300"
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                    <CheckList
+                      label="🎟️ Activities"
+                      items={t.a}
+                      checked={st.act}
+                      onToggle={(idx) => toggleAct(slot.id, i, idx)}
+                    />
+                  </>
                 )}
                 {t.f.length > 0 && (
                   <CheckList
-                    label="🍜 Signature food"
+                    label="🍜 Signature food (bucket list — free, doesn't count toward totals)"
                     items={t.f}
                     checked={st.sig}
                     onToggle={(idx) => toggleSig(slot.id, i, idx)}
+                    refOnly
                   />
                 )}
               </div>
@@ -235,11 +270,16 @@ function CheckList({
   items,
   checked,
   onToggle,
+  refOnly = false,
 }: {
   label: string;
   items: [string, number][];
   checked: boolean[];
   onToggle: (idx: number) => void;
+  // Phase 7: signature dishes are a $0 bucket list -- their price is shown
+  // for reference only, not counted, so it renders greyed/labeled instead of
+  // the normal counted-green style activities use.
+  refOnly?: boolean;
 }) {
   return (
     <div className="mt-3">
@@ -259,7 +299,9 @@ function CheckList({
               className="accent-emerald-500"
             />
             <span className="flex-1 text-zinc-300">{name}</span>
-            <span className="text-emerald-400">{price ? `$${price}` : "free"}</span>
+            <span className={refOnly ? "text-zinc-500" : "text-emerald-400"}>
+              {refOnly ? (price ? `ref $${price}` : "free") : price ? `$${price}` : "free"}
+            </span>
           </label>
         ))}
       </div>

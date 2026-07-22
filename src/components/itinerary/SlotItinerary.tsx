@@ -21,7 +21,7 @@ import {
 } from "@/lib/calc/booking";
 import { usePlanStore } from "@/lib/store/plan";
 import type { SlotActuals } from "@/lib/calc/types";
-import { actualEntered, blendedSlot, hasVal, slotActuals } from "@/lib/calc/costs";
+import { actualEntered, blendedSlot, hasVal, slotActuals, tripPriceRange, stopCurrentEstimate } from "@/lib/calc/costs";
 import { liveSlotCosts } from "@/lib/calc/livePricing";
 import { useLivePriceStore } from "@/lib/store/livePrices";
 import LiveFlightPrice from "./LiveFlightPrice";
@@ -182,11 +182,19 @@ export default function SlotItinerary({
           const dys = daysOf(st.nights);
           const checkedActs = t.a.filter((_, idx) => st.act[idx]);
           const checkedSig = t.f.filter((_, idx) => st.sig[idx]);
+          const range = tripPriceRange(t, ctx);
+          const current = stopCurrentEstimate(t, st, ctx);
           return (
             <div key={i} className="text-[12.5px]">
-              <div className="font-semibold text-zinc-200">
-                {multi ? `${i + 1}. ` : ""}
-                {t.n} <span className="font-normal text-zinc-500">· {t.c} · {st.nights === 0 ? "day trip" : `${st.nights}n`}</span>
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+                <div className="font-semibold text-zinc-200">
+                  {multi ? `${i + 1}. ` : ""}
+                  {t.n} <span className="font-normal text-zinc-500">· {t.c} · {st.nights === 0 ? "day trip" : `${st.nights}n`}</span>
+                </div>
+                <div className="text-[11px]">
+                  <span className="text-zinc-500">${Math.round(range.floor)}–${Math.round(range.ceiling)} </span>
+                  <span className="font-semibold text-emerald-400">· Current ${Math.round(current)}</span>
+                </div>
               </div>
               <div className="mt-1 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
@@ -212,12 +220,17 @@ export default function SlotItinerary({
                     <span>{ft[0]} × {dys}d</span>
                     <span>{money(ft[1] * dys)}</span>
                   </div>
-                  {checkedSig.map(([name, price]) => (
-                    <div key={name} className="flex justify-between text-zinc-400">
-                      <span>{name}</span>
-                      <span>{money(price)}</span>
+                  {checkedSig.length > 0 && (
+                    <div className="mt-1.5 text-zinc-600">
+                      <span className="text-[10px] font-semibold uppercase tracking-wide">Bucket list (free)</span>
+                      {checkedSig.map(([name, price]) => (
+                        <div key={name} className="flex justify-between">
+                          <span>{name}</span>
+                          <span>{price ? `ref ${money(price)}` : "free"}</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             </div>
@@ -359,7 +372,7 @@ export default function SlotItinerary({
         {stops.some((st) => stopHasSigFood(ctx, st)) && (
           <div className="mt-2">
             <b className="text-[10.5px] font-semibold uppercase tracking-wide text-zinc-500">
-              🍜 Find the signature food
+              🍜 Find your bucket-list dishes
             </b>
             <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
               {stops.flatMap((st) => {
