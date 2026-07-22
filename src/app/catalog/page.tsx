@@ -5,6 +5,7 @@ import { TRIPS } from "@/data/trips";
 import { HOMES } from "@/data/homes";
 import { useActivePlan } from "@/lib/store/plan";
 import { useCustomTripsStore } from "@/lib/store/customTrips";
+import { useCustomHomesStore } from "@/lib/store/customHomes";
 import {
   activeFilterCount,
   buildFilterGroups,
@@ -21,12 +22,13 @@ import DiscoverPanel from "@/components/discover/DiscoverPanel";
 export default function CatalogPage() {
   const { home } = useActivePlan();
   const customTrips = useCustomTripsStore((s) => s.trips);
+  const customHome = useCustomHomesStore((s) => s.homes[home]);
   const [filters, setFilters] = useState(emptyFilters());
   const [query, setQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [showDiscover, setShowDiscover] = useState(false);
 
-  const homeCoord = HOMES[home] || HOMES.Prague;
+  const homeCoord: [number, number] = HOMES[home] || (customHome ? [customHome.lat, customHome.lon] : HOMES.Prague);
   // makeCtx reads custom trips from the store internally (not as an arg),
   // so this dep is what tells the memo to recompute when they change
   // eslint-disable-next-line react-hooks/exhaustive-deps

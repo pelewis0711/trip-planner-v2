@@ -3,6 +3,7 @@
 import { TRIPS, type Trip } from "@/data/trips";
 import { HOMES } from "@/data/homes";
 import { useCustomTripsStore } from "@/lib/store/customTrips";
+import { useCustomHomesStore } from "@/lib/store/customHomes";
 import type { BagOption } from "./pricing";
 
 export interface PlannerCtx {
@@ -27,13 +28,16 @@ export function makeCtx(home: string, bag: BagOption = "cabin"): PlannerCtx {
   const trips = hasCustom ? [...TRIPS, ...Object.values(custom)] : TRIPS;
   const byId = hasCustom ? new Map(trips.map((t) => [t.id, t])) : TRIP_BY_ID;
 
+  const customHome = useCustomHomesStore.getState().homes[home];
+  const homeCoord: [number, number] = HOMES[home] || (customHome ? [customHome.lat, customHome.lon] : HOMES.Prague);
+
   return {
     trips,
     tripOf: (id) => byId.get(id),
     coordsOf: (id) => byId.get(id)?.co,
     nameOf: (id) => byId.get(id)?.n ?? "?",
     home,
-    homeCoord: HOMES[home] || HOMES.Prague,
+    homeCoord,
     bag,
   };
 }

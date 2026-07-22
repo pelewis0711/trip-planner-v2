@@ -4,6 +4,7 @@
 // conservative: it over-counts on purpose.
 import type { Placements } from "./types";
 import type { Trip } from "@/data/trips";
+import { useCustomHomesStore } from "@/lib/store/customHomes";
 
 export const SCHENGEN = new Set([
   "Andorra", "Austria", "Belgium", "Bulgaria", "Croatia", "Czechia", "Denmark",
@@ -27,7 +28,7 @@ export function schengenDays(
   home: string,
   tripOf: (tripId: string) => Trip | undefined
 ): number {
-  const homeC = HOME_COUNTRY[home];
+  const homeC = HOME_COUNTRY[home] ?? useCustomHomesStore.getState().homes[home]?.country;
   let d = 0;
   for (const sid in placements) {
     for (const st of placements[sid].stops || []) {
