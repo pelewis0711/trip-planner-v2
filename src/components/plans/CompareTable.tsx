@@ -128,10 +128,12 @@ export default function CompareTable({
             </td>
           </tr>
           <Row label="✈️ Travel" values={totals.map((t) => t.travel)} />
-          <Row label="🛏️ Lodging" values={totals.map((t) => t.lodg)} />
+          <Row label="🛏️ Lodging (per person)" values={totals.map((t) => t.lodg)} />
+          <Row label="🛏️ Lodging (group)" values={totals.map((t) => t.lodgGroup)} />
           <Row label="🍽️ Food" values={totals.map((t) => t.food)} />
           <Row label="🎟️ Activities" values={totals.map((t) => t.act)} />
-          <Row label="Subtotal" values={totals.map((t) => t.total)} />
+          <Row label="Subtotal (per person)" values={totals.map((t) => t.total)} />
+          <Row label="Subtotal (group)" values={totals.map((t) => t.totalGroup)} />
           <Row label="+12% buffer" values={totals.map((t) => t.total * 1.12)} />
           <Row
             label="Cost per night away"

@@ -66,7 +66,7 @@ export default function DiscoverPanel({
       .filter((s) => !plan.placements[s.id]?.stops.length)
       .map((s) => ({ label: s.label, date: s.date }));
 
-    const bt = blendedTotals(plan.placements, ctx);
+    const bt = blendedTotals(plan.placements, ctx, plan.defaultTravelers ?? 1);
     const remainingBudget = plan.budget !== null ? Math.max(0, Math.round(plan.budget - bt.blend)) : null;
 
     const schD = schengenDays(plan.placements, plan.home, ctx.tripOf);

@@ -10,13 +10,26 @@ export const CI_BASE: Record<number, { lodg: number; food: number }> = {
 
 export type Tier = [label: string, price: number];
 
-export function lodgingTiers(ci: number): Tier[] {
+// Phase 8: group-aware, per person per night. Hostel is a flat per-bed price
+// regardless of group size. Airbnb/private/boutique assume the group shares
+// units/rooms -- a whole-unit or whole-room price is split across the group,
+// so bigger groups drop the per-person cost. See CLAUDE.md's Phase 8 section
+// for the calibration table this was checked against before shipping.
+export function lodgingTiers(ci: number, travelers: number): Tier[] {
   const b = (CI_BASE[ci] || CI_BASE[3]).lodg;
+  const n = Math.max(1, travelers);
+  const rooms = Math.ceil(n / 2); // private/boutique: 2 people per room
+
+  const airbnbUnit = (2.5 + 0.5 * n) * b;
+  const airbnbPerPerson = Math.max(airbnbUnit / n, 0.8 * b);
+  const privatePerPerson = (b * 2.1 * rooms) / n;
+  const boutiquePerPerson = (b * 3.6 * rooms) / n;
+
   return [
-    ["Hostel dorm", b],
-    ["Apartment / Airbnb split", Math.round(b * 1.5)],
-    ["Private room / budget hotel", Math.round(b * 2.1)],
-    ["Boutique / splurge", Math.round(b * 3.6)],
+    ["Hostel dorm", Math.round(b)],
+    ["Apartment / Airbnb split", Math.round(airbnbPerPerson)],
+    ["Private room / budget hotel", Math.round(privatePerPerson)],
+    ["Boutique / splurge", Math.round(boutiquePerPerson)],
   ];
 }
 

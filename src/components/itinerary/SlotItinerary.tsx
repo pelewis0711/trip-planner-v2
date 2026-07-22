@@ -25,6 +25,7 @@ import { actualEntered, blendedSlot, hasVal, slotActuals, tripPriceRange, stopCu
 import { liveSlotCosts } from "@/lib/calc/livePricing";
 import { useLivePriceStore } from "@/lib/store/livePrices";
 import LiveFlightPrice from "./LiveFlightPrice";
+import LiveHotelPrice from "./LiveHotelPrice";
 
 const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
 
@@ -33,6 +34,7 @@ export default function SlotItinerary({
   placement,
   ctx,
   home,
+  travelers,
   year = 2027,
   useLive = false,
 }: {
@@ -40,6 +42,7 @@ export default function SlotItinerary({
   placement: Placement;
   ctx: PlannerCtx;
   home: string;
+  travelers: number;
   year?: number;
   useLive?: boolean;
 }) {
@@ -48,14 +51,14 @@ export default function SlotItinerary({
 
   const stops = placement.stops;
   const costs = useLive
-    ? liveSlotCosts(slot.id, slot, stops, ctx, year, livePrices)
-    : { ...slotCosts(slot.id, stops, ctx), liveLegIndexes: new Set<number>() };
+    ? liveSlotCosts(slot.id, slot, stops, ctx, year, livePrices, travelers)
+    : { ...slotCosts(slot.id, stops, ctx, travelers), liveLegIndexes: new Set<number>() };
   const warnings = slotWarnings(slot, stops, costs.legs, ctx.tripOf);
   const sd = stopDates(slot, stops, year);
   const multi = stops.length > 1;
   const actuals = slotActuals(placement);
   const booked = actualEntered(placement);
-  const blend = blendedSlot(slot.id, placement, ctx);
+  const blend = blendedSlot(slot.id, placement, ctx, travelers);
 
   const title = stops.map((st) => ctx.tripOf(st.tripId)?.n ?? "?").join(" → ");
   const routeStr = [home, ...stops.map((st) => ctx.tripOf(st.tripId)?.n ?? "?"), home].join(" → ");
@@ -83,12 +86,18 @@ export default function SlotItinerary({
           <span className="text-xs text-zinc-500">
             {slot.label} · {slot.date}
             {multi ? ` · ${stops.length} places` : ""}
+            {travelers > 1 ? ` · 👥 ${travelers} travelers` : ""}
           </span>
         </div>
-        <span className="text-lg font-extrabold text-emerald-400">
-          {money(costs.total)}
-          {costs.liveLegIndexes.size > 0 && (
-            <span className="ml-1.5 align-middle text-[10px] font-bold text-sky-400">LIVE</span>
+        <span className="text-right">
+          <span className="text-lg font-extrabold text-emerald-400">
+            {money(costs.total)}
+            {costs.liveLegIndexes.size > 0 && (
+              <span className="ml-1.5 align-middle text-[10px] font-bold text-sky-400">LIVE</span>
+            )}
+          </span>
+          {travelers > 1 && (
+            <span className="block text-[11px] text-zinc-500">{money(costs.total * travelers)} for {travelers}</span>
           )}
         </span>
       </div>
@@ -131,7 +140,7 @@ export default function SlotItinerary({
         </div>
         <div>
           <b className="mb-1 block text-[10.5px] font-semibold uppercase tracking-wide text-zinc-500">
-            🛏️ Lodging ({money(costs.lodg)})
+            🛏️ Lodging ({money(costs.lodg)} per person{travelers > 1 ? `, ${money(costs.lodg * travelers)} for ${travelers}` : ""})
           </b>
           {stops.map((st, i) => {
             const t = ctx.tripOf(st.tripId);
@@ -143,14 +152,31 @@ export default function SlotItinerary({
                   <span className="text-zinc-500">$0</span>
                 </div>
               );
-            const lt = lodgingTiers(t.ci)[st.l];
+            const lt = lodgingTiers(t.ci, travelers)[st.l];
+            const perPerson = lt[1] * st.nights;
             return (
-              <div key={i} className="flex justify-between py-0.5 text-zinc-300">
-                <span>
-                  {multi ? `${t.n}: ` : ""}
-                  {lt[0]} × {st.nights}n
-                </span>
-                <span className="text-zinc-500">{money(lt[1] * st.nights)}</span>
+              <div key={i} className="py-0.5">
+                <div className="flex justify-between text-zinc-300">
+                  <span>
+                    {multi ? `${t.n}: ` : ""}
+                    {lt[0]} × {st.nights}n
+                  </span>
+                  <span className="text-zinc-500">
+                    {money(perPerson)}
+                    {travelers > 1 && ` (${money(perPerson * travelers)} for ${travelers})`}
+                  </span>
+                </div>
+                {st.l === 2 || st.l === 3 ? (
+                  <LiveHotelPrice
+                    city={t.n}
+                    checkIn={sd[i] ? iso(sd[i].in) : null}
+                    checkOut={sd[i] ? iso(sd[i].out) : null}
+                    guests={travelers}
+                    tier={st.l === 2 ? "private" : "boutique"}
+                  />
+                ) : (
+                  <span className="text-[10px] text-zinc-600">estimate only — no free live-price API for this tier</span>
+                )}
               </div>
             );
           })}
@@ -169,7 +195,12 @@ export default function SlotItinerary({
           </div>
           <div className="mt-1 flex justify-between border-t border-zinc-800 pt-1 font-bold text-zinc-100">
             <span>Slot total</span>
-            <span className="text-emerald-400">{money(costs.total)}</span>
+            <span className="text-emerald-400">
+              {money(costs.total)}
+              {travelers > 1 && (
+                <span className="ml-1 font-normal text-zinc-500">({money(costs.total * travelers)} for {travelers})</span>
+              )}
+            </span>
           </div>
         </div>
       </div>
@@ -183,7 +214,7 @@ export default function SlotItinerary({
           const checkedActs = t.a.filter((_, idx) => st.act[idx]);
           const checkedSig = t.f.filter((_, idx) => st.sig[idx]);
           const range = tripPriceRange(t, ctx);
-          const current = stopCurrentEstimate(t, st, ctx);
+          const current = stopCurrentEstimate(t, st, ctx, travelers);
           return (
             <div key={i} className="text-[12.5px]">
               <div className="flex flex-wrap items-baseline justify-between gap-x-3">
@@ -331,13 +362,13 @@ export default function SlotItinerary({
                       {t.n} <span className="font-normal text-zinc-600">{nice(d.in)} → {nice(d.out)}</span>
                     </div>
                     <div className="flex flex-wrap gap-1.5 text-[10.5px]">
-                      <a href={hostelworldUrl(t.n, ci, co)} target="_blank" rel="noopener" className="text-blue-400">
+                      <a href={hostelworldUrl(t.n, ci, co, travelers)} target="_blank" rel="noopener" className="text-blue-400">
                         Hostelworld
                       </a>
-                      <a href={bookingComUrl(t.n, ci, co)} target="_blank" rel="noopener" className="text-blue-400">
+                      <a href={bookingComUrl(t.n, ci, co, travelers)} target="_blank" rel="noopener" className="text-blue-400">
                         Booking
                       </a>
-                      <a href={airbnbUrl(t.n, ci, co)} target="_blank" rel="noopener" className="text-blue-400">
+                      <a href={airbnbUrl(t.n, ci, co, travelers)} target="_blank" rel="noopener" className="text-blue-400">
                         Airbnb
                       </a>
                     </div>

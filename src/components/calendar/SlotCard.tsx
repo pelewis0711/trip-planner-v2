@@ -17,6 +17,7 @@ export default function SlotCard({
   slot,
   placement,
   ctx,
+  travelers,
   armed,
   onActivate,
   onDropTrip,
@@ -26,6 +27,7 @@ export default function SlotCard({
   slot: Slot;
   placement: Placement | undefined;
   ctx: PlannerCtx;
+  travelers: number;
   armed: boolean;
   onActivate: () => void;
   onDropTrip: (tripId: string) => void;
@@ -34,7 +36,7 @@ export default function SlotCard({
 }) {
   const stops = placement?.stops ?? [];
   const hasStops = stops.length > 0;
-  const costs = hasStops ? slotCosts(slot.id, stops, ctx) : null;
+  const costs = hasStops ? slotCosts(slot.id, stops, ctx, travelers) : null;
   const warnings = hasStops ? slotWarnings(slot, stops, costs!.legs, ctx.tripOf) : [];
 
   return (
@@ -56,8 +58,13 @@ export default function SlotCard({
           <div className="text-[11px] text-zinc-500">{slot.date}</div>
         </div>
         {costs && (
-          <span className="shrink-0 text-sm font-extrabold text-emerald-400">
+          <span className="shrink-0 text-right text-sm font-extrabold text-emerald-400">
             ${Math.round(costs.total)}
+            {travelers > 1 && (
+              <span className="block text-[10px] font-normal text-zinc-500">
+                ${Math.round(costs.total * travelers)} · 👥{travelers}
+              </span>
+            )}
           </span>
         )}
       </div>

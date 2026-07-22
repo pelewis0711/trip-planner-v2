@@ -26,13 +26,13 @@ const OTHER_CITY = "__other__";
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
-  const { id, home, bag, placements } = useActivePlan();
+  const { id, home, bag, placements, defaultTravelers } = useActivePlan();
   const setHome = usePlanStore((s) => s.setHome);
   const switchPlan = usePlanStore((s) => s.switchPlan);
   const plans = usePlanStore((s) => s.plans);
   const user = useAuthStore((s) => s.user);
   const authLoading = useAuthStore((s) => s.loading);
-  const total = grandTotals(placements, makeCtx(home, bag)).total;
+  const total = grandTotals(placements, makeCtx(home, bag), defaultTravelers ?? 1).total;
 
   const customHomes = useCustomHomesStore((s) => s.homes);
   const addHome = useCustomHomesStore((s) => s.addHome);

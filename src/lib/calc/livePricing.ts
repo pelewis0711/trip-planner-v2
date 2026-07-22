@@ -6,7 +6,7 @@ import { IATA } from "@/data/iata";
 import type { Slot } from "@/data/slots";
 import type { Placements } from "./types";
 import type { PlannerCtx } from "./context";
-import { slotCosts, type SlotCosts, type GrandTotals } from "./costs";
+import { slotCosts, travelersFor, type SlotCosts, type GrandTotals } from "./costs";
 import { stopDates, legDateFor, iso, type StopDates } from "./dates";
 import { legKey, type LivePrice } from "@/lib/store/livePrices";
 
@@ -75,9 +75,10 @@ export function liveSlotCosts(
   stops: Placements[string]["stops"],
   ctx: PlannerCtx,
   year: number,
-  livePrices: Record<string, LivePrice>
+  livePrices: Record<string, LivePrice>,
+  travelers: number
 ): LiveSlotCosts {
-  const costs = slotCosts(slotId, stops, ctx);
+  const costs = slotCosts(slotId, stops, ctx, travelers);
   if (!slot) return { ...costs, liveLegIndexes: new Set() };
   const sd = stopDates(slot, stops, year);
   const legInfos = flightLegInfos(costs.legs, sd, stops.length);
@@ -92,19 +93,23 @@ export function liveAdjustedGrandTotals(
   ctx: PlannerCtx,
   slots: Slot[],
   year: number,
-  livePrices: Record<string, LivePrice>
+  livePrices: Record<string, LivePrice>,
+  defaultTravelers = 1
 ): GrandTotals {
   const slotById = new Map(slots.map((s) => [s.id, s]));
-  const g: GrandTotals = { act: 0, food: 0, travel: 0, lodg: 0, total: 0, count: 0, stops: 0 };
+  const g: GrandTotals = { act: 0, food: 0, travel: 0, lodg: 0, total: 0, totalGroup: 0, lodgGroup: 0, count: 0, stops: 0 };
 
   for (const id in placements) {
     const stops = placements[id].stops;
-    const c = liveSlotCosts(id, slotById.get(id), stops, ctx, year, livePrices);
+    const travelers = travelersFor(placements[id], defaultTravelers);
+    const c = liveSlotCosts(id, slotById.get(id), stops, ctx, year, livePrices, travelers);
     g.act += c.act;
     g.food += c.food;
     g.lodg += c.lodg;
     g.travel += c.travel;
     g.total += c.total;
+    g.totalGroup += c.total * travelers;
+    g.lodgGroup += c.lodg * travelers;
     g.count++;
     g.stops += stops.length;
   }

@@ -8,7 +8,7 @@ export interface PlanGrandTotals extends GrandTotals {
 
 export function planGrandTotals(plan: Plan): PlanGrandTotals {
   const ctx = makeCtx(plan.home, plan.bag);
-  const g = grandTotals(plan.placements, ctx);
+  const g = grandTotals(plan.placements, ctx, plan.defaultTravelers ?? 1);
   let nights = 0;
   for (const sid in plan.placements) {
     for (const st of plan.placements[sid].stops) nights += st.nights || 0;

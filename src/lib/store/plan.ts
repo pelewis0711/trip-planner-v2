@@ -33,6 +33,10 @@ export interface Plan {
   // when true, totals use live flight prices (where fetched) in place of
   // the estimate for flight legs — see src/lib/calc/livePricing.ts
   useLivePrices?: boolean;
+  // Phase 8: this plan's default party size for any slot that hasn't set
+  // its own travelers count. undefined -> 1 (solo), same fallback shape as
+  // everything else in the calc engine.
+  defaultTravelers?: number;
 
   // account sync / sharing (all optional — absent for plans that have never
   // touched Supabase, e.g. anonymous local-only use)
@@ -122,6 +126,8 @@ interface PlanStoreState {
   setBudget: (budget: number | null) => void;
   setHome: (home: string) => void;
   setUseLivePrices: (useLivePrices: boolean) => void;
+  setDefaultTravelers: (travelers: number) => void;
+  setTravelersFor: (slotId: string, travelers: number) => void;
 
   // plan management
   newPlan: (name?: string) => string;
@@ -308,6 +314,22 @@ export const usePlanStore = create<PlanStoreState>()(
       setBudget: (budget) => set((state) => withActive(state, () => ({ budget }))),
       setHome: (home) => set((state) => withActive(state, () => ({ home: isKnownHome(home) ? home : "Prague" }))),
       setUseLivePrices: (useLivePrices) => set((state) => withActive(state, () => ({ useLivePrices }))),
+      setDefaultTravelers: (travelers) =>
+        set((state) => withActive(state, () => ({ defaultTravelers: Math.max(1, Math.round(travelers)) }))),
+
+      setTravelersFor: (slotId, travelers) =>
+        set((state) =>
+          withActive(state, (p) => {
+            const existing = p.placements[slotId];
+            if (!existing) return {};
+            return {
+              placements: {
+                ...p.placements,
+                [slotId]: { ...existing, travelers: Math.max(1, Math.round(travelers)) },
+              },
+            };
+          })
+        ),
 
       newPlan: (name) => {
         const id = uid();
