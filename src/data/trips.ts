@@ -4245,7 +4245,7 @@ export const TRIPS: Trip[] = [
         0
       ],
       [
-        "Panorama of Racławice",
+        "Panorama of Raclawice",
         8
       ],
       [
@@ -4258,6 +4258,46 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Craft-beer crawl",
+        15
+      ],
+      [
+        "Africarium zoo",
+        12
+      ],
+      [
+        "Ostrow Tumski evening walk",
+        0
+      ],
+      [
+        "Hydropolis water museum",
+        8
+      ],
+      [
+        "Pierogi-tasting crawl",
+        12
+      ],
+      [
+        "National Museum Wroclaw",
+        6
+      ],
+      [
+        "Multimedia Fountain show",
+        0
+      ],
+      [
+        "Old Town Hall + market cafes",
+        0
+      ],
+      [
+        "Museum of Bread",
+        5
+      ],
+      [
+        "Mathematical Tower viewpoint",
+        4
+      ],
+      [
+        "Odra River boat cruise",
         15
       ]
     ],
@@ -4319,6 +4359,46 @@ export const TRIPS: Trip[] = [
       [
         "Westerplatte boat",
         12
+      ],
+      [
+        "Amber Museum",
+        6
+      ],
+      [
+        "St. Mary's Church tower climb",
+        5
+      ],
+      [
+        "European Solidarity Centre rooftop",
+        0
+      ],
+      [
+        "Gdansk Crane (Zuraw)",
+        6
+      ],
+      [
+        "Malbork Castle day trip",
+        15
+      ],
+      [
+        "Shipyard historical walk",
+        0
+      ],
+      [
+        "Brzezno beach day",
+        0
+      ],
+      [
+        "Amber-jewelry-making workshop",
+        25
+      ],
+      [
+        "Oliwa Cathedral organ concert",
+        8
+      ],
+      [
+        "Sopot Molo pier + zip line",
+        15
       ]
     ],
     "f": [
@@ -4365,7 +4445,7 @@ export const TRIPS: Trip[] = [
         2
       ],
       [
-        "Gubałówka funicular",
+        "Gubalowka funicular",
         8
       ],
       [
@@ -4375,6 +4455,50 @@ export const TRIPS: Trip[] = [
       [
         "Thermal baths",
         12
+      ],
+      [
+        "Krupowki street-food crawl",
+        10
+      ],
+      [
+        "Highlander folk-music evening",
+        15
+      ],
+      [
+        "Wooden-architecture walking tour",
+        0
+      ],
+      [
+        "Chocholow village day trip",
+        8
+      ],
+      [
+        "Oscypek cheese tasting",
+        5
+      ],
+      [
+        "Great Tatra Trail day hike",
+        0
+      ],
+      [
+        "Dunajec River rafting",
+        25
+      ],
+      [
+        "Nosal ski slope (spring)",
+        15
+      ],
+      [
+        "Sheepskin & souvenir shopping walk",
+        0
+      ],
+      [
+        "Funicular + sledding",
+        12
+      ],
+      [
+        "Chocholowskie thermal valley hike",
+        0
       ]
     ],
     "f": [
@@ -4429,8 +4553,52 @@ export const TRIPS: Trip[] = [
         8
       ],
       [
-        "Old town + Dürer house",
+        "Old town + Durer house",
         8
+      ],
+      [
+        "Christmas-market-square walk",
+        0
+      ],
+      [
+        "Bratwurst-tasting crawl",
+        12
+      ],
+      [
+        "Germanisches Nationalmuseum",
+        8
+      ],
+      [
+        "City-wall + tower walk",
+        0
+      ],
+      [
+        "Nuremberg Toy Museum",
+        6
+      ],
+      [
+        "Lebkuchen gingerbread tasting",
+        8
+      ],
+      [
+        "Handwerkerhof craft village",
+        0
+      ],
+      [
+        "Beer-cellar tour",
+        15
+      ],
+      [
+        "St. Sebaldus Church",
+        0
+      ],
+      [
+        "Nuremberg Zoo",
+        15
+      ],
+      [
+        "Franconian wine tasting",
+        20
       ]
     ],
     "f": [
@@ -4499,6 +4667,42 @@ export const TRIPS: Trip[] = [
       [
         "Deutsches Museum",
         15
+      ],
+      [
+        "Hofbrauhaus beer-hall evening",
+        20
+      ],
+      [
+        "Viktualienmarkt food crawl",
+        15
+      ],
+      [
+        "Nymphenburg Palace + gardens",
+        8
+      ],
+      [
+        "Olympiapark + tower viewpoint",
+        8
+      ],
+      [
+        "Pinakothek der Moderne",
+        10
+      ],
+      [
+        "Beer-garden crawl",
+        25
+      ],
+      [
+        "Andechs Monastery day trip",
+        15
+      ],
+      [
+        "Munich Residenz palace",
+        9
+      ],
+      [
+        "Alte Pinakothek",
+        9
       ]
     ],
     "f": [
@@ -4568,6 +4772,42 @@ export const TRIPS: Trip[] = [
       [
         "Spree boat tour",
         18
+      ],
+      [
+        "Berlin Wall Memorial",
+        0
+      ],
+      [
+        "Checkpoint Charlie + museum",
+        8
+      ],
+      [
+        "Brandenburg Gate walk",
+        0
+      ],
+      [
+        "Berlin techno-club night",
+        20
+      ],
+      [
+        "Currywurst-tasting crawl",
+        10
+      ],
+      [
+        "Tempelhofer Feld bike/skate",
+        0
+      ],
+      [
+        "DDR Museum",
+        12
+      ],
+      [
+        "Kreuzberg street-art tour",
+        0
+      ],
+      [
+        "Fernsehturm TV-tower viewpoint",
+        23
       ]
     ],
     "f": [
@@ -4631,6 +4871,46 @@ export const TRIPS: Trip[] = [
       [
         "Sunday Fischmarkt",
         0
+      ],
+      [
+        "Speicherstadt warehouse-district walk",
+        0
+      ],
+      [
+        "Hamburg Dungeon",
+        25
+      ],
+      [
+        "St. Michaelis Church tower",
+        8
+      ],
+      [
+        "Planten un Blomen park",
+        0
+      ],
+      [
+        "Alster lake cruise",
+        18
+      ],
+      [
+        "Fish-sandwich tasting crawl",
+        12
+      ],
+      [
+        "St. Pauli Kiez pub crawl",
+        20
+      ],
+      [
+        "Hafencity architecture walk",
+        0
+      ],
+      [
+        "Blankenese village day trip",
+        8
+      ],
+      [
+        "Beatles-Platz history walk",
+        0
       ]
     ],
     "f": [
@@ -4689,8 +4969,52 @@ export const TRIPS: Trip[] = [
         14
       ],
       [
-        "Elbe riverside + Brühl Terrace",
+        "Elbe riverside + Bruhl Terrace",
         0
+      ],
+      [
+        "Semperoper opera-house tour",
+        12
+      ],
+      [
+        "Furstenzug (Procession of Princes)",
+        0
+      ],
+      [
+        "Saxon Switzerland day trip",
+        20
+      ],
+      [
+        "Striezelmarkt walk (seasonal)",
+        0
+      ],
+      [
+        "Military History Museum",
+        8
+      ],
+      [
+        "Pfunds Molkerei dairy shop",
+        0
+      ],
+      [
+        "Bastei Bridge hike",
+        8
+      ],
+      [
+        "Dresden Transport Museum",
+        6
+      ],
+      [
+        "Meissen porcelain factory day trip",
+        15
+      ],
+      [
+        "Dresden beer-garden evening",
+        15
+      ],
+      [
+        "Elbe river cruise",
+        18
       ]
     ],
     "f": [
@@ -4746,8 +5070,52 @@ export const TRIPS: Trip[] = [
         10
       ],
       [
-        "Panometer 360° panorama",
+        "Panometer 360 panorama",
         12
+      ],
+      [
+        "Old-town walking tour",
+        0
+      ],
+      [
+        "Auerbachs Keller (Goethe's Faust tavern)",
+        20
+      ],
+      [
+        "Leipzig Zoo",
+        20
+      ],
+      [
+        "Stasi Museum (Runde Ecke)",
+        5
+      ],
+      [
+        "Grassi Museum",
+        8
+      ],
+      [
+        "Craft-beer crawl",
+        15
+      ],
+      [
+        "Volkerschlachtdenkmal platform climb",
+        5
+      ],
+      [
+        "Market square + old city hall",
+        0
+      ],
+      [
+        "Gohliser Schlosschen palace",
+        5
+      ],
+      [
+        "Gewandhaus concert",
+        15
+      ],
+      [
+        "Plagwitz canal walking tour",
+        0
       ]
     ],
     "f": [
@@ -4805,6 +5173,50 @@ export const TRIPS: Trip[] = [
       [
         "Rhine river walk + bridge locks",
         0
+      ],
+      [
+        "Kolsch beer-hall crawl",
+        20
+      ],
+      [
+        "Roman-Germanic Museum",
+        9
+      ],
+      [
+        "Farina Fragrance Museum",
+        12
+      ],
+      [
+        "Christmas-market walk (seasonal)",
+        0
+      ],
+      [
+        "Hohenzollern Bridge love-locks walk",
+        0
+      ],
+      [
+        "Carnival museum",
+        6
+      ],
+      [
+        "Rhine dinner cruise",
+        35
+      ],
+      [
+        "Rheinseilbahn cable car",
+        8
+      ],
+      [
+        "Altstadt old-town walk",
+        0
+      ],
+      [
+        "Wallraf-Richartz Museum",
+        9
+      ],
+      [
+        "Phantasialand theme-park day trip",
+        45
       ]
     ],
     "f": [
@@ -4861,6 +5273,50 @@ export const TRIPS: Trip[] = [
       [
         "Student Jail (Studentenkarzer)",
         4
+      ],
+      [
+        "Heidelberg Museum",
+        6
+      ],
+      [
+        "Neckar river boat cruise",
+        15
+      ],
+      [
+        "University library tour",
+        4
+      ],
+      [
+        "German Pharmacy Museum",
+        6
+      ],
+      [
+        "Snake-pit (Schlangenweg) hike",
+        0
+      ],
+      [
+        "Beer-garden evening",
+        20
+      ],
+      [
+        "Konigstuhl mountain funicular",
+        15
+      ],
+      [
+        "Neckartal wine-village day trip",
+        25
+      ],
+      [
+        "Marktplatz + Church of the Holy Spirit",
+        0
+      ],
+      [
+        "Heiligenberg hilltop-ruins hike",
+        0
+      ],
+      [
+        "Castle candlelight tour (seasonal)",
+        18
       ]
     ],
     "f": [
@@ -4916,6 +5372,50 @@ export const TRIPS: Trip[] = [
       [
         "Christmas museum",
         5
+      ],
+      [
+        "Plonlein postcard-view photo stop",
+        0
+      ],
+      [
+        "St. Jakob's Church (Holy Blood altar)",
+        3
+      ],
+      [
+        "Schneeballen pastry tasting",
+        6
+      ],
+      [
+        "Reichsstadtmuseum",
+        5
+      ],
+      [
+        "Franconian wine tasting",
+        18
+      ],
+      [
+        "Tauber Valley scenic walk",
+        0
+      ],
+      [
+        "Toy Museum",
+        6
+      ],
+      [
+        "Town-hall tower climb",
+        3
+      ],
+      [
+        "Christmas-village shopping walk",
+        0
+      ],
+      [
+        "Dinkelsbuhl medieval-town day trip",
+        12
+      ],
+      [
+        "Herrngasse old-street walk",
+        0
       ]
     ],
     "f": [
@@ -4970,6 +5470,50 @@ export const TRIPS: Trip[] = [
       [
         "Gorge hike",
         0
+      ],
+      [
+        "Black Forest cake tasting",
+        10
+      ],
+      [
+        "Titisee lake boat ride",
+        12
+      ],
+      [
+        "Freiburg old-town day trip",
+        15
+      ],
+      [
+        "Ravenna Gorge viaduct hike",
+        0
+      ],
+      [
+        "Vogtsbauernhof open-air museum",
+        10
+      ],
+      [
+        "Europa-Park day trip",
+        55
+      ],
+      [
+        "Ham & wine tasting",
+        20
+      ],
+      [
+        "Feldberg summit hike",
+        0
+      ],
+      [
+        "Mummelsee lake walk",
+        0
+      ],
+      [
+        "Wutach Gorge nature trail",
+        0
+      ],
+      [
+        "Hinterzarten village walk",
+        0
       ]
     ],
     "f": [
@@ -5019,11 +5563,11 @@ export const TRIPS: Trip[] = [
         75
       ],
       [
-        "Mürren cliff walk",
+        "Murren cliff walk",
         0
       ],
       [
-        "Trümmelbach Falls",
+        "Trummelbach Falls",
         12
       ],
       [
@@ -5033,6 +5577,46 @@ export const TRIPS: Trip[] = [
       [
         "Jungfraujoch 'Top of Europe'",
         120
+      ],
+      [
+        "Staubbach Falls viewpoint",
+        0
+      ],
+      [
+        "Valley-floor walk",
+        0
+      ],
+      [
+        "Gimmelwald car-free village walk",
+        0
+      ],
+      [
+        "Stechelberg cable car to Murren",
+        30
+      ],
+      [
+        "Alpine cheese tasting at a mountain farm",
+        20
+      ],
+      [
+        "Mannlichen cable car + panorama trail",
+        65
+      ],
+      [
+        "Wengen village + Lauberhorn viewpoint",
+        20
+      ],
+      [
+        "Trift Bridge suspension walk (day trip)",
+        15
+      ],
+      [
+        "Schynige Platte cogwheel railway",
+        55
+      ],
+      [
+        "Via ferrata guided climb",
+        100
       ]
     ],
     "f": [
@@ -5096,6 +5680,46 @@ export const TRIPS: Trip[] = [
       [
         "Lake Thun kayak",
         30
+      ],
+      [
+        "Old-town walk",
+        0
+      ],
+      [
+        "Lake Brienz boat cruise",
+        35
+      ],
+      [
+        "St. Beatus Caves",
+        20
+      ],
+      [
+        "Bungee jumping (Stockhorn)",
+        130
+      ],
+      [
+        "White-water rafting",
+        100
+      ],
+      [
+        "Trummelbach Falls day trip",
+        12
+      ],
+      [
+        "Schynige Platte panoramic railway",
+        55
+      ],
+      [
+        "Hohenmatte park picnic + view",
+        0
+      ],
+      [
+        "Brienz wood-carving village day trip",
+        10
+      ],
+      [
+        "Local heritage museum",
+        15
       ]
     ],
     "f": [
@@ -5153,6 +5777,50 @@ export const TRIPS: Trip[] = [
       [
         "Sunnegga funicular",
         35
+      ],
+      [
+        "Car-free old-town walk",
+        0
+      ],
+      [
+        "Matterhorn Museum",
+        12
+      ],
+      [
+        "Riffelsee reflection hike",
+        0
+      ],
+      [
+        "Schwarzsee lake hike",
+        30
+      ],
+      [
+        "Cheese-fondue dinner",
+        35
+      ],
+      [
+        "Klein Matterhorn glacier ski (spring)",
+        90
+      ],
+      [
+        "Gorner Gorge walk",
+        12
+      ],
+      [
+        "Mountain-guide half-day hike",
+        65
+      ],
+      [
+        "Edelweiss alpine garden",
+        0
+      ],
+      [
+        "Furi cable car + hiking base",
+        25
+      ],
+      [
+        "Rothorn Paradise cable car",
+        70
       ]
     ],
     "f": [
@@ -5195,11 +5863,11 @@ export const TRIPS: Trip[] = [
     "w": "Lakeside Swiss polish — old-town lanes, a clean swimmable river, and alpine day trips.",
     "a": [
       [
-        "Old town + Fraumünster",
+        "Old town + Fraumunster",
         8
       ],
       [
-        "Lake Zürich cruise",
+        "Lake Zurich cruise",
         15
       ],
       [
@@ -5213,6 +5881,46 @@ export const TRIPS: Trip[] = [
       [
         "Kunsthaus museum",
         23
+      ],
+      [
+        "Bahnhofstrasse shopping walk",
+        0
+      ],
+      [
+        "Zurich West nightlife district",
+        20
+      ],
+      [
+        "Swiss National Museum",
+        10
+      ],
+      [
+        "Grossmunster tower climb",
+        5
+      ],
+      [
+        "Zurich Zoo",
+        26
+      ],
+      [
+        "Rhine Falls day trip (Schaffhausen)",
+        15
+      ],
+      [
+        "FIFA World Football Museum",
+        25
+      ],
+      [
+        "Public lake baths swim",
+        8
+      ],
+      [
+        "Fondue evening in the old town",
+        35
+      ],
+      [
+        "Uetliberg sunset + skyline",
+        0
       ]
     ],
     "f": [
@@ -5266,6 +5974,50 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Lake St. Moritz loop",
+        0
+      ],
+      [
+        "Village walk",
+        0
+      ],
+      [
+        "Segantini Museum",
+        12
+      ],
+      [
+        "Diavolezza cable car + glacier view",
+        45
+      ],
+      [
+        "Muottas Muragl funicular sunrise",
+        40
+      ],
+      [
+        "Engadin cheese & wine tasting",
+        30
+      ],
+      [
+        "Bad Scuol thermal-spa day trip",
+        60
+      ],
+      [
+        "Piz Nair cable car",
+        40
+      ],
+      [
+        "Val Roseg horse-drawn carriage ride",
+        45
+      ],
+      [
+        "Pontresina alpine-village walk",
+        0
+      ],
+      [
+        "Lake summer activities day",
+        25
+      ],
+      [
+        "Celerina village walk",
         0
       ]
     ],
@@ -5321,6 +6073,50 @@ export const TRIPS: Trip[] = [
       [
         "Glacier gorge walk",
         12
+      ],
+      [
+        "Village walk",
+        0
+      ],
+      [
+        "Mannlichen cable car panorama",
+        65
+      ],
+      [
+        "Eiger Trail hike",
+        0
+      ],
+      [
+        "Grosse Scheidegg post-bus ride",
+        20
+      ],
+      [
+        "Kleine Scheidegg + Eiger viewpoint",
+        25
+      ],
+      [
+        "Jungfraujoch day trip",
+        120
+      ],
+      [
+        "Pfingstegg mountain-restaurant lunch",
+        20
+      ],
+      [
+        "Cheese-dairy tour",
+        15
+      ],
+      [
+        "Glacier Canyon suspension bridges",
+        15
+      ],
+      [
+        "Bussalp alpine-meadow hike",
+        0
+      ],
+      [
+        "Winter ice-climbing experience (seasonal)",
+        90
       ]
     ],
     "f": [
@@ -5378,6 +6174,46 @@ export const TRIPS: Trip[] = [
       [
         "Tramway du Mont-Blanc",
         42
+      ],
+      [
+        "Old-town walk",
+        0
+      ],
+      [
+        "Planpraz cable car + panorama trail",
+        30
+      ],
+      [
+        "Chamonix Alpine Museum",
+        6
+      ],
+      [
+        "Fondue/raclette dinner",
+        30
+      ],
+      [
+        "Brevent summit hike + cable car",
+        35
+      ],
+      [
+        "Argentiere glacier village day trip",
+        10
+      ],
+      [
+        "Via ferrata",
+        65
+      ],
+      [
+        "White-water rafting on the Arve",
+        60
+      ],
+      [
+        "Skyway Monte Bianco cable car",
+        55
+      ],
+      [
+        "Craft-beer & cheese tasting",
+        25
       ]
     ],
     "f": [

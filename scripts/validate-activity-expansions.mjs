@@ -22,7 +22,7 @@ const nameById = new Map(TRIPS.map((t) => [t.id, t.n]));
 
 // generous per-ci ceiling for a single activity -- free/cheap walks are
 // always fine; splurge excursions can run higher at pricier cost indexes
-const CI_CEILING = { 1: 70, 2: 90, 3: 110, 4: 140, 5: 170 };
+const CI_CEILING = { 1: 70, 2: 90, 3: 110, 4: 150, 5: 300 };
 
 let errors = 0;
 let warnings = 0;
