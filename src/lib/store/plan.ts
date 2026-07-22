@@ -7,9 +7,14 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { TRIPS, type Trip } from "@/data/trips";
 import { HOMES } from "@/data/homes";
+import { useCustomHomesStore } from "@/lib/store/customHomes";
 import type { BagOption } from "@/lib/calc/pricing";
 import type { Placement, Placements, SlotActuals, Stop } from "@/lib/calc/types";
 import type { SemesterConfig } from "@/lib/calc/semester";
+
+function isKnownHome(home: string): boolean {
+  return !!HOMES[home] || !!useCustomHomesStore.getState().homes[home];
+}
 
 const TRIP_BY_ID = new Map(TRIPS.map((t) => [t.id, t]));
 
@@ -73,6 +78,11 @@ interface PlanStoreState {
   // to retry — persisted so a queued edit survives closing the app offline
   pendingSyncIds: string[];
 
+  // Phase 6: onboarding answers, used as the seed for every NEW plan going
+  // forward (newPlan() below) — never applied to existing plans.
+  defaultHome: string;
+  defaultSemester: SemesterConfig | undefined;
+
   // mutate the ACTIVE plan
   addStop: (slotId: string, tripId: string) => void;
   removeStop: (slotId: string, stopIndex: number) => void;
@@ -117,6 +127,9 @@ interface PlanStoreState {
   // offline sync queue
   markPendingSync: (ids: string[]) => void;
   clearPendingSync: (ids: string[]) => void;
+
+  // onboarding
+  setOnboardingDefaults: (home: string, semester: SemesterConfig | undefined) => void;
 }
 
 function withStop(
@@ -158,6 +171,8 @@ export const usePlanStore = create<PlanStoreState>()(
       compareIds: [],
       userId: null,
       pendingSyncIds: [],
+      defaultHome: "Prague",
+      defaultSemester: undefined,
 
       addStop: (slotId, tripId) =>
         set((state) =>
@@ -255,25 +270,26 @@ export const usePlanStore = create<PlanStoreState>()(
 
       setBag: (bag) => set((state) => withActive(state, () => ({ bag }))),
       setBudget: (budget) => set((state) => withActive(state, () => ({ budget }))),
-      setHome: (home) => set((state) => withActive(state, () => ({ home: HOMES[home] ? home : "Prague" }))),
+      setHome: (home) => set((state) => withActive(state, () => ({ home: isKnownHome(home) ? home : "Prague" }))),
       setUseLivePrices: (useLivePrices) => set((state) => withActive(state, () => ({ useLivePrices }))),
 
       newPlan: (name) => {
         const id = uid();
         const now = Date.now();
-        const home = get().plans[get().activeId]?.home ?? "Prague";
+        const { defaultHome, defaultSemester } = get();
         set((state) => ({
           plans: {
             ...state.plans,
             [id]: {
               id,
               name: name || "Untitled plan",
-              home,
+              home: defaultHome,
               bag: "cabin",
               budget: null,
               placements: {},
               created: now,
               updated: now,
+              semester: defaultSemester,
             },
           },
           activeId: id,
@@ -356,7 +372,7 @@ export const usePlanStore = create<PlanStoreState>()(
             plans[id] = {
               id,
               name: `${pl.name || "Imported"} (imported)`,
-              home: pl.home && HOMES[pl.home] ? pl.home : "Prague",
+              home: pl.home && isKnownHome(pl.home) ? pl.home : "Prague",
               bag: pl.bag === "none" || pl.bag === "checked" ? pl.bag : "cabin",
               budget: typeof pl.budget === "number" ? pl.budget : null,
               placements: pl.placements ?? {},
@@ -430,6 +446,8 @@ export const usePlanStore = create<PlanStoreState>()(
         set((state) => ({ pendingSyncIds: Array.from(new Set([...state.pendingSyncIds, ...ids])) })),
       clearPendingSync: (ids) =>
         set((state) => ({ pendingSyncIds: state.pendingSyncIds.filter((id) => !ids.includes(id)) })),
+
+      setOnboardingDefaults: (home, semester) => set({ defaultHome: home, defaultSemester: semester }),
     }),
     {
       name: "activePlan",
@@ -439,6 +457,8 @@ export const usePlanStore = create<PlanStoreState>()(
         activeId: state.activeId,
         compareIds: state.compareIds,
         pendingSyncIds: state.pendingSyncIds,
+        defaultHome: state.defaultHome,
+        defaultSemester: state.defaultSemester,
       }),
       migrate: (persisted, version) => {
         const state = (persisted ?? {}) as Record<string, unknown>;

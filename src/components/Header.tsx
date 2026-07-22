@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useActivePlan, usePlanStore } from "@/lib/store/plan";
 import { useAuthStore } from "@/lib/store/auth";
 import { createClient } from "@/lib/supabase/client";
 import { HOMES } from "@/data/homes";
+import { useCustomHomesStore } from "@/lib/store/customHomes";
 import { makeCtx } from "@/lib/calc/context";
 import { grandTotals } from "@/lib/calc/costs";
 import OfflineIndicator from "./OfflineIndicator";
@@ -16,7 +18,10 @@ const NAV = [
   { href: "/calendar", label: "My Calendar" },
   { href: "/itinerary", label: "Itinerary & Totals" },
   { href: "/plans", label: "Plans & Compare" },
+  { href: "/settings", label: "Settings" },
 ];
+
+const OTHER_CITY = "__other__";
 
 export default function Header() {
   const pathname = usePathname();
@@ -28,6 +33,36 @@ export default function Header() {
   const user = useAuthStore((s) => s.user);
   const authLoading = useAuthStore((s) => s.loading);
   const total = grandTotals(placements, makeCtx(home, bag)).total;
+
+  const customHomes = useCustomHomesStore((s) => s.homes);
+  const addHome = useCustomHomesStore((s) => s.addHome);
+  const [addingCity, setAddingCity] = useState(false);
+  const [cityInput, setCityInput] = useState("");
+  const [geocoding, setGeocoding] = useState(false);
+  const [geocodeError, setGeocodeError] = useState<string | null>(null);
+
+  async function handleAddCity() {
+    const q = cityInput.trim();
+    if (!q) return;
+    setGeocoding(true);
+    setGeocodeError(null);
+    try {
+      const res = await fetch(`/api/geocode?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      if (!res.ok) {
+        setGeocodeError(data.error || "Couldn't find that city");
+        return;
+      }
+      addHome(data.city, { lat: data.lat, lon: data.lon, country: data.country });
+      setHome(data.city);
+      setAddingCity(false);
+      setCityInput("");
+    } catch {
+      setGeocodeError("Couldn't reach the geocoding service");
+    } finally {
+      setGeocoding(false);
+    }
+  }
 
   async function handleSignOut() {
     const supabase = createClient();
@@ -75,21 +110,60 @@ export default function Header() {
           <div className="sm:hidden">{totalPill}</div>
         </div>
 
-        <label className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-xs font-medium text-zinc-400">
-          <span aria-hidden>🏠</span>
-          <span className="hidden sm:inline">Home</span>
-          <select
-            value={home}
-            onChange={(e) => setHome(e.target.value)}
-            className="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-sm font-semibold text-zinc-100"
-          >
-            {Object.keys(HOMES).map((h) => (
-              <option key={h} value={h}>
-                {h}
-              </option>
-            ))}
-          </select>
-        </label>
+        {addingCity ? (
+          <div className="flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-xs">
+            <input
+              autoFocus
+              type="text"
+              value={cityInput}
+              onChange={(e) => setCityInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleAddCity()}
+              placeholder="Type a city…"
+              className="w-28 rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-sm text-zinc-100 placeholder:text-zinc-600"
+            />
+            <button
+              type="button"
+              onClick={handleAddCity}
+              disabled={geocoding}
+              className="rounded-md bg-emerald-500 px-2 py-1 font-bold text-zinc-950 disabled:opacity-50"
+            >
+              {geocoding ? "…" : "✓"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setAddingCity(false);
+                setGeocodeError(null);
+              }}
+              className="text-zinc-500 hover:text-zinc-300"
+            >
+              ✕
+            </button>
+            {geocodeError && <span className="text-red-400">{geocodeError}</span>}
+          </div>
+        ) : (
+          <label className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-xs font-medium text-zinc-400">
+            <span aria-hidden>🏠</span>
+            <span className="hidden sm:inline">Home</span>
+            <select
+              value={home}
+              onChange={(e) => (e.target.value === OTHER_CITY ? setAddingCity(true) : setHome(e.target.value))}
+              className="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-sm font-semibold text-zinc-100"
+            >
+              {Object.keys(HOMES).map((h) => (
+                <option key={h} value={h}>
+                  {h}
+                </option>
+              ))}
+              {Object.keys(customHomes).map((h) => (
+                <option key={h} value={h}>
+                  {h}
+                </option>
+              ))}
+              <option value={OTHER_CITY}>Other city…</option>
+            </select>
+          </label>
+        )}
 
         <label className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-xs font-medium text-zinc-400">
           <span aria-hidden>📋</span>

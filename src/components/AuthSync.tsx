@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { useAuthStore } from "@/lib/store/auth";
 import { usePlanStore, type Plan } from "@/lib/store/plan";
+import { useCustomHomesStore } from "@/lib/store/customHomes";
+import { HOMES } from "@/data/homes";
 import { fetchProfileEmails } from "@/lib/supabase/profiles";
 import { planToInsertRow, rowToPlan, savePlanData, type PlanRow } from "@/lib/supabase/sharing";
+import { fetchUserSettings, rowToOnboardingValues } from "@/lib/supabase/settings";
 
 interface SyncResult {
   succeeded: string[];
@@ -108,9 +112,32 @@ async function flushPendingSync(supabase: SupabaseClient, userId: string) {
 export default function AuthSync() {
   const setUser = useAuthStore((s) => s.setUser);
   const mergedRef = useRef(false);
+  const router = useRouter();
 
   useEffect(() => {
     const supabase = createClient();
+
+    /** Phase 6: pulls the account's onboarding answers (if any) so this
+     * device's plan defaults + custom home city match what was set up
+     * elsewhere, and sends a never-onboarded account to /onboarding once.
+     * Runs after the plan merge above so a redirect doesn't race it. */
+    async function checkOnboarding(userId: string) {
+      const row = await fetchUserSettings(supabase, userId);
+      if (!row) {
+        if (window.location.pathname !== "/onboarding") router.push("/onboarding");
+        return;
+      }
+      const values = rowToOnboardingValues(row);
+      if (!HOMES[values.host.city]) {
+        useCustomHomesStore.getState().addHome(values.host.city, {
+          lat: values.host.lat,
+          lon: values.host.lon,
+          country: values.host.country,
+        });
+      }
+      usePlanStore.getState().setOnboardingDefaults(values.host.city, values.semester);
+      if (!row.onboarded_at && window.location.pathname !== "/onboarding") router.push("/onboarding");
+    }
 
     async function mergeOnSignIn(userId: string) {
       const [owned, collaborated] = await Promise.all([
@@ -156,6 +183,8 @@ export default function AuthSync() {
 
       // pick up anything that was queued from a previous offline session
       flushPendingSync(supabase, userId);
+
+      checkOnboarding(userId);
     }
 
     supabase.auth.getSession().then(({ data }) => {
@@ -181,7 +210,7 @@ export default function AuthSync() {
     });
 
     return () => sub.subscription.unsubscribe();
-  }, [setUser]);
+  }, [setUser, router]);
 
   // write-through: push plan changes to Postgres while signed in
   useEffect(() => {
