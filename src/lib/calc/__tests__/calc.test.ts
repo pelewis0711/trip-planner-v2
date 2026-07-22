@@ -11,9 +11,9 @@ import { useCustomHomesStore } from "@/lib/store/customHomes";
 import { HOMES } from "@/data/homes";
 import { SLOTS } from "@/data/slots";
 import { TRIPS } from "@/data/trips";
-import { slotCosts, tripPriceRange } from "../costs";
+import { slotCosts, tripPriceRange, travelersFor, grandTotals } from "../costs";
 import { makeCtx } from "../context";
-import { foodTiers, daysOf } from "../cost";
+import { foodTiers, daysOf, lodgingTiers } from "../cost";
 
 const rome = TRIPS.find((t) => t.id === "rome")!;
 const dublin = TRIPS.find((t) => t.id === "dublin")!;
@@ -123,10 +123,10 @@ describe("Phase 7: food-model fix (no double-count)", () => {
     const ctx = makeCtx("Prague");
     // rome.f has priced entries (e.g. a $28 trattoria dinner) -- check all of them
     const stop: Stop = { tripId: "rome", nights: 2, act: [], sig: rome.f.map(() => true), l: 0, fd: 0 };
-    const withDishesChecked = slotCosts("s06", [stop], ctx);
+    const withDishesChecked = slotCosts("s06", [stop], ctx, 1);
 
     const stopNoDishes: Stop = { tripId: "rome", nights: 2, act: [], sig: rome.f.map(() => false), l: 0, fd: 0 };
-    const withoutDishesChecked = slotCosts("s06", [stopNoDishes], ctx);
+    const withoutDishesChecked = slotCosts("s06", [stopNoDishes], ctx, 1);
 
     // food total must be identical whether or not bucket-list dishes are checked
     expect(withDishesChecked.food).toBe(withoutDishesChecked.food);
@@ -161,5 +161,97 @@ describe("Phase 7: activity presets", () => {
   it("presets check the first N in authored order (priority order), not an arbitrary subset", () => {
     const checks = presetActivityChecks(6, "balanced");
     expect(checks).toEqual([true, true, true, false, false, false]);
+  });
+});
+
+describe("Phase 8: group-aware lodging (sanity-check table, ci=3)", () => {
+  // Matches the table shown to Parker before this shipped: b=28 (CI_BASE[3]).
+  it("hostel dorm is flat per person regardless of group size", () => {
+    for (const n of [1, 2, 4, 6]) {
+      expect(lodgingTiers(3, n)[0][1]).toBe(28);
+    }
+  });
+
+  it("Airbnb/apartment per-person cost matches the calibration table", () => {
+    expect(lodgingTiers(3, 1)[1][1]).toBe(84);
+    expect(lodgingTiers(3, 2)[1][1]).toBe(49);
+    expect(lodgingTiers(3, 4)[1][1]).toBe(32); // 31.5 rounds up
+    expect(lodgingTiers(3, 6)[1][1]).toBe(26); // 25.67 rounds up
+  });
+
+  it("Airbnb's 0.8b floor doesn't engage in the 1-6 traveler range", () => {
+    // floor = 0.8*28 = 22.4 -- every value in the table above is well above it
+    for (const n of [1, 2, 4, 6]) {
+      expect(lodgingTiers(3, n)[1][1]).toBeGreaterThan(0.8 * 28);
+    }
+  });
+
+  it("private room per-person cost matches the calibration table (room split evenly)", () => {
+    expect(lodgingTiers(3, 1)[2][1]).toBe(59); // 58.8 rounds up
+    expect(lodgingTiers(3, 2)[2][1]).toBe(29); // 29.4 rounds down
+    expect(lodgingTiers(3, 4)[2][1]).toBe(29);
+    expect(lodgingTiers(3, 6)[2][1]).toBe(29);
+  });
+
+  it("boutique per-person cost matches the calibration table", () => {
+    expect(lodgingTiers(3, 1)[3][1]).toBe(101); // 100.8 rounds up
+    expect(lodgingTiers(3, 2)[3][1]).toBe(50);
+    expect(lodgingTiers(3, 4)[3][1]).toBe(50);
+    expect(lodgingTiers(3, 6)[3][1]).toBe(50);
+  });
+
+  it("private and boutique are identical per-person at any even group size (both reduce to room-rate/2)", () => {
+    for (const n of [2, 4, 6]) {
+      const tiers = lodgingTiers(3, n);
+      expect(tiers[2][1]).toBe(Math.round((28 * 2.1) / 2));
+      expect(tiers[3][1]).toBe(Math.round((28 * 3.6) / 2));
+    }
+  });
+});
+
+describe("Phase 8: travelers-aware totals", () => {
+  it("travelersFor falls back placement -> plan default -> 1", () => {
+    expect(travelersFor(undefined, 4)).toBe(4);
+    expect(travelersFor({ stops: [] }, 4)).toBe(4);
+    expect(travelersFor({ stops: [], travelers: 6 }, 4)).toBe(6);
+    expect(travelersFor(undefined, undefined as unknown as number)).toBe(1);
+  });
+
+  it("slotCosts with travelers=1 matches pre-Phase-8 behavior exactly (regression)", () => {
+    const ctx = makeCtx("Prague");
+    const stop: Stop = { tripId: "rome", nights: 2, act: [], sig: [], l: 2, fd: 0 };
+    const solo = slotCosts("s06", [stop], ctx, 1);
+    // ci=3, private room tier at n=1 -> 59/person/night (see calibration table)
+    expect(solo.lodg).toBe(59 * 2);
+  });
+
+  it("group total is always exactly per-person lodging times travelers", () => {
+    const ctx = makeCtx("Prague");
+    const stop: Stop = { tripId: "rome", nights: 2, act: [], sig: [], l: 2, fd: 0 };
+    for (const travelers of [1, 2, 4, 6]) {
+      const c = slotCosts("s06", [stop], ctx, travelers);
+      const perPersonLodgingRate = lodgingTiers(3, travelers)[2][1];
+      expect(c.lodg).toBe(perPersonLodgingRate * 2);
+      // the group total (a display-time computation, not a stored field) is
+      // always per-person * travelers by construction
+      expect(c.lodg * travelers).toBe(perPersonLodgingRate * 2 * travelers);
+    }
+  });
+
+  it("grandTotals sums per-slot group totals correctly even with mixed party sizes", () => {
+    const ctx = makeCtx("Prague");
+    const soloStop: Stop = { tripId: "rome", nights: 1, act: [], sig: [], l: 0, fd: 0 };
+    const groupStop: Stop = { tripId: "dublin", nights: 1, act: [], sig: [], l: 0, fd: 0 };
+    const placements: Placements = {
+      s06: { stops: [soloStop] }, // no override -> uses defaultTravelers
+      s01: { stops: [groupStop], travelers: 4 }, // explicit override
+    };
+    const g = grandTotals(placements, ctx, 1);
+    // manually recompute the expected group total: solo slot at 1 traveler,
+    // group slot at 4 travelers -- NOT the per-person grand total times a
+    // single shared travelers count
+    const soloCosts = slotCosts("s06", [soloStop], ctx, 1);
+    const groupCosts = slotCosts("s01", [groupStop], ctx, 4);
+    expect(g.totalGroup).toBe(soloCosts.total * 1 + groupCosts.total * 4);
   });
 });

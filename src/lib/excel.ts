@@ -12,10 +12,12 @@ import {
   blendedTotals,
   grandTotals,
   slotCosts,
+  travelersFor,
   type SlotCosts,
 } from "@/lib/calc/costs";
 import { liveSlotCosts, liveAdjustedGrandTotals } from "@/lib/calc/livePricing";
 import type { LivePrice } from "@/lib/store/livePrices";
+import { hotelKey, type LiveHotelPrice } from "@/lib/store/liveHotelPrices";
 import { daysOf, foodTiers, lodgingTiers } from "@/lib/calc/cost";
 import { HOME_COUNTRY, SCHENGEN, schengenDays } from "@/lib/calc/schengen";
 import { useCustomHomesStore } from "@/lib/store/customHomes";
@@ -50,7 +52,11 @@ const XM = (n: number): CellObject => ({
   z: '"$"#,##0',
 });
 
-export function buildXlsxSheets(plan: Plan, livePrices: Record<string, LivePrice> = {}) {
+export function buildXlsxSheets(
+  plan: Plan,
+  livePrices: Record<string, LivePrice> = {},
+  liveHotelPrices: Record<string, LiveHotelPrice> = {}
+) {
   const ctx = makeCtx(plan.home, plan.bag);
   const slots = getSlotsForPlan(plan);
   const ordered = slots.filter((s) => plan.placements[s.id]?.stops.length);
@@ -63,10 +69,12 @@ export function buildXlsxSheets(plan: Plan, livePrices: Record<string, LivePrice
   const semEndMonth = plan.semester ? Number(plan.semester.end.slice(5, 7)) : 5;
 
   const useLive = !!plan.useLivePrices;
+  const defaultTravelers = plan.defaultTravelers ?? 1;
+  const travelersOf = (s: Slot) => travelersFor(plan.placements[s.id], defaultTravelers);
   const costsFor = (s: Slot): SlotCosts & { liveLegIndexes: Set<number> } =>
     useLive
-      ? liveSlotCosts(s.id, s, plan.placements[s.id].stops, ctx, semYear, livePrices)
-      : { ...slotCosts(s.id, plan.placements[s.id].stops, ctx), liveLegIndexes: new Set<number>() };
+      ? liveSlotCosts(s.id, s, plan.placements[s.id].stops, ctx, semYear, livePrices, travelersOf(s))
+      : { ...slotCosts(s.id, plan.placements[s.id].stops, ctx, travelersOf(s)), liveLegIndexes: new Set<number>() };
 
   const routeOf = (s: Slot) =>
     plan.placements[s.id].stops.map((st) => ctx.tripOf(st.tripId)?.n ?? "?").join(" → ");
@@ -74,17 +82,19 @@ export function buildXlsxSheets(plan: Plan, livePrices: Record<string, LivePrice
     plan.placements[s.id].stops.reduce((n, st) => n + (st.nights || 0), 0);
   const flagsOf = (s: Slot) => {
     const stops = plan.placements[s.id]?.stops ?? [];
-    const legs = slotCosts(s.id, stops, ctx).legs;
+    const legs = slotCosts(s.id, stops, ctx, travelersOf(s)).legs;
     return slotWarnings(s, stops, legs, ctx.tripOf)
       .map((w) => (w.lv === "red" ? "⚠ " : "◔ ") + w.msg)
       .join("  |  ");
   };
-  const g = useLive ? liveAdjustedGrandTotals(plan.placements, ctx, slots, semYear, livePrices) : grandTotals(plan.placements, ctx);
+  const g = useLive
+    ? liveAdjustedGrandTotals(plan.placements, ctx, slots, semYear, livePrices, defaultTravelers)
+    : grandTotals(plan.placements, ctx, defaultTravelers);
   const nightsAll = ordered.reduce((n, s) => n + nightsOf(s), 0);
   const today = new Date().toLocaleDateString();
 
   /* ---- Sheet 1: Budget ---- */
-  const bt = blendedTotals(plan.placements, ctx);
+  const bt = blendedTotals(plan.placements, ctx, defaultTravelers);
   const homeC = HOME_COUNTRY[plan.home] || useCustomHomesStore.getState().homes[plan.home]?.country || plan.home;
   const schD = schengenDays(plan.placements, plan.home, ctx.tripOf);
 
@@ -92,7 +102,7 @@ export function buildXlsxSheets(plan: Plan, livePrices: Record<string, LivePrice
     [`STUDY ABROAD BUDGET — ${plan.name || "Plan"}`],
     ["Home base", plan.home],
     ["Semester", plan.semester ? `Custom (${plan.semester.start} to ${plan.semester.end})` : "Spring 2027 (AAU Prague calendar)"],
-    ["Currency", "USD, per person"],
+    ["Currency", "USD, per person (group totals shown alongside where travelers > 1)"],
     ["Exported", today],
     [
       "Flight pricing includes",
@@ -105,44 +115,46 @@ export function buildXlsxSheets(plan: Plan, livePrices: Record<string, LivePrice
         : "OFF — all numbers below are algorithmic estimates, no live fares",
     ],
     [],
-    ["Slot", "Dates", "Route", "Nights", "Travel", "Lodging", "Food", "Activities", "Slot total", "Actual (booked)", "Variance", "Live?", "Flags"],
+    ["Slot", "Dates", "Route", "Nights", "Travelers", "Travel", "Lodging", "Lodging (group)", "Food", "Activities", "Slot total", "Slot total (group)", "Actual (booked)", "Variance", "Live?", "Flags"],
   ];
   ordered.forEach((s) => {
     const c = costsFor(s);
+    const travelers = travelersOf(s);
     const booked = actualEntered(plan.placements[s.id]);
-    const bl = blendedSlot(s.id, plan.placements[s.id], ctx);
+    const bl = blendedSlot(s.id, plan.placements[s.id], ctx, travelers);
     const liveNote = c.liveLegIndexes.size
       ? `live (${c.liveLegIndexes.size}/${c.legs.filter((l) => l.mode === "flight").length} flight legs)`
       : "";
     bud.push([
-      s.label, s.date, routeOf(s), nightsOf(s),
-      XM(c.travel), XM(c.lodg), XM(c.food), XM(c.act), XM(c.total),
+      s.label, s.date, routeOf(s), nightsOf(s), travelers,
+      XM(c.travel), XM(c.lodg), XM(c.lodg * travelers), XM(c.food), XM(c.act), XM(c.total), XM(c.total * travelers),
       booked ? XM(bl) : "", booked ? XM(bl - c.total) : "", liveNote, flagsOf(s),
     ]);
   });
   const buf = g.total * 0.12;
   bud.push(
     [],
-    ["TOTALS", "", "", nightsAll, XM(g.travel), XM(g.lodg), XM(g.food), XM(g.act), XM(g.total), bt.booked ? XM(bt.blend) : "", bt.booked ? XM(bt.blend - bt.est) : ""],
+    ["TOTALS", "", "", nightsAll, "", XM(g.travel), XM(g.lodg), XM(g.lodgGroup), XM(g.food), XM(g.act), XM(g.total), XM(g.totalGroup), bt.booked ? XM(bt.blend) : "", bt.booked ? XM(bt.blend - bt.est) : ""],
     [],
-    ["Trips subtotal (estimates)", "", "", "", "", "", "", "", XM(g.total)],
-    ["Projected spend (booked actuals where entered)", "", "", "", "", "", "", "", XM(bt.blend)],
-    ["+12% contingency buffer", "", "", "", "", "", "", "", XM(buf)],
-    ["Optional: Eurail Global Pass (Youth, 10d/2mo)", "", "", "", "", "", "", "", XM(296)],
-    ["ESTIMATED GRAND TOTAL (projection + buffer + Eurail)", "", "", "", "", "", "", "", XM(bt.blend + buf + 296)],
+    ["Trips subtotal (estimates, per person)", "", "", "", "", "", "", "", "", "", XM(g.total)],
+    ["Trips subtotal (estimates, group)", "", "", "", "", "", "", "", "", "", XM(g.totalGroup)],
+    ["Projected spend (booked actuals where entered, per person)", "", "", "", "", "", "", "", "", "", XM(bt.blend)],
+    ["+12% contingency buffer", "", "", "", "", "", "", "", "", "", XM(buf)],
+    ["Optional: Eurail Global Pass (Youth, 10d/2mo)", "", "", "", "", "", "", "", "", "", XM(296)],
+    ["ESTIMATED GRAND TOTAL (projection + buffer + Eurail, per person)", "", "", "", "", "", "", "", "", "", XM(bt.blend + buf + 296)],
     []
   );
   if (plan.budget) {
     bud.push(
-      ["Travel budget cap", "", "", "", "", "", "", "", XM(plan.budget)],
-      ["Remaining vs budget (projection)", "", "", "", "", "", "", "", XM(plan.budget - bt.blend)]
+      ["Travel budget cap (per person)", "", "", "", "", "", "", "", "", "", XM(plan.budget)],
+      ["Remaining vs budget (projection, per person)", "", "", "", "", "", "", "", "", "", XM(plan.budget - bt.blend)]
     );
   }
   bud.push(
-    ["Cost per night away", "", "", "", "", "", "", "", nightsAll ? XM(g.total / nightsAll) : "—"],
+    ["Cost per night away (per person)", "", "", "", "", "", "", "", "", "", nightsAll ? XM(g.total / nightsAll) : "—"],
     [
       `🛂 Schengen days used (${SCHENGEN.has(homeC) ? `outside ${homeC}` : "in the Schengen area"})`,
-      "", "", "", "", "", "", "",
+      "", "", "", "", "", "", "", "", "",
       `${schD} of 90 per 180${schD > 90 ? " — OVER THE LEGAL LIMIT" : schD > 80 ? " — cutting it close" : ""}`,
     ],
     [`Note: excludes normal weekday living costs in ${plan.home}.`]
@@ -162,9 +174,12 @@ export function buildXlsxSheets(plan: Plan, livePrices: Record<string, LivePrice
   ordered.forEach((s) => {
     const stops = plan.placements[s.id].stops;
     const c = costsFor(s);
+    const travelers = travelersOf(s);
+    const stopSd = stopDates(s, stops, semYear);
     const multi = stops.length > 1;
     tp.push([`■ ${s.label} — ${s.date}${s.note ? `  (${s.note})` : ""}`]);
     tp.push(["Route", [plan.home, ...stops.map((st) => ctx.tripOf(st.tripId)?.n ?? "?"), plan.home].join(" → ")]);
+    if (travelers > 1) tp.push(["Travelers", `${travelers} (lodging split, food/activities/travel per person)`]);
     const fl = flagsOf(s);
     if (fl) tp.push(["⚠ Check", fl]);
     tp.push(["Booking tip", timingTipFor(s)]);
@@ -180,8 +195,18 @@ export function buildXlsxSheets(plan: Plan, livePrices: Record<string, LivePrice
       if (!t) return;
       tp.push(["", `${multi ? `Stop ${si + 1}: ` : ""}${t.n}, ${t.c} — ${st.nights === 0 ? "day trip" : `${st.nights} night${st.nights > 1 ? "s" : ""}`}`]);
       if (st.nights > 0) {
-        const lt = lodgingTiers(t.ci)[st.l];
-        tp.push(["", "", "Lodging", `${lt[0]} × ${st.nights}n`, XM(lt[1] * st.nights)]);
+        const lt = lodgingTiers(t.ci, travelers)[st.l];
+        const perPerson = lt[1] * st.nights;
+        const isLiveTier = st.l === 2 || st.l === 3;
+        const sdi = stopSd[si];
+        const liveHit = isLiveTier && sdi
+          ? liveHotelPrices[hotelKey(t.n, iso(sdi.in), iso(sdi.out), travelers, st.l === 2 ? "private" : "boutique")]
+          : undefined;
+        const liveNote = liveHit && liveHit.price !== null ? `LIVE: $${Math.round(liveHit.price)}` : isLiveTier ? "estimate (live price not checked yet)" : "estimate (no free live-price API for this tier)";
+        tp.push([
+          "", "", `Lodging (per person)`, `${lt[0]} × ${st.nights}n`, XM(perPerson),
+          travelers > 1 ? `${XM(perPerson * travelers).v} for ${travelers} — ${liveNote}` : liveNote,
+        ]);
       }
       const ft = foodTiers(t.ci)[st.fd];
       const dys = daysOf(st.nights);
@@ -191,7 +216,10 @@ export function buildXlsxSheets(plan: Plan, livePrices: Record<string, LivePrice
       t.f.forEach(([name, price], i) => { if (st.sig[i]) tp.push(["", "", "Bucket list (ref, not counted)", name, XM(price)]); });
       t.a.forEach(([name, price], i) => { if (st.act[i]) tp.push(["", "", "Activity", name, price ? XM(price) : "free"]); });
     });
-    tp.push(["", "SLOT TOTAL", "", "", "", "", XM(c.total)]);
+    tp.push([
+      "", "SLOT TOTAL (per person)", "", "", "", "", XM(c.total),
+      travelers > 1 ? `${XM(c.total * travelers).v} for ${travelers} total` : "",
+    ]);
     tp.push([]);
   });
   if (!ordered.length) tp.push(["(No trips scheduled yet.)"]);
@@ -233,17 +261,20 @@ export function buildXlsxSheets(plan: Plan, livePrices: Record<string, LivePrice
   const wk: Row[] = [
     [`SLOT-BY-SLOT CALENDAR — ${plan.name || "Plan"}`],
     [],
-    ["Slot", `Dates (${semYear})`, "Type", "Note", "Route", "Places", "Nights", "Cost", "Warnings"],
+    ["Slot", `Dates (${semYear})`, "Type", "Note", "Route", "Places", "Nights", "Travelers", "Cost (per person)", "Cost (group)", "Warnings"],
   ];
   slots.forEach((s) => {
     const filled = plan.placements[s.id]?.stops.length;
     const c = filled ? costsFor(s) : null;
+    const travelers = filled ? travelersOf(s) : 1;
     wk.push([
       s.label, s.date, s.kind, s.note || "",
       filled ? routeOf(s) : "— free —",
       filled ? plan.placements[s.id].stops.length : "",
       filled ? nightsOf(s) : "",
+      filled ? travelers : "",
       filled && c ? XM(c.total) : "",
+      filled && c && travelers > 1 ? XM(c.total * travelers) : "",
       filled ? flagsOf(s) : "",
     ]);
   });
@@ -256,7 +287,7 @@ export function buildXlsxSheets(plan: Plan, livePrices: Record<string, LivePrice
   ];
   const legsWithDates = (s: Slot) => {
     const stops = plan.placements[s.id].stops;
-    const legs = slotCosts(s.id, stops, ctx).legs;
+    const legs = slotCosts(s.id, stops, ctx, travelersOf(s)).legs;
     const sd = stopDates(s, stops, semYear);
     return legs.map((l, i) => ({ ...l, d: legDateFor(sd, stops.length, legs.length, i) }));
   };
@@ -281,7 +312,7 @@ export function buildXlsxSheets(plan: Plan, livePrices: Record<string, LivePrice
   lk.push([], ["🚆 TRAINS & BUSES"], ["Slot", "Leg", "~km", "Search 1", "Search 2", "Search 3"]);
   let anyRail = false;
   ordered.forEach((s) => {
-    slotCosts(s.id, plan.placements[s.id].stops, ctx).legs
+    slotCosts(s.id, plan.placements[s.id].stops, ctx, travelersOf(s)).legs
       .filter((l) => l.mode === "train/bus")
       .forEach((l) => {
         anyRail = true;
@@ -290,10 +321,11 @@ export function buildXlsxSheets(plan: Plan, livePrices: Record<string, LivePrice
   });
   if (!anyRail) lk.push(["(no rail/bus legs in this plan)"]);
 
-  lk.push([], ["🛏️ LODGING — links open with your dates pre-filled"], ["Slot", "City", "Check-in", "Check-out", "Nights", "Tier chosen", "Search 1", "Search 2", "Search 3"]);
+  lk.push([], ["🛏️ LODGING (estimate) — links open with your dates + travelers pre-filled"], ["Slot", "City", "Check-in", "Check-out", "Nights", "Travelers", "Tier chosen", "Search 1", "Search 2", "Search 3"]);
   let anyStay = false;
   ordered.forEach((s) => {
     const sd = stopDates(s, plan.placements[s.id].stops, semYear);
+    const travelers = travelersOf(s);
     plan.placements[s.id].stops.forEach((st, i) => {
       if (st.nights < 1) return;
       const t = ctx.tripOf(st.tripId);
@@ -302,10 +334,10 @@ export function buildXlsxSheets(plan: Plan, livePrices: Record<string, LivePrice
       const ci = iso(sd[i].in);
       const co = iso(sd[i].out);
       lk.push([
-        s.label, t.n, ci, co, st.nights, lodgingTiers(t.ci)[st.l][0],
-        XL("Hostelworld", hostelworldUrl(t.n, ci, co)),
-        XL("Booking.com", bookingComUrl(t.n, ci, co)),
-        XL("Airbnb", airbnbUrl(t.n, ci, co)),
+        s.label, t.n, ci, co, st.nights, travelers, lodgingTiers(t.ci, travelers)[st.l][0],
+        XL("Hostelworld", hostelworldUrl(t.n, ci, co, travelers)),
+        XL("Booking.com", bookingComUrl(t.n, ci, co, travelers)),
+        XL("Airbnb", airbnbUrl(t.n, ci, co, travelers)),
       ]);
     });
   });
@@ -364,19 +396,23 @@ function timingTipFor(s: Slot): string {
   return "Weekend citybreak: budget flights are usually cheapest ~4–6 weeks out and climb steeply in the final 2 weeks. Midweek or early-Saturday departures save the most.";
 }
 
-export async function exportPlanXlsx(plan: Plan, livePrices: Record<string, LivePrice> = {}) {
+export async function exportPlanXlsx(
+  plan: Plan,
+  livePrices: Record<string, LivePrice> = {},
+  liveHotelPrices: Record<string, LiveHotelPrice> = {}
+) {
   const XLSX = await import("xlsx");
-  const sheets = buildXlsxSheets(plan, livePrices);
+  const sheets = buildXlsxSheets(plan, livePrices, liveHotelPrices);
   const wb = XLSX.utils.book_new();
   const add = (aoa: Row[], name: string, cols: number[]) => {
     const ws = XLSX.utils.aoa_to_sheet(aoa);
     ws["!cols"] = cols.map((w) => ({ wch: w }));
     XLSX.utils.book_append_sheet(wb, ws, name);
   };
-  add(sheets.bud, "Budget", [26, 20, 44, 8, 10, 10, 10, 10, 12, 13, 10, 20, 60]);
+  add(sheets.bud, "Budget", [26, 20, 44, 8, 10, 10, 10, 14, 10, 12, 12, 16, 13, 10, 20, 60]);
   add(sheets.tp, "Travel Plan", [14, 34, 16, 30, 12, 8, 10, 34]);
   add(sheets.cal, "Calendar (Months)", [22, 22, 22, 22, 22, 22, 22]);
-  add(sheets.wk, "Calendar (Weekends)", [16, 22, 9, 26, 44, 7, 7, 9, 55]);
-  add(sheets.lk, "Booking Links", [16, 26, 13, 13, 10, 24, 16, 14, 14]);
+  add(sheets.wk, "Calendar (Weekends)", [16, 22, 9, 26, 44, 7, 7, 10, 12, 12, 55]);
+  add(sheets.lk, "Booking Links", [16, 26, 13, 13, 10, 10, 20, 16, 14, 14]);
   XLSX.writeFile(wb, `${(plan.name || "plan").replace(/[^\w-]+/g, "_")}_Travel_Plan.xlsx`);
 }

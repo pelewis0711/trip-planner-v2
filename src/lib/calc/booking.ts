@@ -22,16 +22,18 @@ export function googleFlightsUrl(from: string, to: string, date?: Date | null): 
   )}`;
 }
 
-export function hostelworldUrl(city: string, checkIn: string, checkOut: string): string {
-  return `https://www.hostelworld.com/search?search_keywords=${enc(city)}&from=${checkIn}&to=${checkOut}`;
+// Phase 8: guest count defaults to 1 (matches pre-Phase-8 links exactly for
+// solo travelers) so every existing call site keeps working unchanged.
+export function hostelworldUrl(city: string, checkIn: string, checkOut: string, guests = 1): string {
+  return `https://www.hostelworld.com/search?search_keywords=${enc(city)}&from=${checkIn}&to=${checkOut}&number_of_guests=${guests}`;
 }
 
-export function bookingComUrl(city: string, checkIn: string, checkOut: string): string {
-  return `https://www.booking.com/searchresults.html?ss=${enc(city)}&checkin=${checkIn}&checkout=${checkOut}`;
+export function bookingComUrl(city: string, checkIn: string, checkOut: string, guests = 1): string {
+  return `https://www.booking.com/searchresults.html?ss=${enc(city)}&checkin=${checkIn}&checkout=${checkOut}&group_adults=${guests}`;
 }
 
-export function airbnbUrl(city: string, checkIn: string, checkOut: string): string {
-  return `https://www.airbnb.com/s/${enc(city)}/homes?checkin=${checkIn}&checkout=${checkOut}`;
+export function airbnbUrl(city: string, checkIn: string, checkOut: string, guests = 1): string {
+  return `https://www.airbnb.com/s/${enc(city)}/homes?checkin=${checkIn}&checkout=${checkOut}&adults=${guests}`;
 }
 
 export function getYourGuideUrl(query: string): string {

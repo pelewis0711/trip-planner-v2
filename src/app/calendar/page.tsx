@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useActivePlan, usePlanStore } from "@/lib/store/plan";
 import { getSlotsForPlan } from "@/lib/calc/semester";
 import { makeCtx } from "@/lib/calc/context";
+import { travelersFor } from "@/lib/calc/costs";
 import { schengenDays, schengenStatus } from "@/lib/calc/schengen";
 import TripTray from "@/components/calendar/TripTray";
 import SlotCard from "@/components/calendar/SlotCard";
@@ -14,6 +15,7 @@ export default function CalendarPage() {
   const activePlan = useActivePlan();
   const { home, bag, placements } = activePlan;
   const slots = useMemo(() => getSlotsForPlan(activePlan), [activePlan]);
+  const semesterYear = activePlan.semester ? Number(activePlan.semester.start.slice(0, 4)) : 2027;
   const addStop = usePlanStore((s) => s.addStop);
   const removeStop = usePlanStore((s) => s.removeStop);
   const clearAll = usePlanStore((s) => s.clearAll);
@@ -143,6 +145,7 @@ export default function CalendarPage() {
                     slot={slot}
                     placement={placements[slot.id]}
                     ctx={ctx}
+                    travelers={travelersFor(placements[slot.id], activePlan.defaultTravelers ?? 1)}
                     armed={!!armedId}
                     onActivate={() => activate(slot.id)}
                     onDropTrip={(tripId) => dropTrip(slot.id, tripId)}
@@ -164,7 +167,9 @@ export default function CalendarPage() {
         </div>
       </div>
 
-      {editingSlot && <EditModal slot={editingSlot} ctx={ctx} onClose={() => setEditingSlotId(null)} />}
+      {editingSlot && (
+        <EditModal slot={editingSlot} ctx={ctx} year={semesterYear} onClose={() => setEditingSlotId(null)} />
+      )}
     </div>
   );
 }

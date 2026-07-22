@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useActivePlan, usePlanStore } from "@/lib/store/plan";
 import { getSlotsForPlan } from "@/lib/calc/semester";
 import { makeCtx } from "@/lib/calc/context";
-import { blendedTotals, grandTotals } from "@/lib/calc/costs";
+import { blendedTotals, grandTotals, travelersFor } from "@/lib/calc/costs";
 import { liveAdjustedGrandTotals } from "@/lib/calc/livePricing";
 import { useLivePriceStore } from "@/lib/store/livePrices";
 import { schengenDays, schengenStatus } from "@/lib/calc/schengen";
@@ -17,10 +17,11 @@ const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
 
 export default function ItineraryPage() {
   const activePlan = useActivePlan();
-  const { home, placements, bag, budget, useLivePrices } = activePlan;
+  const { home, placements, bag, budget, useLivePrices, defaultTravelers } = activePlan;
   const setBag = usePlanStore((s) => s.setBag);
   const setBudget = usePlanStore((s) => s.setBudget);
   const setUseLivePrices = usePlanStore((s) => s.setUseLivePrices);
+  const setDefaultTravelers = usePlanStore((s) => s.setDefaultTravelers);
   const livePrices = useLivePriceStore((s) => s.prices);
 
   const [editingBudget, setEditingBudget] = useState(false);
@@ -30,9 +31,9 @@ export default function ItineraryPage() {
   const slots = useMemo(() => getSlotsForPlan(activePlan), [activePlan]);
   const semesterYear = activePlan.semester ? Number(activePlan.semester.start.slice(0, 4)) : 2027;
   const g = useLivePrices
-    ? liveAdjustedGrandTotals(placements, ctx, slots, semesterYear, livePrices)
-    : grandTotals(placements, ctx);
-  const bt = blendedTotals(placements, ctx);
+    ? liveAdjustedGrandTotals(placements, ctx, slots, semesterYear, livePrices, defaultTravelers ?? 1)
+    : grandTotals(placements, ctx, defaultTravelers ?? 1);
+  const bt = blendedTotals(placements, ctx, defaultTravelers ?? 1);
   const schD = schengenDays(placements, home, ctx.tripOf);
   const schStatus = schengenStatus(schD);
   const ordered = slots.filter((s) => placements[s.id]?.stops.length);
@@ -75,14 +76,17 @@ export default function ItineraryPage() {
 
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
           {[
-            ["Travel", g.travel, "text-sky-400"],
-            ["Lodging", g.lodg, "text-violet-400"],
-            ["Food", g.food, "text-amber-400"],
-            ["Activities", g.act, "text-emerald-400"],
-            ["Trips subtotal", g.total, "text-zinc-100"],
-          ].map(([label, val, cls]) => (
+            ["Travel", g.travel, "text-sky-400", null],
+            ["Lodging", g.lodg, "text-violet-400", g.lodgGroup],
+            ["Food", g.food, "text-amber-400", null],
+            ["Activities", g.act, "text-emerald-400", null],
+            ["Trips subtotal (per person)", g.total, "text-zinc-100", g.totalGroup],
+          ].map(([label, val, cls, group]) => (
             <div key={label as string} className="rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-center">
               <b className={`block text-xl font-extrabold ${cls}`}>{money(val as number)}</b>
+              {group !== null && (group as number) !== (val as number) && (
+                <span className="block text-[11px] text-zinc-400">{money(group as number)} group total</span>
+              )}
               <span className="text-[11px] text-zinc-500">{label}</span>
             </div>
           ))}
@@ -121,6 +125,25 @@ export default function ItineraryPage() {
                 </option>
               ))}
             </select>
+          </label>
+
+          <label className="flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 font-semibold text-zinc-300">
+            👥 Default travelers
+            <button
+              type="button"
+              onClick={() => setDefaultTravelers(Math.max(1, (defaultTravelers ?? 1) - 1))}
+              className="rounded-md border border-zinc-700 px-1.5 font-bold"
+            >
+              −
+            </button>
+            <span className="w-4 text-center text-emerald-400">{defaultTravelers ?? 1}</span>
+            <button
+              type="button"
+              onClick={() => setDefaultTravelers(Math.min(20, (defaultTravelers ?? 1) + 1))}
+              className="rounded-md border border-zinc-700 px-1.5 font-bold"
+            >
+              +
+            </button>
           </label>
 
           {editingBudget ? (
@@ -217,7 +240,9 @@ export default function ItineraryPage() {
             placement={placements[slot.id]}
             ctx={ctx}
             home={home}
+            travelers={travelersFor(placements[slot.id], defaultTravelers ?? 1)}
             year={semesterYear}
+            useLive={!!useLivePrices}
           />
         ))}
       </div>

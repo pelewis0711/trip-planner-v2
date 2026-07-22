@@ -19,6 +19,9 @@ export interface SlotActuals {
 export interface Placement {
   stops: Stop[];
   actual?: SlotActuals;
+  // Phase 8: party size for this slot's whole group (shared across every
+  // stop in a multi-city slot). undefined -> use the plan's default.
+  travelers?: number;
 }
 
 export type Placements = Record<string, Placement>;

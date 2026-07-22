@@ -5,6 +5,7 @@ import type { Plan } from "@/lib/store/plan";
 import { planGrandTotals } from "@/lib/planTotals";
 import { exportPlanXlsx } from "@/lib/excel";
 import { useLivePriceStore } from "@/lib/store/livePrices";
+import { useLiveHotelPriceStore } from "@/lib/store/liveHotelPrices";
 import SharePanel from "./SharePanel";
 import SemesterPanel from "./SemesterPanel";
 
@@ -45,11 +46,12 @@ export default function PlanCard({
   const isOwner = !plan.ownerId || plan.ownerId === currentUserId;
   const isCollaboration = !plan.readOnly && plan.ownerId && plan.ownerId !== currentUserId;
   const livePrices = useLivePriceStore((s) => s.prices);
+  const liveHotelPrices = useLiveHotelPriceStore((s) => s.prices);
 
   const handleExportXlsx = async () => {
     setBuildingXlsx(true);
     try {
-      await exportPlanXlsx(plan, livePrices);
+      await exportPlanXlsx(plan, livePrices, liveHotelPrices);
     } catch {
       alert("Something went wrong building the Excel file. Try again in a moment.");
     } finally {

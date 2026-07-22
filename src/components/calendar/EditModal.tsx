@@ -5,7 +5,9 @@ import { useActivePlan, usePlanStore, type ActivityPreset } from "@/lib/store/pl
 import { useAuthStore } from "@/lib/store/auth";
 import type { PlannerCtx } from "@/lib/calc/context";
 import { daysOf, foodTiers, lodgingTiers } from "@/lib/calc/cost";
-import { slotCosts, tripPriceRange, stopCurrentEstimate } from "@/lib/calc/costs";
+import { slotCosts, tripPriceRange, stopCurrentEstimate, travelersFor } from "@/lib/calc/costs";
+import { stopDates, iso } from "@/lib/calc/dates";
+import LiveHotelPrice from "@/components/itinerary/LiveHotelPrice";
 import SlotCollab from "./SlotCollab";
 
 const PRESETS: [ActivityPreset, string][] = [
@@ -18,10 +20,12 @@ const PRESETS: [ActivityPreset, string][] = [
 export default function EditModal({
   slot,
   ctx,
+  year = 2027,
   onClose,
 }: {
   slot: Slot;
   ctx: PlannerCtx;
+  year?: number;
   onClose: () => void;
 }) {
   const plan = useActivePlan();
@@ -33,9 +37,12 @@ export default function EditModal({
   const toggleSig = usePlanStore((s) => s.toggleSig);
   const applyActivityPreset = usePlanStore((s) => s.applyActivityPreset);
   const moveStop = usePlanStore((s) => s.moveStop);
+  const setTravelersFor = usePlanStore((s) => s.setTravelersFor);
 
   const stops = placements[slot.id]?.stops ?? [];
-  const costs = stops.length ? slotCosts(slot.id, stops, ctx) : null;
+  const travelers = travelersFor(placements[slot.id], plan.defaultTravelers ?? 1);
+  const costs = stops.length ? slotCosts(slot.id, stops, ctx, travelers) : null;
+  const sd = stops.length ? stopDates(slot, stops, year) : [];
 
   if (!stops.length) {
     onClose();
@@ -65,15 +72,35 @@ export default function EditModal({
           </button>
         </div>
 
+        <div className="mt-3 flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-xs">
+          <span className="text-zinc-500">👥 Travelers</span>
+          <button
+            type="button"
+            onClick={() => setTravelersFor(slot.id, Math.max(1, travelers - 1))}
+            className="rounded-md border border-zinc-800 px-2 py-0.5 font-bold text-zinc-300"
+          >
+            −
+          </button>
+          <span className="w-6 text-center font-bold text-emerald-400">{travelers}</span>
+          <button
+            type="button"
+            onClick={() => setTravelersFor(slot.id, Math.min(20, travelers + 1))}
+            className="rounded-md border border-zinc-800 px-2 py-0.5 font-bold text-zinc-300"
+          >
+            +
+          </button>
+          <span className="text-zinc-500">for this whole slot (all stops share the group)</span>
+        </div>
+
         <div className="mt-4 space-y-4">
           {stops.map((st, i) => {
             const t = ctx.tripOf(st.tripId);
             if (!t) return null;
-            const lTiers = lodgingTiers(t.ci);
+            const lTiers = lodgingTiers(t.ci, travelers);
             const fTiers = foodTiers(t.ci);
             const days = daysOf(st.nights);
             const range = tripPriceRange(t, ctx);
-            const current = stopCurrentEstimate(t, st, ctx);
+            const current = stopCurrentEstimate(t, st, ctx, travelers);
 
             return (
               <div key={i} className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3.5">
@@ -120,7 +147,12 @@ export default function EditModal({
                   </span>
                   <br />
                   <span className="text-zinc-500">Current </span>
-                  <span className="font-semibold text-emerald-400">${Math.round(current)}</span>
+                  <span className="font-semibold text-emerald-400">
+                    ${Math.round(current)}
+                    {travelers > 1 && (
+                      <span className="font-normal text-zinc-500"> (${Math.round(current * travelers)} for {travelers})</span>
+                    )}
+                  </span>
                 </div>
 
                 <div className="mt-3 flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-xs">
@@ -146,14 +178,32 @@ export default function EditModal({
                 </div>
 
                 {st.nights > 0 && (
-                  <TierGroup
-                    label="🛏️ Lodging"
-                    tiers={lTiers}
-                    perNight
-                    nights={st.nights}
-                    value={st.l}
-                    onChange={(idx) => updateStop(slot.id, i, { l: idx })}
-                  />
+                  <>
+                    <TierGroup
+                      label="🛏️ Lodging (per person)"
+                      tiers={lTiers}
+                      perNight
+                      nights={st.nights}
+                      travelers={travelers}
+                      value={st.l}
+                      onChange={(idx) => updateStop(slot.id, i, { l: idx })}
+                    />
+                    <div className="mt-1">
+                      {st.l === 2 || st.l === 3 ? (
+                        <LiveHotelPrice
+                          city={t.n}
+                          checkIn={sd[i] ? iso(sd[i].in) : null}
+                          checkOut={sd[i] ? iso(sd[i].out) : null}
+                          guests={travelers}
+                          tier={st.l === 2 ? "private" : "boutique"}
+                        />
+                      ) : (
+                        <span className="text-[10.5px] text-zinc-600">
+                          estimate only — no free live-price API for hostels/Airbnb
+                        </span>
+                      )}
+                    </div>
+                  </>
                 )}
                 <TierGroup
                   label="🍽️ Food tier"
@@ -201,15 +251,19 @@ export default function EditModal({
         </div>
 
         {costs && (
-          <div className="mt-4 grid grid-cols-2 gap-2 border-t border-zinc-800 pt-3 sm:grid-cols-4">
+          <div className="mt-4 grid grid-cols-2 gap-2 border-t border-zinc-800 pt-3 sm:grid-cols-5">
             {[
-              ["Travel", costs.travel],
-              ["Lodging", costs.lodg],
-              ["Food", costs.food],
-              ["Activities", costs.act],
-            ].map(([label, val]) => (
+              ["Travel", costs.travel, null],
+              ["Lodging", costs.lodg, costs.lodg * travelers],
+              ["Food", costs.food, null],
+              ["Activities", costs.act, null],
+              ["Total (per person)", costs.total, costs.total * travelers],
+            ].map(([label, val, group]) => (
               <div key={label as string} className="rounded-lg bg-zinc-900/60 p-2 text-center">
                 <b className="block text-sm text-emerald-400">${Math.round(val as number)}</b>
+                {group !== null && travelers > 1 && (
+                  <span className="block text-[10px] text-zinc-400">${Math.round(group as number)} for {travelers}</span>
+                )}
                 <span className="text-[10px] text-zinc-500">{label}</span>
               </div>
             ))}
@@ -231,6 +285,7 @@ function TierGroup({
   nights,
   value,
   onChange,
+  travelers,
 }: {
   label: string;
   tiers: [string, number][];
@@ -238,6 +293,10 @@ function TierGroup({
   nights: number;
   value: number;
   onChange: (idx: number) => void;
+  // Phase 8: when set (>1), shows the whole-group total alongside the
+  // per-person price -- only lodging is group-aware, food/activities don't
+  // split, so this is omitted for the food TierGroup.
+  travelers?: number;
 }) {
   return (
     <div className="mt-3">
@@ -245,21 +304,30 @@ function TierGroup({
         {label}
       </h5>
       <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-        {tiers.map(([name, price], idx) => (
-          <button
-            key={name}
-            type="button"
-            onClick={() => onChange(idx)}
-            className={`rounded-lg border px-2 py-1.5 text-left text-[11px] transition-colors ${
-              value === idx
-                ? "border-emerald-500 bg-emerald-500/10 text-zinc-100"
-                : "border-zinc-800 bg-zinc-950 text-zinc-400 hover:border-zinc-600"
-            }`}
-          >
-            <span className="block truncate font-medium">{name}</span>
-            <span className="text-emerald-400">${price * nights}{perNight ? "" : " total"}</span>
-          </button>
-        ))}
+        {tiers.map(([name, price], idx) => {
+          const perPerson = price * nights;
+          return (
+            <button
+              key={name}
+              type="button"
+              onClick={() => onChange(idx)}
+              className={`rounded-lg border px-2 py-1.5 text-left text-[11px] transition-colors ${
+                value === idx
+                  ? "border-emerald-500 bg-emerald-500/10 text-zinc-100"
+                  : "border-zinc-800 bg-zinc-950 text-zinc-400 hover:border-zinc-600"
+              }`}
+            >
+              <span className="block truncate font-medium">{name}</span>
+              <span className="text-emerald-400">
+                ${perPerson}
+                {perNight ? "" : " total"}
+              </span>
+              {!!travelers && travelers > 1 && (
+                <span className="block text-[10px] text-zinc-500">${perPerson * travelers} for {travelers}</span>
+              )}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
