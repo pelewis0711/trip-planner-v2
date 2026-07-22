@@ -75,6 +75,54 @@ export const TRIPS: Trip[] = [
       [
         "Catacombs + Appian Way bike",
         20
+      ],
+      [
+        "Trastevere food & wine walking tour",
+        45
+      ],
+      [
+        "Ostia Antica ruins day trip",
+        15
+      ],
+      [
+        "Castel Sant'Angelo",
+        14
+      ],
+      [
+        "Hands-on pasta & tiramisu class",
+        55
+      ],
+      [
+        "Domus Aurea guided tour",
+        18
+      ],
+      [
+        "Capitoline Museums",
+        14
+      ],
+      [
+        "Baths of Caracalla",
+        9
+      ],
+      [
+        "Gianicolo Hill sunset viewpoint",
+        0
+      ],
+      [
+        "Jewish Ghetto walking tour",
+        0
+      ],
+      [
+        "Gladiator school experience",
+        65
+      ],
+      [
+        "Vatican Gardens guided tour",
+        35
+      ],
+      [
+        "Cinecitta film studios tour",
+        18
       ]
     ],
     "f": [
@@ -143,6 +191,54 @@ export const TRIPS: Trip[] = [
       [
         "Boboli + Pitti Palace",
         12
+      ],
+      [
+        "Bargello Museum",
+        12
+      ],
+      [
+        "Ponte Vecchio + Oltrarno walk",
+        0
+      ],
+      [
+        "San Lorenzo Medici Chapels",
+        10
+      ],
+      [
+        "Leather-making workshop",
+        45
+      ],
+      [
+        "Fiesole hilltop day trip",
+        8
+      ],
+      [
+        "Florentine steak dinner cooking class",
+        60
+      ],
+      [
+        "Santa Croce Basilica",
+        10
+      ],
+      [
+        "San Miniato al Monte sunset",
+        0
+      ],
+      [
+        "Mercato Centrale food tour",
+        30
+      ],
+      [
+        "Palazzo Vecchio tower climb",
+        14
+      ],
+      [
+        "Orsanmichele church",
+        0
+      ],
+      [
+        "Vasari Corridor guided tour",
+        45
       ]
     ],
     "f": [
@@ -193,7 +289,7 @@ export const TRIPS: Trip[] = [
         30
       ],
       [
-        "Gondola ride (split 5–6)",
+        "Gondola ride (split 5-6)",
         22
       ],
       [
@@ -207,6 +303,54 @@ export const TRIPS: Trip[] = [
       [
         "Vaporetto Grand Canal",
         9
+      ],
+      [
+        "Rialto Market morning walk",
+        0
+      ],
+      [
+        "Glassblowing demonstration (Murano)",
+        12
+      ],
+      [
+        "Scuola Grande di San Rocco",
+        12
+      ],
+      [
+        "Bacaro wine-bar crawl",
+        25
+      ],
+      [
+        "Lido beach day",
+        0
+      ],
+      [
+        "Secret Itineraries Doge's Palace tour",
+        32
+      ],
+      [
+        "Bell tower of San Giorgio Maggiore",
+        8
+      ],
+      [
+        "Venetian mask-making workshop",
+        40
+      ],
+      [
+        "Torcello island day trip",
+        15
+      ],
+      [
+        "Squero gondola-workshop visit",
+        0
+      ],
+      [
+        "Cicchetti food crawl",
+        35
+      ],
+      [
+        "Basilica dei Frari",
+        5
       ]
     ],
     "f": [
@@ -276,6 +420,50 @@ export const TRIPS: Trip[] = [
       [
         "Lake Como day trip",
         25
+      ],
+      [
+        "Pinacoteca di Brera",
+        15
+      ],
+      [
+        "Fashion district window-shopping walk",
+        0
+      ],
+      [
+        "Aperitivo happy-hour crawl",
+        20
+      ],
+      [
+        "Bergamo day trip",
+        12
+      ],
+      [
+        "Cimitero Monumentale",
+        0
+      ],
+      [
+        "Design district (Isola/Tortona) tour",
+        0
+      ],
+      [
+        "Teatro alla Scala museum",
+        9
+      ],
+      [
+        "Certosa di Pavia day trip",
+        15
+      ],
+      [
+        "Santa Maria delle Grazie cloister",
+        6
+      ],
+      [
+        "Risotto cooking class",
+        55
+      ],
+      [
+        "Motor Valley day trip (Modena)",
+        45
       ]
     ],
     "f": [
@@ -333,11 +521,51 @@ export const TRIPS: Trip[] = [
         25
       ],
       [
-        "Boat tour of all five",
+        "Boat tour of all five villages",
         35
       ],
       [
         "Sunset from Corniglia",
+        0
+      ],
+      [
+        "Vernazza harbor swim",
+        0
+      ],
+      [
+        "Local pesto-making class",
+        40
+      ],
+      [
+        "Via dell'Amore cliffside walk",
+        0
+      ],
+      [
+        "Portovenere day trip",
+        12
+      ],
+      [
+        "Terraced-vineyard wine tasting",
+        35
+      ],
+      [
+        "La Spezia market morning",
+        0
+      ],
+      [
+        "Kayak to hidden coves",
+        30
+      ],
+      [
+        "Focaccia & wine tasting",
+        15
+      ],
+      [
+        "Sciacchetra dessert-wine tasting",
+        20
+      ],
+      [
+        "Sunrise hike Monterosso-Vernazza",
         0
       ]
     ],
@@ -391,7 +619,7 @@ export const TRIPS: Trip[] = [
         0
       ],
       [
-        "Ötzi Iceman Museum",
+        "Otzi Iceman Museum",
         12
       ],
       [
@@ -401,6 +629,46 @@ export const TRIPS: Trip[] = [
       [
         "Tre Cime loop",
         10
+      ],
+      [
+        "Bolzano old town walk",
+        0
+      ],
+      [
+        "Alpe di Siusi horseback ride",
+        55
+      ],
+      [
+        "Cortina d'Ampezzo day trip",
+        15
+      ],
+      [
+        "Mountain-hut (rifugio) dinner",
+        35
+      ],
+      [
+        "Val Gardena cable-car circuit",
+        45
+      ],
+      [
+        "Tandem paragliding flight",
+        130
+      ],
+      [
+        "South Tyrolean wine tasting",
+        25
+      ],
+      [
+        "Karersee lake photo stop",
+        0
+      ],
+      [
+        "E-bike alpine trail rental",
+        40
+      ],
+      [
+        "Speck & apple strudel tasting tour",
+        20
       ]
     ],
     "f": [
@@ -454,7 +722,7 @@ export const TRIPS: Trip[] = [
         65
       ],
       [
-        "Positano–Amalfi ferry hop",
+        "Positano-Amalfi ferry hop",
         25
       ],
       [
@@ -464,6 +732,46 @@ export const TRIPS: Trip[] = [
       [
         "Ravello gardens",
         8
+      ],
+      [
+        "Limoncello tasting tour",
+        20
+      ],
+      [
+        "Amalfi Cathedral + cloister",
+        3
+      ],
+      [
+        "Sorrento day trip",
+        12
+      ],
+      [
+        "Blue Grotto boat excursion (Capri)",
+        20
+      ],
+      [
+        "Emerald Grotto (Conca dei Marini)",
+        8
+      ],
+      [
+        "Cooking class: pasta & limoncello",
+        65
+      ],
+      [
+        "Praiano cliffside swim spot",
+        0
+      ],
+      [
+        "Scenic SITA bus coastal ride",
+        0
+      ],
+      [
+        "Villa Cimbrone gardens (Ravello)",
+        8
+      ],
+      [
+        "Private boat day along the coast (split)",
+        90
       ]
     ],
     "f": [
@@ -532,6 +840,42 @@ export const TRIPS: Trip[] = [
       [
         "Herculaneum",
         15
+      ],
+      [
+        "Pizza-making class at a real pizzeria",
+        35
+      ],
+      [
+        "Cappella Sansevero (Veiled Christ)",
+        8
+      ],
+      [
+        "Castel dell'Ovo waterfront walk",
+        0
+      ],
+      [
+        "Naples street-food crawl",
+        20
+      ],
+      [
+        "Procida island day trip",
+        18
+      ],
+      [
+        "Certosa di San Martino",
+        6
+      ],
+      [
+        "Toledo metro art-station tour",
+        0
+      ],
+      [
+        "Phlegraean Fields volcanic crater",
+        10
+      ],
+      [
+        "Galleria Umberto I",
+        0
       ]
     ],
     "f": [
@@ -578,7 +922,7 @@ export const TRIPS: Trip[] = [
     "w": "Sicily's chaotic, delicious capital — Arab-Norman mosaics, street food, and Mondello beach.",
     "a": [
       [
-        "Ballarò + Vucciria market walk",
+        "Ballaro + Vucciria market walk",
         0
       ],
       [
@@ -596,6 +940,46 @@ export const TRIPS: Trip[] = [
       [
         "Capuchin catacombs",
         5
+      ],
+      [
+        "Street-food tour (arancini, panelle)",
+        20
+      ],
+      [
+        "Teatro Massimo tour",
+        8
+      ],
+      [
+        "Palermo Cathedral",
+        5
+      ],
+      [
+        "Cefalu day trip",
+        12
+      ],
+      [
+        "Mercato del Capo evening",
+        0
+      ],
+      [
+        "Zisa Castle",
+        6
+      ],
+      [
+        "Cooking class: Sicilian pasta",
+        45
+      ],
+      [
+        "Cala beach swim (city center)",
+        0
+      ],
+      [
+        "Segesta ruins day trip",
+        18
+      ],
+      [
+        "Politeama Theatre area walk",
+        0
       ]
     ],
     "f": [
@@ -660,6 +1044,46 @@ export const TRIPS: Trip[] = [
       [
         "4x4 to the summit zone",
         65
+      ],
+      [
+        "Catania Cathedral + elephant fountain",
+        0
+      ],
+      [
+        "Baroque old-town walking tour",
+        0
+      ],
+      [
+        "Aci Trezza cyclops-rocks boat trip",
+        20
+      ],
+      [
+        "Street-food tour (arancini, granita)",
+        18
+      ],
+      [
+        "Ursino Castle",
+        6
+      ],
+      [
+        "Etna wine tasting (no hike)",
+        25
+      ],
+      [
+        "Isola Bella swim (Taormina)",
+        0
+      ],
+      [
+        "Greek theatre of Taormina",
+        10
+      ],
+      [
+        "Fish-market breakfast crawl",
+        15
+      ],
+      [
+        "Bicycle tour of the lava-stone city",
+        20
       ]
     ],
     "f": [
@@ -723,6 +1147,46 @@ export const TRIPS: Trip[] = [
       [
         "Boat to Villasimius coves",
         45
+      ],
+      [
+        "Cagliari Cathedral",
+        0
+      ],
+      [
+        "Bastione San Remy viewpoint",
+        0
+      ],
+      [
+        "Sardinian cooking class (malloreddus)",
+        45
+      ],
+      [
+        "Poetto kitesurfing lesson",
+        60
+      ],
+      [
+        "Chia beach day trip",
+        15
+      ],
+      [
+        "San Benedetto market",
+        0
+      ],
+      [
+        "Molentargius flamingo park",
+        0
+      ],
+      [
+        "Villasimius scuba/snorkel trip",
+        55
+      ],
+      [
+        "Grotte Is Zuddas cave tour",
+        15
+      ],
+      [
+        "Su Nuraxi archaeological site",
+        12
       ]
     ],
     "f": [
@@ -787,6 +1251,46 @@ export const TRIPS: Trip[] = [
       [
         "Castel del Monte",
         7
+      ],
+      [
+        "Basilica di San Nicola",
+        0
+      ],
+      [
+        "Orecchiette-making lesson",
+        35
+      ],
+      [
+        "Lecce baroque day trip",
+        20
+      ],
+      [
+        "Ostuni white-city day trip",
+        18
+      ],
+      [
+        "Polignano cliff-diving viewpoint",
+        0
+      ],
+      [
+        "Puglia olive-oil tasting tour",
+        25
+      ],
+      [
+        "Torre Guaceto nature reserve",
+        10
+      ],
+      [
+        "Bari waterfront evening passeggiata",
+        0
+      ],
+      [
+        "Trani cathedral day trip",
+        15
+      ],
+      [
+        "Grotte di Castellana cave tour",
+        14
       ]
     ],
     "f": [
@@ -853,6 +1357,46 @@ export const TRIPS: Trip[] = [
       [
         "FICO food park",
         0
+      ],
+      [
+        "Tortellini & tagliatelle pasta class",
+        55
+      ],
+      [
+        "World's-oldest-university quarter tour",
+        0
+      ],
+      [
+        "Bologna porticoes walking tour",
+        0
+      ],
+      [
+        "Mercato di Mezzo food crawl",
+        25
+      ],
+      [
+        "Ferrari Museum day trip (Maranello)",
+        40
+      ],
+      [
+        "San Luca sanctuary hike/bus",
+        8
+      ],
+      [
+        "Gelato-tasting crawl",
+        15
+      ],
+      [
+        "Certosa di Bologna cemetery",
+        0
+      ],
+      [
+        "Balsamic-vinegar tasting (Modena)",
+        20
+      ],
+      [
+        "Bologna street-art tour",
+        0
       ]
     ],
     "f": [
@@ -917,6 +1461,46 @@ export const TRIPS: Trip[] = [
       [
         "Lake Garda day trip",
         18
+      ],
+      [
+        "Verona old-town walking tour",
+        0
+      ],
+      [
+        "Torre dei Lamberti climb",
+        8
+      ],
+      [
+        "Piazza delle Erbe market",
+        0
+      ],
+      [
+        "Giardino Giusti",
+        8
+      ],
+      [
+        "Amarone wine tasting",
+        40
+      ],
+      [
+        "Sirmione hot-springs day trip",
+        25
+      ],
+      [
+        "Ponte Pietra sunset",
+        0
+      ],
+      [
+        "Basilica di San Zeno",
+        3
+      ],
+      [
+        "Risotto all'Amarone cooking class",
+        50
+      ],
+      [
+        "Gardaland theme-park day trip",
+        45
       ]
     ],
     "f": [
@@ -976,6 +1560,50 @@ export const TRIPS: Trip[] = [
       [
         "Brunello wine tasting",
         40
+      ],
+      [
+        "Basilica di San Domenico",
+        0
+      ],
+      [
+        "Fortezza Medicea walk",
+        0
+      ],
+      [
+        "Val d'Orcia scenic day trip",
+        30
+      ],
+      [
+        "Pienza cheese tasting",
+        20
+      ],
+      [
+        "Contrade (Palio districts) walking tour",
+        0
+      ],
+      [
+        "Montepulciano wine day trip",
+        35
+      ],
+      [
+        "Siena cooking class (pici pasta)",
+        50
+      ],
+      [
+        "Crete Senesi photography day trip",
+        25
+      ],
+      [
+        "Panforte & cantucci tasting",
+        12
+      ],
+      [
+        "Abbey of Sant'Antimo day trip",
+        15
+      ],
+      [
+        "Duomo museum + rooftop (Facciatone)",
+        15
       ]
     ],
     "f": [
@@ -1042,6 +1670,46 @@ export const TRIPS: Trip[] = [
       [
         "Superga hill tram + view",
         8
+      ],
+      [
+        "Chocolate-tasting walking tour",
+        30
+      ],
+      [
+        "Palazzo Madama",
+        10
+      ],
+      [
+        "Turin Shroud Cathedral",
+        0
+      ],
+      [
+        "Porta Palazzo market",
+        0
+      ],
+      [
+        "Reggia di Venaria Reale day trip",
+        20
+      ],
+      [
+        "Langhe wine-region day trip (Barolo)",
+        55
+      ],
+      [
+        "Juventus Stadium tour",
+        20
+      ],
+      [
+        "Parco del Valentino walk",
+        0
+      ],
+      [
+        "National Automobile Museum",
+        14
+      ],
+      [
+        "Gianduiotto chocolate-making class",
+        40
       ]
     ],
     "f": [
@@ -1106,6 +1774,46 @@ export const TRIPS: Trip[] = [
       [
         "Portofino day trip",
         15
+      ],
+      [
+        "Pesto-making class",
+        35
+      ],
+      [
+        "Genoa Cathedral (San Lorenzo)",
+        0
+      ],
+      [
+        "Lanterna lighthouse walk",
+        3
+      ],
+      [
+        "Focaccia tasting crawl",
+        15
+      ],
+      [
+        "Cinque Terre day trip (from Genoa)",
+        30
+      ],
+      [
+        "Via Garibaldi palaces",
+        0
+      ],
+      [
+        "Camogli fishing-village day trip",
+        12
+      ],
+      [
+        "Staglieno monumental cemetery",
+        0
+      ],
+      [
+        "San Fruttuoso abbey boat trip",
+        20
+      ],
+      [
+        "Nervi seaside promenade",
+        0
       ]
     ],
     "f": [
@@ -1166,6 +1874,50 @@ export const TRIPS: Trip[] = [
       [
         "Canyon viewpoint hike",
         0
+      ],
+      [
+        "Matera Cathedral",
+        0
+      ],
+      [
+        "Cave-hotel crypt aperitivo",
+        15
+      ],
+      [
+        "Palombaro Lungo underground cistern",
+        5
+      ],
+      [
+        "Murgia Materana Park hike",
+        0
+      ],
+      [
+        "Local orecchiette-making class",
+        35
+      ],
+      [
+        "Sassi-by-night photography walk",
+        0
+      ],
+      [
+        "Sassi cave-church candlelit tour",
+        20
+      ],
+      [
+        "Altamura bread-tasting day trip",
+        15
+      ],
+      [
+        "Craco ghost-town day trip",
+        25
+      ],
+      [
+        "Primitivo wine tasting",
+        20
+      ],
+      [
+        "E-bike tour of the ravine",
+        30
       ]
     ],
     "f": [
@@ -1211,7 +1963,7 @@ export const TRIPS: Trip[] = [
     "w": "The 'Florence of the South' — over-the-top baroque in golden stone, and Salento beaches nearby.",
     "a": [
       [
-        "Baroque old town walk",
+        "Baroque old-town walk",
         0
       ],
       [
@@ -1225,6 +1977,50 @@ export const TRIPS: Trip[] = [
       [
         "Otranto/Gallipoli beach day",
         15
+      ],
+      [
+        "Lecce Cathedral",
+        0
+      ],
+      [
+        "Papier-mache workshop (cartapesta)",
+        30
+      ],
+      [
+        "Pasticciotto pastry-tasting crawl",
+        12
+      ],
+      [
+        "Otranto castle + old-town day trip",
+        10
+      ],
+      [
+        "Salento beach-hopping day trip",
+        20
+      ],
+      [
+        "Grotta della Poesia sea-cave swim",
+        0
+      ],
+      [
+        "Gallipoli old-town evening",
+        0
+      ],
+      [
+        "Puglia orecchiette cooking class",
+        40
+      ],
+      [
+        "Porto Cesareo nature reserve",
+        10
+      ],
+      [
+        "Roman theatre",
+        5
+      ],
+      [
+        "Salento wine tasting (Negroamaro)",
+        25
       ]
     ],
     "f": [
@@ -1284,6 +2080,50 @@ export const TRIPS: Trip[] = [
       [
         "Lake Trasimeno day",
         10
+      ],
+      [
+        "Perugina chocolate-factory tour",
+        15
+      ],
+      [
+        "Corso Vannucci evening passeggiata",
+        0
+      ],
+      [
+        "Rocca Paolina underground fortress",
+        0
+      ],
+      [
+        "Spoleto day trip",
+        18
+      ],
+      [
+        "Umbria truffle-hunting experience",
+        55
+      ],
+      [
+        "Assisi hilltop sunset viewpoint",
+        0
+      ],
+      [
+        "Deruta ceramics workshop",
+        30
+      ],
+      [
+        "Umbria Jazz square evening (seasonal)",
+        0
+      ],
+      [
+        "Gubbio medieval-town day trip",
+        20
+      ],
+      [
+        "Orvieto day trip + cathedral",
+        22
+      ],
+      [
+        "Sagrantino wine tasting (Montefalco)",
+        30
       ]
     ],
     "f": [

@@ -25,6 +25,22 @@ const TRIPS = extractValue(
   "/* ============ CALENDAR SLOTS",
   "const TRIPS="
 );
+
+// Phase 7 Part A: merge in hand-authored activity expansions (15-25 per
+// city, replacing v1's original 3-7) for whichever trips have one so far --
+// see src/data/activityExpansions.json and CLAUDE.md's Phase 7 section for
+// how this gets extended over future sessions. reference-v1-app.html itself
+// is never touched; trips with no overlay entry yet just keep their
+// original extracted `a` array.
+const activityExpansionsPath = path.join(root, "src/data/activityExpansions.json");
+const activityExpansions = JSON.parse(readFileSync(activityExpansionsPath, "utf8"));
+let expanded = 0;
+for (const t of TRIPS) {
+  if (activityExpansions[t.id]) {
+    t.a = activityExpansions[t.id];
+    expanded++;
+  }
+}
 const SLOTS = extractValue(
   "const SLOTS=[",
   "const TRIP=Object.fromEntries",
@@ -88,7 +104,7 @@ writeFileSync(
   banner + HOMES_TYPE + JSON.stringify(HOMES, null, 2) + ";\n"
 );
 
-console.log(`TRIPS: ${TRIPS.length}`);
+console.log(`TRIPS: ${TRIPS.length} (${expanded} with expanded activities from activityExpansions.json)`);
 console.log(`SLOTS: ${SLOTS.length}`);
 console.log(`HOMES: ${Object.keys(HOMES).length}`);
 console.log("\nSpot-check:");

@@ -45,15 +45,34 @@ export interface Plan {
   lastEditedAt?: number | null;
 }
 
+// Phase 7: activities start unchecked -- with 15-25 per city incoming, auto-
+// checking everything would make every stop look absurdly expensive and
+// defeats the point of choice. Signature dishes stay auto-checked: they're a
+// $0 bucket list now (see costs.ts), so "all on" costs nothing and reads
+// naturally as "here's what to try."
 function defaultStop(t: Trip): Stop {
   return {
     tripId: t.id,
     nights: t.g,
-    act: t.a.map(() => true),
+    act: t.a.map(() => false),
     sig: t.f.map(() => true),
     l: 0,
     fd: 0,
   };
+}
+
+export type ActivityPreset = "none" | "highlights" | "balanced" | "everything";
+
+// Highlights/Balanced both read as "top N in authored priority order" -- city
+// activity lists are authored must-do-first, so this needs no extra
+// per-activity metadata and automatically covers future AI-discovered trips.
+export function presetActivityChecks(count: number, preset: ActivityPreset): boolean[] {
+  const n =
+    preset === "none" ? 0
+    : preset === "highlights" ? Math.min(3, count)
+    : preset === "balanced" ? Math.ceil(count / 2)
+    : count;
+  return Array.from({ length: count }, (_, i) => i < n);
 }
 
 const DEFAULT_ID = "p_default";
@@ -83,12 +102,18 @@ interface PlanStoreState {
   defaultHome: string;
   defaultSemester: SemesterConfig | undefined;
 
+  // Phase 7: one-time "food pricing was fixed" banner -- global, not
+  // per-plan, since it's about the app's math changing, not any one plan.
+  foodFixNoticeSeen: boolean;
+  dismissFoodFixNotice: () => void;
+
   // mutate the ACTIVE plan
   addStop: (slotId: string, tripId: string) => void;
   removeStop: (slotId: string, stopIndex: number) => void;
   updateStop: (slotId: string, stopIndex: number, patch: Partial<Stop>) => void;
   toggleAct: (slotId: string, stopIndex: number, actIndex: number) => void;
   toggleSig: (slotId: string, stopIndex: number, sigIndex: number) => void;
+  applyActivityPreset: (slotId: string, stopIndex: number, preset: ActivityPreset) => void;
   moveStop: (slotId: string, from: number, to: number) => void;
   clearSlot: (slotId: string) => void;
   clearAll: () => void;
@@ -173,6 +198,7 @@ export const usePlanStore = create<PlanStoreState>()(
       pendingSyncIds: [],
       defaultHome: "Prague",
       defaultSemester: undefined,
+      foodFixNoticeSeen: false,
 
       addStop: (slotId, tripId) =>
         set((state) =>
@@ -228,6 +254,16 @@ export const usePlanStore = create<PlanStoreState>()(
               sig[sigIndex] = !sig[sigIndex];
               return { ...s, sig };
             }),
+          }))
+        ),
+
+      applyActivityPreset: (slotId, stopIndex, preset) =>
+        set((state) =>
+          withActive(state, (p) => ({
+            placements: withStop(p.placements, slotId, stopIndex, (s) => ({
+              ...s,
+              act: presetActivityChecks(s.act.length, preset),
+            })),
           }))
         ),
 
@@ -448,6 +484,8 @@ export const usePlanStore = create<PlanStoreState>()(
         set((state) => ({ pendingSyncIds: state.pendingSyncIds.filter((id) => !ids.includes(id)) })),
 
       setOnboardingDefaults: (home, semester) => set({ defaultHome: home, defaultSemester: semester }),
+
+      dismissFoodFixNotice: () => set({ foodFixNoticeSeen: true }),
     }),
     {
       name: "activePlan",
@@ -459,6 +497,7 @@ export const usePlanStore = create<PlanStoreState>()(
         pendingSyncIds: state.pendingSyncIds,
         defaultHome: state.defaultHome,
         defaultSemester: state.defaultSemester,
+        foodFixNoticeSeen: state.foodFixNoticeSeen,
       }),
       migrate: (persisted, version) => {
         const state = (persisted ?? {}) as Record<string, unknown>;

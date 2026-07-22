@@ -30,7 +30,15 @@ const MO_SHORT: Record<number, string> = {
   7: "Jul", 8: "Aug", 9: "Sep", 10: "Oct", 11: "Nov", 12: "Dec",
 };
 
-export default function TripCard({ trip, price }: { trip: Trip; price: number }) {
+export default function TripCard({
+  trip,
+  floor,
+  ceiling,
+}: {
+  trip: Trip;
+  floor: number;
+  ceiling: number;
+}) {
   const tier = tierOf(trip.ci);
   return (
     <div className="flex flex-col rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 transition-colors hover:border-emerald-500/40">
@@ -64,7 +72,9 @@ export default function TripCard({ trip, price }: { trip: Trip; price: number })
           {trip.g === 0 ? "Day trip" : `${trip.g} night${trip.g > 1 ? "s" : ""}`} &middot;{" "}
           {trip.m.map((m) => MO_SHORT[m]).join("/")}
         </span>
-        <span className="text-[15px] font-extrabold text-emerald-400">${Math.round(price)}</span>
+        <span className="text-[15px] font-extrabold text-emerald-400">
+          ${Math.round(floor)}–${Math.round(ceiling)}
+        </span>
       </div>
     </div>
   );
