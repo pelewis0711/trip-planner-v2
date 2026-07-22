@@ -6268,6 +6268,50 @@ export const TRIPS: Trip[] = [
       [
         "Paragliding over the lake",
         110
+      ],
+      [
+        "Lake Annecy swim spot",
+        0
+      ],
+      [
+        "Old-town food market",
+        0
+      ],
+      [
+        "Talloires lakeside village day trip",
+        15
+      ],
+      [
+        "Chateau de Menthon-Saint-Bernard",
+        10
+      ],
+      [
+        "Gorges du Fier walkway",
+        8
+      ],
+      [
+        "Cheese & wine tasting",
+        25
+      ],
+      [
+        "Col de la Forclaz launch viewpoint",
+        0
+      ],
+      [
+        "SUP / kayak the lake",
+        25
+      ],
+      [
+        "Christmas market walk (seasonal)",
+        0
+      ],
+      [
+        "Tournette mountain hike",
+        0
+      ],
+      [
+        "Aravis mountain-pass scenic drive",
+        15
       ]
     ],
     "f": [
@@ -6327,6 +6371,46 @@ export const TRIPS: Trip[] = [
       [
         "SUP on the lake",
         18
+      ],
+      [
+        "Kremsnita cream-cake tasting",
+        6
+      ],
+      [
+        "Lake Bled swim",
+        0
+      ],
+      [
+        "Straza summer toboggan",
+        15
+      ],
+      [
+        "Bled Castle wine cellar",
+        12
+      ],
+      [
+        "Bled Island bell ring",
+        0
+      ],
+      [
+        "Lake Bled walking loop (6km)",
+        0
+      ],
+      [
+        "Radovna village hike extension",
+        0
+      ],
+      [
+        "Bled golf-course scenic walk",
+        0
+      ],
+      [
+        "Zaka beach + rowing",
+        10
+      ],
+      [
+        "Rikli forest walking path",
+        0
       ]
     ],
     "f": [
@@ -6381,6 +6465,50 @@ export const TRIPS: Trip[] = [
       [
         "Mostnica Gorge trail",
         4
+      ],
+      [
+        "Bohinj lake swim",
+        0
+      ],
+      [
+        "Triglav National Park visitor center",
+        5
+      ],
+      [
+        "Cheese-dairy tour",
+        12
+      ],
+      [
+        "Prsivec viewpoint hike",
+        0
+      ],
+      [
+        "Voje valley waterfall hike",
+        0
+      ],
+      [
+        "Railway tunnel walk",
+        0
+      ],
+      [
+        "Stara Fuzina village walk",
+        0
+      ],
+      [
+        "Funfair boat cruise",
+        12
+      ],
+      [
+        "Komna plateau alpine hike",
+        0
+      ],
+      [
+        "Mostnica canyon swim spot",
+        0
+      ],
+      [
+        "Vogel summer luge",
+        15
       ]
     ],
     "f": [
@@ -6436,6 +6564,50 @@ export const TRIPS: Trip[] = [
       [
         "Tobotronc alpine coaster",
         25
+      ],
+      [
+        "Andorra la Vella old-town walk",
+        0
+      ],
+      [
+        "Duty-free shopping crawl",
+        0
+      ],
+      [
+        "Naturlandia zipline park",
+        30
+      ],
+      [
+        "Casa de la Vall (parliament house)",
+        5
+      ],
+      [
+        "Andorra ski museum",
+        6
+      ],
+      [
+        "Engolasters lake walk",
+        0
+      ],
+      [
+        "Roc del Quer viewpoint",
+        0
+      ],
+      [
+        "Canillo funicular + viewpoint",
+        15
+      ],
+      [
+        "Meritxell sanctuary",
+        0
+      ],
+      [
+        "Andorra fondue dinner",
+        30
+      ],
+      [
+        "Coma Pedrosa peak hike",
+        0
       ]
     ],
     "f": [
@@ -6490,6 +6662,50 @@ export const TRIPS: Trip[] = [
       [
         "Olympic ski jump",
         5
+      ],
+      [
+        "Garmisch old-town walk",
+        0
+      ],
+      [
+        "Alpspix viewing platform",
+        20
+      ],
+      [
+        "Hollentalklamm gorge hike",
+        8
+      ],
+      [
+        "Bavarian beer-garden lunch",
+        20
+      ],
+      [
+        "Kandahar ski-run summer hike",
+        0
+      ],
+      [
+        "Wank mountain cable car",
+        25
+      ],
+      [
+        "Werdenfels museum",
+        6
+      ],
+      [
+        "Mittenwald violin-town day trip",
+        10
+      ],
+      [
+        "Eibsee lake swim/boat rental",
+        15
+      ],
+      [
+        "Thermal-bath spa",
+        25
+      ],
+      [
+        "Zugspitze glacier snow experience (seasonal)",
+        15
       ]
     ],
     "f": [
@@ -6541,7 +6757,7 @@ export const TRIPS: Trip[] = [
         30
       ],
       [
-        "Musée d'Orsay",
+        "Musee d'Orsay",
         18
       ],
       [
@@ -6557,8 +6773,56 @@ export const TRIPS: Trip[] = [
         29
       ],
       [
-        "Montmartre + Sacré-Cœur",
+        "Montmartre + Sacre-Coeur",
         0
+      ],
+      [
+        "Seine river cruise",
+        18
+      ],
+      [
+        "Sainte-Chapelle stained glass",
+        13
+      ],
+      [
+        "Musee de l'Orangerie",
+        14
+      ],
+      [
+        "Latin Quarter walking tour",
+        0
+      ],
+      [
+        "Le Marais neighborhood walk",
+        0
+      ],
+      [
+        "Pere Lachaise cemetery",
+        0
+      ],
+      [
+        "Arc de Triomphe rooftop",
+        14
+      ],
+      [
+        "Centre Pompidou",
+        16
+      ],
+      [
+        "Croissant & pastry crawl",
+        15
+      ],
+      [
+        "French cooking class",
+        65
+      ],
+      [
+        "Palais Garnier opera-house tour",
+        15
+      ],
+      [
+        "Rodin Museum",
+        13
       ]
     ],
     "f": [
@@ -6608,7 +6872,7 @@ export const TRIPS: Trip[] = [
         15
       ],
       [
-        "Èze hilltop village",
+        "Eze hilltop village",
         0
       ],
       [
@@ -6621,6 +6885,46 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Sea-kayak the coast",
+        30
+      ],
+      [
+        "Cours Saleya flower/food market",
+        0
+      ],
+      [
+        "Vieux Nice walking tour",
+        0
+      ],
+      [
+        "Promenade des Anglais bike rental",
+        15
+      ],
+      [
+        "Matisse Museum",
+        10
+      ],
+      [
+        "Villefranche-sur-Mer beach day",
+        0
+      ],
+      [
+        "Socca tasting crawl",
+        12
+      ],
+      [
+        "Saint-Paul-de-Vence day trip",
+        15
+      ],
+      [
+        "Monaco Grand Casino visit",
+        12
+      ],
+      [
+        "Mont Boron hilltop hike",
+        0
+      ],
+      [
+        "Grasse perfume workshop day trip",
         30
       ]
     ],
@@ -6674,7 +6978,7 @@ export const TRIPS: Trip[] = [
         0
       ],
       [
-        "Fourvière basilica + Roman theatres",
+        "Fourviere basilica + Roman theatres",
         0
       ],
       [
@@ -6684,6 +6988,50 @@ export const TRIPS: Trip[] = [
       [
         "Beaujolais vineyard day trip",
         55
+      ],
+      [
+        "Croix-Rousse silk-weaver walking tour",
+        0
+      ],
+      [
+        "Musee des Confluences",
+        9
+      ],
+      [
+        "Bouchon Lyonnais dinner experience",
+        35
+      ],
+      [
+        "Presqu'ile shopping & cafe walk",
+        0
+      ],
+      [
+        "Institut Lumiere",
+        8
+      ],
+      [
+        "Parc de la Tete d'Or walk",
+        0
+      ],
+      [
+        "Street-food crawl",
+        15
+      ],
+      [
+        "Perouges medieval village day trip",
+        12
+      ],
+      [
+        "Fete des Lumieres evening (seasonal)",
+        0
+      ],
+      [
+        "Roman theatre concert (seasonal)",
+        20
+      ],
+      [
+        "City-center wine-tasting cellar",
+        25
       ]
     ],
     "f": [
@@ -6738,7 +7086,7 @@ export const TRIPS: Trip[] = [
         0
       ],
       [
-        "Château d'If island",
+        "Chateau d'If island",
         13
       ],
       [
@@ -6748,6 +7096,46 @@ export const TRIPS: Trip[] = [
       [
         "Cassis coastal day",
         12
+      ],
+      [
+        "MuCEM museum",
+        11
+      ],
+      [
+        "Vieux Port morning walk",
+        0
+      ],
+      [
+        "Savon de Marseille soap workshop",
+        20
+      ],
+      [
+        "Bouillabaisse tasting dinner",
+        35
+      ],
+      [
+        "Panier street-art walk",
+        0
+      ],
+      [
+        "Frioul Islands boat trip",
+        15
+      ],
+      [
+        "Pastis tasting",
+        15
+      ],
+      [
+        "Longchamp Palace + gardens",
+        0
+      ],
+      [
+        "Calanque de Sugiton hike",
+        0
+      ],
+      [
+        "Fish-market morning walk",
+        0
       ]
     ],
     "f": [
@@ -6790,11 +7178,11 @@ export const TRIPS: Trip[] = [
     "w": "The world's wine capital in a golden 18th-century city — plus Europe's tallest dune nearby.",
     "a": [
       [
-        "Cité du Vin wine museum",
+        "Cite du Vin wine museum",
         22
       ],
       [
-        "Saint-Émilion vineyard tour",
+        "Saint-Emilion vineyard tour",
         70
       ],
       [
@@ -6804,6 +7192,50 @@ export const TRIPS: Trip[] = [
       [
         "Dune du Pilat day trip",
         20
+      ],
+      [
+        "Wine-tasting class",
+        35
+      ],
+      [
+        "Place de la Bourse evening walk",
+        0
+      ],
+      [
+        "Cannele pastry tasting",
+        8
+      ],
+      [
+        "Grand Theatre tour",
+        10
+      ],
+      [
+        "Medoc vineyard day trip",
+        55
+      ],
+      [
+        "Darwin ecosystem street-art walk",
+        0
+      ],
+      [
+        "Arcachon Bay oyster tasting",
+        20
+      ],
+      [
+        "Cathedral + tower climb",
+        6
+      ],
+      [
+        "Cap Ferret day trip",
+        15
+      ],
+      [
+        "Night wine-bar crawl",
+        20
+      ],
+      [
+        "Rocher de Palmer viewpoint",
+        0
       ]
     ],
     "f": [
@@ -6861,6 +7293,50 @@ export const TRIPS: Trip[] = [
       [
         "Boat tour of the Ill",
         15
+      ],
+      [
+        "Christmas market walk (seasonal)",
+        0
+      ],
+      [
+        "Tarte flambee tasting crawl",
+        12
+      ],
+      [
+        "European Parliament exterior tour",
+        0
+      ],
+      [
+        "Barrage Vauban viewpoint",
+        0
+      ],
+      [
+        "Musee Alsacien",
+        7
+      ],
+      [
+        "Colmar day trip",
+        15
+      ],
+      [
+        "Route des Vins bike tour",
+        25
+      ],
+      [
+        "Beer/wine bar crawl",
+        15
+      ],
+      [
+        "Palais Rohan museum",
+        10
+      ],
+      [
+        "Petite France photography walk",
+        0
+      ],
+      [
+        "Riquewihr fairytale village day trip",
+        12
       ]
     ],
     "f": [
@@ -6917,6 +7393,50 @@ export const TRIPS: Trip[] = [
       [
         "Mont-Saint-Michel day trip",
         15
+      ],
+      [
+        "Pointe du Hoc cliffside memorial",
+        0
+      ],
+      [
+        "Arromanches D-Day museum",
+        8
+      ],
+      [
+        "Bayeux old-town walk",
+        0
+      ],
+      [
+        "Cider & Calvados tasting",
+        20
+      ],
+      [
+        "Camembert cheese-farm tasting",
+        15
+      ],
+      [
+        "Honfleur harbor town day trip",
+        15
+      ],
+      [
+        "Etretat cliffs day trip",
+        15
+      ],
+      [
+        "Utah Beach museum",
+        8
+      ],
+      [
+        "Caen Memorial museum",
+        20
+      ],
+      [
+        "Deauville boardwalk day trip",
+        10
+      ],
+      [
+        "Rouen old-town day trip",
+        15
       ]
     ],
     "f": [
@@ -6959,11 +7479,11 @@ export const TRIPS: Trip[] = [
     "w": "A valley of storybook Renaissance castles — bike between Chenonceau and Chambord through vineyards.",
     "a": [
       [
-        "Château de Chenonceau",
+        "Chateau de Chenonceau",
         16
       ],
       [
-        "Château de Chambord",
+        "Chateau de Chambord",
         16
       ],
       [
@@ -6973,6 +7493,50 @@ export const TRIPS: Trip[] = [
       [
         "Vouvray wine cellar",
         14
+      ],
+      [
+        "Chateau de Villandry gardens",
+        12
+      ],
+      [
+        "Chateau d'Amboise",
+        13
+      ],
+      [
+        "Clos Luce (da Vinci's home)",
+        15
+      ],
+      [
+        "Loire river canoe",
+        20
+      ],
+      [
+        "Tours old-town walk",
+        0
+      ],
+      [
+        "Chateau d'Azay-le-Rideau",
+        12
+      ],
+      [
+        "Loire wine-tasting tour",
+        30
+      ],
+      [
+        "Blois castle",
+        12
+      ],
+      [
+        "Troglodyte cave-dwelling visit",
+        8
+      ],
+      [
+        "Amboise market morning",
+        0
+      ],
+      [
+        "Fontevraud Abbey day trip",
+        10
       ]
     ],
     "f": [
@@ -7037,6 +7601,42 @@ export const TRIPS: Trip[] = [
       [
         "Heineken Experience",
         23
+      ],
+      [
+        "Jordaan neighborhood walk",
+        0
+      ],
+      [
+        "Albert Cuyp Market",
+        0
+      ],
+      [
+        "Vondelpark bike/picnic",
+        0
+      ],
+      [
+        "Bike-rental city tour",
+        15
+      ],
+      [
+        "Red Light District evening walk",
+        0
+      ],
+      [
+        "A'DAM Lookout tower",
+        15
+      ],
+      [
+        "Stroopwafel-tasting crawl",
+        8
+      ],
+      [
+        "Zaanse Schans windmill village day trip",
+        15
+      ],
+      [
+        "NEMO Science Museum",
+        18
       ]
     ],
     "f": [
@@ -7096,6 +7696,50 @@ export const TRIPS: Trip[] = [
       [
         "Harbor architecture boat",
         18
+      ],
+      [
+        "Street-food crawl",
+        15
+      ],
+      [
+        "Delfshaven historic harbor walk",
+        0
+      ],
+      [
+        "Kunsthal art museum",
+        16
+      ],
+      [
+        "Hotel New York walk",
+        0
+      ],
+      [
+        "Delft day trip",
+        12
+      ],
+      [
+        "Nightlife-district crawl",
+        15
+      ],
+      [
+        "Erasmus Bridge sunset viewpoint",
+        0
+      ],
+      [
+        "Museum Boijmans classic wing",
+        20
+      ],
+      [
+        "Kinderdijk windmills day trip",
+        15
+      ],
+      [
+        "Witte de Withstraat art-district walk",
+        0
+      ],
+      [
+        "Rotterdam Zoo (Diergaarde Blijdorp)",
+        25
       ]
     ],
     "f": [
@@ -7152,6 +7796,50 @@ export const TRIPS: Trip[] = [
       [
         "Castle de Haar day trip",
         18
+      ],
+      [
+        "Old-town walking tour",
+        0
+      ],
+      [
+        "Wharf-cellar bar crawl",
+        15
+      ],
+      [
+        "Centraal Museum",
+        15
+      ],
+      [
+        "Railway Museum",
+        18
+      ],
+      [
+        "Botanical garden",
+        8
+      ],
+      [
+        "Oudegracht canal-side cafe evening",
+        0
+      ],
+      [
+        "Speelklok mechanical-music museum",
+        12
+      ],
+      [
+        "Bike tour",
+        15
+      ],
+      [
+        "Rietveld Schroder House",
+        14
+      ],
+      [
+        "Dom Church + cloister garden",
+        0
+      ],
+      [
+        "Amelisweerd forest-park walk",
+        0
       ]
     ],
     "f": [
@@ -7209,6 +7897,50 @@ export const TRIPS: Trip[] = [
       [
         "Beer museum + tasting",
         16
+      ],
+      [
+        "Markt square evening walk",
+        0
+      ],
+      [
+        "Basilica of the Holy Blood",
+        0
+      ],
+      [
+        "Church of Our Lady",
+        6
+      ],
+      [
+        "Lace-making demonstration",
+        8
+      ],
+      [
+        "Frites-tasting crawl",
+        8
+      ],
+      [
+        "Windmills of Bruges walk",
+        0
+      ],
+      [
+        "Groeninge Museum",
+        15
+      ],
+      [
+        "Minnewater (Lake of Love) walk",
+        0
+      ],
+      [
+        "Beer-bar crawl",
+        18
+      ],
+      [
+        "Damme village bike day trip",
+        12
+      ],
+      [
+        "Chocolate-tasting crawl",
+        15
       ]
     ],
     "f": [
@@ -7270,6 +8002,50 @@ export const TRIPS: Trip[] = [
       [
         "Canal boat",
         9
+      ],
+      [
+        "Belfry climb",
+        10
+      ],
+      [
+        "Patershol neighborhood walk",
+        0
+      ],
+      [
+        "Waffle-tasting crawl",
+        8
+      ],
+      [
+        "Design Museum Gent",
+        12
+      ],
+      [
+        "Vrijdagmarkt square evening",
+        0
+      ],
+      [
+        "STAM city museum",
+        8
+      ],
+      [
+        "Craft-beer crawl",
+        15
+      ],
+      [
+        "Korenlei/Graslei riverside walk",
+        0
+      ],
+      [
+        "Light Festival (seasonal)",
+        0
+      ],
+      [
+        "Citadelpark walk",
+        0
+      ],
+      [
+        "Student-quarter pub crawl",
+        15
       ]
     ],
     "f": [
@@ -7327,6 +8103,50 @@ export const TRIPS: Trip[] = [
       [
         "Comic-strip trail",
         8
+      ],
+      [
+        "Waffle & fry crawl",
+        12
+      ],
+      [
+        "Beer-bar crawl",
+        20
+      ],
+      [
+        "Royal Museums of Fine Arts",
+        15
+      ],
+      [
+        "Parc du Cinquantenaire walk",
+        0
+      ],
+      [
+        "Delirium Cafe tour",
+        15
+      ],
+      [
+        "Mini-Europe park",
+        17
+      ],
+      [
+        "Sablon chocolate-shop crawl",
+        15
+      ],
+      [
+        "Brussels City Museum",
+        8
+      ],
+      [
+        "European Quarter walk",
+        0
+      ],
+      [
+        "Marolles flea market",
+        0
+      ],
+      [
+        "Cantillon lambic-brewery tour",
+        12
       ]
     ],
     "f": [
@@ -7383,6 +8203,50 @@ export const TRIPS: Trip[] = [
       [
         "Vianden castle day trip",
         10
+      ],
+      [
+        "Old-town walk",
+        0
+      ],
+      [
+        "Notre-Dame Cathedral",
+        0
+      ],
+      [
+        "Mudam modern-art museum",
+        8
+      ],
+      [
+        "Luxembourg City History Museum",
+        8
+      ],
+      [
+        "Adolphe Bridge viewpoint",
+        0
+      ],
+      [
+        "Mullerthal hiking-trail day trip",
+        15
+      ],
+      [
+        "Wenzel walking circuit",
+        0
+      ],
+      [
+        "Christmas market walk (seasonal)",
+        0
+      ],
+      [
+        "Echternach abbey day trip",
+        12
+      ],
+      [
+        "Moselle valley wine tasting",
+        25
+      ],
+      [
+        "Fort Thungen museum",
+        8
       ]
     ],
     "f": [
@@ -7446,6 +8310,42 @@ export const TRIPS: Trip[] = [
       [
         "Kilmainham Gaol",
         8
+      ],
+      [
+        "Temple Bar pub crawl",
+        20
+      ],
+      [
+        "Dublin Castle",
+        10
+      ],
+      [
+        "EPIC Irish Emigration Museum",
+        18
+      ],
+      [
+        "Christ Church Cathedral",
+        9
+      ],
+      [
+        "Phoenix Park + zoo walk",
+        0
+      ],
+      [
+        "Grafton Street busker walk",
+        0
+      ],
+      [
+        "Traditional Irish music session",
+        0
+      ],
+      [
+        "Malahide Castle day trip",
+        12
+      ],
+      [
+        "Little Museum of Dublin",
+        15
       ]
     ],
     "f": [
@@ -7506,6 +8406,50 @@ export const TRIPS: Trip[] = [
       [
         "Connemara NP day trip",
         40
+      ],
+      [
+        "City walls walk",
+        0
+      ],
+      [
+        "Spanish Arch + Long Walk",
+        0
+      ],
+      [
+        "Oyster tasting",
+        20
+      ],
+      [
+        "Salthill promenade walk",
+        0
+      ],
+      [
+        "Kylemore Abbey day trip",
+        15
+      ],
+      [
+        "Galway City Museum",
+        0
+      ],
+      [
+        "Dunguaire Castle banquet (seasonal)",
+        55
+      ],
+      [
+        "Inis Mor bike rental",
+        15
+      ],
+      [
+        "Saturday market crawl",
+        0
+      ],
+      [
+        "Corrib river walk",
+        0
+      ],
+      [
+        "Irish sweater shopping walk",
+        0
       ]
     ],
     "f": [
@@ -7566,6 +8510,46 @@ export const TRIPS: Trip[] = [
       [
         "Scotch whisky experience",
         22
+      ],
+      [
+        "Royal Mile walking tour",
+        0
+      ],
+      [
+        "Palace of Holyroodhouse",
+        19
+      ],
+      [
+        "National Museum of Scotland (free)",
+        0
+      ],
+      [
+        "Camera Obscura",
+        20
+      ],
+      [
+        "Greyfriars Kirkyard ghost tour",
+        15
+      ],
+      [
+        "Calton Hill sunset viewpoint",
+        0
+      ],
+      [
+        "Edinburgh Gin distillery tour",
+        25
+      ],
+      [
+        "Rosslyn Chapel day trip",
+        12
+      ],
+      [
+        "Dean Village photography walk",
+        0
+      ],
+      [
+        "Traditional ceilidh dance night",
+        15
       ]
     ],
     "f": [
@@ -7622,6 +8606,50 @@ export const TRIPS: Trip[] = [
       [
         "Loch Lomond day trip",
         20
+      ],
+      [
+        "Glasgow Cathedral",
+        0
+      ],
+      [
+        "Necropolis hill walk",
+        0
+      ],
+      [
+        "Riverside Museum (free)",
+        0
+      ],
+      [
+        "West End Ashton Lane crawl",
+        15
+      ],
+      [
+        "Barras Market Sunday walk",
+        0
+      ],
+      [
+        "Botanic Gardens",
+        0
+      ],
+      [
+        "Curry-house tasting crawl",
+        18
+      ],
+      [
+        "Tenement House museum",
+        8
+      ],
+      [
+        "Glasgow Science Centre",
+        15
+      ],
+      [
+        "Whisky tasting bar crawl",
+        20
+      ],
+      [
+        "Sub Club techno night",
+        15
       ]
     ],
     "f": [
@@ -7687,6 +8715,42 @@ export const TRIPS: Trip[] = [
       [
         "Camden + Borough markets",
         0
+      ],
+      [
+        "St. Paul's Cathedral dome climb",
+        26
+      ],
+      [
+        "Buckingham Palace changing of guard",
+        0
+      ],
+      [
+        "Natural History Museum (free)",
+        0
+      ],
+      [
+        "Shakespeare's Globe theatre",
+        25
+      ],
+      [
+        "Notting Hill/Portobello Market walk",
+        0
+      ],
+      [
+        "Sky Garden viewpoint (free ticket)",
+        0
+      ],
+      [
+        "Warner Bros Harry Potter Studio Tour",
+        55
+      ],
+      [
+        "Greenwich + Cutty Sark day trip",
+        20
+      ],
+      [
+        "London afternoon tea",
+        45
       ]
     ],
     "f": [
@@ -7746,6 +8810,50 @@ export const TRIPS: Trip[] = [
       [
         "Punting on the Cherwell",
         22
+      ],
+      [
+        "Radcliffe Camera + Bridge of Sighs walk",
+        0
+      ],
+      [
+        "Covered Market crawl",
+        0
+      ],
+      [
+        "Blenheim Palace day trip",
+        30
+      ],
+      [
+        "Oxford ghost-tour walk",
+        15
+      ],
+      [
+        "University Church tower climb",
+        5
+      ],
+      [
+        "Pitt Rivers Museum (free)",
+        0
+      ],
+      [
+        "Turf Tavern historic pub visit",
+        12
+      ],
+      [
+        "Botanic Garden",
+        8
+      ],
+      [
+        "Oxford Castle & Prison tour",
+        15
+      ],
+      [
+        "Cotswolds village day trip",
+        25
+      ],
+      [
+        "Harry Potter filming-locations walk",
+        15
       ]
     ],
     "f": [
@@ -7802,6 +8910,50 @@ export const TRIPS: Trip[] = [
       [
         "Round Church + old town",
         4
+      ],
+      [
+        "Trinity College Great Court walk",
+        8
+      ],
+      [
+        "Market square crawl",
+        0
+      ],
+      [
+        "Mathematical Bridge photo stop",
+        0
+      ],
+      [
+        "Bridge of Sighs (St John's)",
+        8
+      ],
+      [
+        "Grantchester meadow walk",
+        0
+      ],
+      [
+        "American Cemetery day trip",
+        0
+      ],
+      [
+        "Polar Museum",
+        0
+      ],
+      [
+        "Botanic Garden",
+        6
+      ],
+      [
+        "Ely Cathedral day trip",
+        12
+      ],
+      [
+        "Cambridge ghost tour",
+        12
+      ],
+      [
+        "Cream-tea tasting",
+        12
       ]
     ],
     "f": [
@@ -7857,6 +9009,50 @@ export const TRIPS: Trip[] = [
       [
         "Stonehenge day trip",
         30
+      ],
+      [
+        "Bath Abbey tower climb",
+        10
+      ],
+      [
+        "Jane Austen Centre",
+        14
+      ],
+      [
+        "Pulteney Bridge + weir walk",
+        0
+      ],
+      [
+        "Christmas market walk (seasonal)",
+        0
+      ],
+      [
+        "Prior Park landscape garden",
+        10
+      ],
+      [
+        "Fashion Museum Bath",
+        10
+      ],
+      [
+        "Sally Lunn's historic bun tasting",
+        6
+      ],
+      [
+        "Bath Skyline hike",
+        0
+      ],
+      [
+        "Bradford-on-Avon day trip",
+        10
+      ],
+      [
+        "Victoria Art Gallery (free)",
+        0
+      ],
+      [
+        "American Museum & Gardens",
+        14
       ]
     ],
     "f": [
@@ -7913,6 +9109,50 @@ export const TRIPS: Trip[] = [
       [
         "Anfield stadium tour",
         25
+      ],
+      [
+        "Liverpool Cathedral tower climb",
+        10
+      ],
+      [
+        "Royal Albert Dock waterfront walk",
+        0
+      ],
+      [
+        "Baltic Triangle street-art walk",
+        0
+      ],
+      [
+        "International Slavery Museum (free)",
+        0
+      ],
+      [
+        "Concert Square nightlife crawl",
+        15
+      ],
+      [
+        "Merseyside Maritime Museum (free)",
+        0
+      ],
+      [
+        "Beatles childhood-homes tour",
+        25
+      ],
+      [
+        "Chinatown food crawl",
+        15
+      ],
+      [
+        "World Museum (free)",
+        0
+      ],
+      [
+        "Mersey ferry cruise",
+        12
+      ],
+      [
+        "Cream nightclub evening",
+        15
       ]
     ],
     "f": [
@@ -7957,15 +9197,15 @@ export const TRIPS: Trip[] = [
     "w": "Gaudí's surreal architecture, tapas, beach, and all-night energy — an ideal spring-break launch.",
     "a": [
       [
-        "Sagrada Família",
+        "Sagrada Familia",
         30
       ],
       [
-        "Park Güell",
+        "Park Guell",
         13
       ],
       [
-        "Casa Batlló",
+        "Casa Batllo",
         35
       ],
       [
@@ -7979,6 +9219,42 @@ export const TRIPS: Trip[] = [
       [
         "Picasso Museum",
         14
+      ],
+      [
+        "La Boqueria market walk",
+        0
+      ],
+      [
+        "Montjuic cable car + castle",
+        15
+      ],
+      [
+        "Casa Mila (La Pedrera)",
+        28
+      ],
+      [
+        "Bunkers del Carmel sunset viewpoint",
+        0
+      ],
+      [
+        "El Born neighborhood walk",
+        0
+      ],
+      [
+        "Camp Nou stadium tour",
+        30
+      ],
+      [
+        "Flamenco show",
+        30
+      ],
+      [
+        "Poble Sec nightlife crawl",
+        20
+      ],
+      [
+        "Montserrat day trip",
+        20
       ]
     ],
     "f": [
@@ -8030,7 +9306,7 @@ export const TRIPS: Trip[] = [
         15
       ],
       [
-        "Reina Sofía (Guernica)",
+        "Reina Sofia (Guernica)",
         12
       ],
       [
@@ -8042,11 +9318,47 @@ export const TRIPS: Trip[] = [
         25
       ],
       [
-        "Bernabéu tour",
+        "Bernabeu tour",
         28
       ],
       [
         "Toledo day trip",
+        20
+      ],
+      [
+        "Retiro Park boat ride",
+        6
+      ],
+      [
+        "Mercado San Miguel food crawl",
+        15
+      ],
+      [
+        "Gran Via architecture walk",
+        0
+      ],
+      [
+        "Templo de Debod sunset",
+        0
+      ],
+      [
+        "Malasana nightlife crawl",
+        20
+      ],
+      [
+        "Thyssen-Bornemisza Museum",
+        13
+      ],
+      [
+        "Rooftop terrace bar crawl",
+        20
+      ],
+      [
+        "Chocolateria San Gines churros",
+        6
+      ],
+      [
+        "Segovia day trip",
         20
       ]
     ],
@@ -8093,7 +9405,7 @@ export const TRIPS: Trip[] = [
     "w": "Andalusia's soul — flamenco, the Alcázar, and orange-blossom spring.",
     "a": [
       [
-        "Royal Alcázar",
+        "Royal Alcazar",
         16
       ],
       [
@@ -8105,12 +9417,52 @@ export const TRIPS: Trip[] = [
         25
       ],
       [
-        "Plaza de España",
+        "Plaza de Espana",
         0
       ],
       [
         "Bike/tapas tour",
         30
+      ],
+      [
+        "Metropol Parasol viewpoint",
+        5
+      ],
+      [
+        "Triana tapas crawl",
+        20
+      ],
+      [
+        "Barrio Santa Cruz walking tour",
+        0
+      ],
+      [
+        "Horse-carriage ride",
+        25
+      ],
+      [
+        "Maria Luisa Park walk",
+        0
+      ],
+      [
+        "Cordoba day trip",
+        20
+      ],
+      [
+        "Rooftop-bar evening",
+        15
+      ],
+      [
+        "Casa de Pilatos",
+        10
+      ],
+      [
+        "Guadalquivir river cruise",
+        15
+      ],
+      [
+        "Tapas cooking class",
+        45
       ]
     ],
     "f": [
@@ -8160,7 +9512,7 @@ export const TRIPS: Trip[] = [
         20
       ],
       [
-        "Albaicín + Sacromonte walk",
+        "Albaicin + Sacromonte walk",
         0
       ],
       [
@@ -8174,6 +9526,46 @@ export const TRIPS: Trip[] = [
       [
         "Sierra Nevada spring ski",
         45
+      ],
+      [
+        "Granada Cathedral + Royal Chapel",
+        8
+      ],
+      [
+        "Mirador San Nicolas sunset",
+        0
+      ],
+      [
+        "Free-tapas bar crawl",
+        0
+      ],
+      [
+        "Granada Science Park",
+        8
+      ],
+      [
+        "Carmen de los Martires gardens",
+        0
+      ],
+      [
+        "Sacromonte cave-flamenco dinner",
+        30
+      ],
+      [
+        "Alcaiceria market walk",
+        0
+      ],
+      [
+        "Tapas cooking class",
+        40
+      ],
+      [
+        "Corral del Carbon",
+        0
+      ],
+      [
+        "Realejo neighborhood walk",
+        0
       ]
     ],
     "f": [
@@ -8219,7 +9611,7 @@ export const TRIPS: Trip[] = [
         13
       ],
       [
-        "Alcázar + gardens",
+        "Alcazar + gardens",
         5
       ],
       [
@@ -8229,6 +9621,50 @@ export const TRIPS: Trip[] = [
       [
         "Medina Azahara ruins",
         8
+      ],
+      [
+        "Roman Bridge sunset walk",
+        0
+      ],
+      [
+        "Patio festival (seasonal)",
+        0
+      ],
+      [
+        "Calleja de las Flores photo walk",
+        0
+      ],
+      [
+        "Cordoba flamenco show",
+        20
+      ],
+      [
+        "Viana Palace patios",
+        8
+      ],
+      [
+        "Tapas crawl",
+        20
+      ],
+      [
+        "Synagogue visit",
+        0
+      ],
+      [
+        "Leather/silver craft workshop",
+        25
+      ],
+      [
+        "Sierra de Cordoba nature walk",
+        0
+      ],
+      [
+        "Wine-bar evening",
+        15
+      ],
+      [
+        "Banos del Alcazar Califal",
+        3
       ]
     ],
     "f": [
@@ -8285,6 +9721,50 @@ export const TRIPS: Trip[] = [
       [
         "Tarifa kitesurf day trip",
         45
+      ],
+      [
+        "Old-town walking tour",
+        0
+      ],
+      [
+        "Torre Tavira camera obscura",
+        7
+      ],
+      [
+        "Seafood-tapas crawl",
+        20
+      ],
+      [
+        "Roman Theatre ruins",
+        6
+      ],
+      [
+        "Genoves Park walk",
+        0
+      ],
+      [
+        "Playa de la Caleta swim",
+        0
+      ],
+      [
+        "Jerez flamenco/horse show",
+        25
+      ],
+      [
+        "Carnival museum (seasonal)",
+        0
+      ],
+      [
+        "Vejer de la Frontera day trip",
+        15
+      ],
+      [
+        "Conil de la Frontera beach day trip",
+        10
+      ],
+      [
+        "Sunset boat trip",
+        25
       ]
     ],
     "f": [
@@ -8341,6 +9821,50 @@ export const TRIPS: Trip[] = [
       [
         "San Juan de Gaztelugatxe hike",
         0
+      ],
+      [
+        "Bilbao Fine Arts Museum",
+        10
+      ],
+      [
+        "La Ribera market walk",
+        0
+      ],
+      [
+        "Bilbao river cruise",
+        15
+      ],
+      [
+        "Pintxos-and-wine crawl",
+        25
+      ],
+      [
+        "Basque cider-house dinner",
+        35
+      ],
+      [
+        "Mundaka surf-town day trip",
+        20
+      ],
+      [
+        "Puppy sculpture + riverside walk",
+        0
+      ],
+      [
+        "Athletic Club stadium tour",
+        15
+      ],
+      [
+        "Getxo beach day",
+        0
+      ],
+      [
+        "Chocolate/pastry crawl",
+        12
+      ],
+      [
+        "Vizcaya transporter-bridge visit",
+        10
       ]
     ],
     "f": [
@@ -8401,6 +9925,46 @@ export const TRIPS: Trip[] = [
       [
         "Monte Urgull walk",
         0
+      ],
+      [
+        "San Telmo Museum",
+        8
+      ],
+      [
+        "Basque cooking class",
+        55
+      ],
+      [
+        "Isla de Santa Clara boat + beach",
+        8
+      ],
+      [
+        "Food-market crawl",
+        15
+      ],
+      [
+        "Kursaal building walk",
+        0
+      ],
+      [
+        "Chef-table pintxos crawl",
+        50
+      ],
+      [
+        "Peine del Viento sculpture walk",
+        0
+      ],
+      [
+        "Hondarribia border-town day trip",
+        12
+      ],
+      [
+        "Bay of Biscay coastal hike",
+        0
+      ],
+      [
+        "Cider-house (sagardotegia) dinner",
+        35
       ]
     ],
     "f": [
@@ -8464,8 +10028,48 @@ export const TRIPS: Trip[] = [
         10
       ],
       [
-        "Oceanogràfic aquarium",
+        "Oceanografic aquarium",
         35
+      ],
+      [
+        "Cathedral + Holy Grail chapel",
+        7
+      ],
+      [
+        "Paella-cooking class",
+        45
+      ],
+      [
+        "Bioparc Valencia",
+        25
+      ],
+      [
+        "Albufera boat + paella lunch",
+        20
+      ],
+      [
+        "Torres de Serranos climb",
+        2
+      ],
+      [
+        "Horchata tasting",
+        5
+      ],
+      [
+        "Barrio del Carmen nightlife crawl",
+        20
+      ],
+      [
+        "La Lonja de la Seda (silk exchange)",
+        2
+      ],
+      [
+        "Valencia bike tour",
+        15
+      ],
+      [
+        "Las Fallas museum (seasonal)",
+        8
       ]
     ],
     "f": [
@@ -8530,6 +10134,46 @@ export const TRIPS: Trip[] = [
       [
         "Nerja caves day trip",
         18
+      ],
+      [
+        "Malaga Cathedral",
+        6
+      ],
+      [
+        "Atarazanas Market food crawl",
+        15
+      ],
+      [
+        "Old-town tapas crawl",
+        20
+      ],
+      [
+        "Pompidou Centre Malaga",
+        10
+      ],
+      [
+        "Malagueta beach day",
+        0
+      ],
+      [
+        "Ronda day trip",
+        25
+      ],
+      [
+        "Sweet-wine tasting",
+        20
+      ],
+      [
+        "Roman Theatre ruins",
+        0
+      ],
+      [
+        "Muelle Uno waterfront walk",
+        0
+      ],
+      [
+        "Rooftop bar evening",
+        15
       ]
     ],
     "f": [
@@ -8584,8 +10228,52 @@ export const TRIPS: Trip[] = [
         0
       ],
       [
-        "Dalí Museum in Figueres",
+        "Dali Museum in Figueres",
         17
+      ],
+      [
+        "Jewish Quarter (Call) walking tour",
+        0
+      ],
+      [
+        "Riverside houses photo walk",
+        0
+      ],
+      [
+        "Food-market crawl",
+        12
+      ],
+      [
+        "Sant Feliu Basilica",
+        0
+      ],
+      [
+        "Cadaques coastal village day trip",
+        15
+      ],
+      [
+        "Girona bike tour",
+        15
+      ],
+      [
+        "Arab Baths",
+        3
+      ],
+      [
+        "Wine-bar evening",
+        15
+      ],
+      [
+        "Tossa de Mar day trip",
+        15
+      ],
+      [
+        "Cathedral tower climb",
+        5
+      ],
+      [
+        "Palamos fishing-village day trip",
+        12
       ]
     ],
     "f": [
@@ -8633,7 +10321,7 @@ export const TRIPS: Trip[] = [
         6
       ],
       [
-        "University façade + frog hunt",
+        "University facade + frog hunt",
         12
       ],
       [
@@ -8642,6 +10330,50 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Roman bridge sunset",
+        0
+      ],
+      [
+        "Tapas crawl",
+        15
+      ],
+      [
+        "Convento de San Esteban",
+        4
+      ],
+      [
+        "Clerecia towers climb (Ieronimus)",
+        4
+      ],
+      [
+        "Student nightlife crawl",
+        15
+      ],
+      [
+        "Huerto de Calixto y Melibea garden",
+        0
+      ],
+      [
+        "Casa de las Conchas",
+        0
+      ],
+      [
+        "Art-shell facade walk",
+        0
+      ],
+      [
+        "Alba de Tormes day trip",
+        12
+      ],
+      [
+        "Jamon tasting",
+        15
+      ],
+      [
+        "Cathedral rooftop tour",
+        10
+      ],
+      [
+        "Tormes riverside walk",
         0
       ]
     ],
@@ -8685,7 +10417,7 @@ export const TRIPS: Trip[] = [
     "w": "The end of the Camino — a granite pilgrim city with a spectacular cathedral and Galician seafood.",
     "a": [
       [
-        "Cathedral + Pórtico da Gloria",
+        "Cathedral + Portico da Gloria",
         12
       ],
       [
@@ -8699,6 +10431,50 @@ export const TRIPS: Trip[] = [
       [
         "Finisterre 'end of the world' trip",
         25
+      ],
+      [
+        "Tapas crawl",
+        15
+      ],
+      [
+        "Museo das Peregrinacions",
+        3
+      ],
+      [
+        "Parque de la Alameda walk",
+        0
+      ],
+      [
+        "Seafood market lunch",
+        20
+      ],
+      [
+        "Cathedral rooftop tour",
+        12
+      ],
+      [
+        "Galician octopus (pulpo) tasting",
+        12
+      ],
+      [
+        "Pilgrim mass attendance",
+        0
+      ],
+      [
+        "Mercado de Abastos food crawl",
+        15
+      ],
+      [
+        "A Coruna day trip",
+        15
+      ],
+      [
+        "Craft-beer bar",
+        12
+      ],
+      [
+        "Pilgrim-passport stamping walk",
+        0
       ]
     ],
     "f": [
@@ -8741,7 +10517,7 @@ export const TRIPS: Trip[] = [
     "w": "Hilly, sun-washed, and cheap for Western Europe — trams, fado, and a Sintra day trip.",
     "a": [
       [
-        "Belém Tower + Jerónimos",
+        "Belem Tower + Jeronimos",
         18
       ],
       [
@@ -8753,12 +10529,52 @@ export const TRIPS: Trip[] = [
         25
       ],
       [
-        "São Jorge Castle",
+        "Sao Jorge Castle",
         15
       ],
       [
         "Fado dinner show",
         30
+      ],
+      [
+        "Lisbon Oceanarium",
+        22
+      ],
+      [
+        "Time Out Market food crawl",
+        15
+      ],
+      [
+        "LX Factory creative-district walk",
+        0
+      ],
+      [
+        "Miradouro sunset-viewpoint hop",
+        0
+      ],
+      [
+        "Pasteis de Belem tasting",
+        5
+      ],
+      [
+        "Cascais day trip",
+        15
+      ],
+      [
+        "Tuk-tuk city tour",
+        30
+      ],
+      [
+        "Bairro Alto nightlife crawl",
+        20
+      ],
+      [
+        "Carmo Convent ruins",
+        5
+      ],
+      [
+        "Costa da Caparica surf lesson",
+        40
       ]
     ],
     "f": [
@@ -8810,7 +10626,7 @@ export const TRIPS: Trip[] = [
         20
       ],
       [
-        "Livraria Lello + Clérigos",
+        "Livraria Lello + Clerigos",
         12
       ],
       [
@@ -8820,6 +10636,50 @@ export const TRIPS: Trip[] = [
       [
         "Douro Valley vineyard day",
         70
+      ],
+      [
+        "Porto Cathedral",
+        3
+      ],
+      [
+        "Ribeira riverside walk",
+        0
+      ],
+      [
+        "Palacio da Bolsa",
+        10
+      ],
+      [
+        "Francesinha-sandwich tasting",
+        12
+      ],
+      [
+        "Old-town food-market crawl",
+        15
+      ],
+      [
+        "Azulejo-tile walking tour",
+        0
+      ],
+      [
+        "Foz do Douro beach walk",
+        0
+      ],
+      [
+        "Craft-beer bar crawl",
+        15
+      ],
+      [
+        "Guimaraes day trip",
+        15
+      ],
+      [
+        "Galerias de Paris nightlife crawl",
+        15
+      ],
+      [
+        "Bacalhau cooking class",
+        45
       ]
     ],
     "f": [
@@ -8879,6 +10739,46 @@ export const TRIPS: Trip[] = [
       [
         "Dolphin-watching boat",
         35
+      ],
+      [
+        "Lagos old-town walk",
+        0
+      ],
+      [
+        "Seafood-tasting crawl",
+        20
+      ],
+      [
+        "Marinha Beach day",
+        0
+      ],
+      [
+        "Faro old-town day trip",
+        10
+      ],
+      [
+        "Zoomarine water park day",
+        40
+      ],
+      [
+        "Algarve wine tasting",
+        20
+      ],
+      [
+        "Silves Moorish-castle day trip",
+        10
+      ],
+      [
+        "Praia da Marinha viewpoint",
+        0
+      ],
+      [
+        "Albufeira nightlife crawl",
+        20
+      ],
+      [
+        "Alvor lagoon kayak",
+        25
       ]
     ],
     "f": [
@@ -8930,7 +10830,7 @@ export const TRIPS: Trip[] = [
         0
       ],
       [
-        "Cabo Girão skywalk",
+        "Cabo Girao skywalk",
         3
       ],
       [
@@ -8940,6 +10840,46 @@ export const TRIPS: Trip[] = [
       [
         "Toboggan ride down Monte",
         30
+      ],
+      [
+        "Funchal old-town walk",
+        0
+      ],
+      [
+        "Madeira wine-tasting tour",
+        20
+      ],
+      [
+        "Mercado dos Lavradores market",
+        0
+      ],
+      [
+        "Monte Palace Tropical Garden",
+        12
+      ],
+      [
+        "Santana traditional-houses day trip",
+        12
+      ],
+      [
+        "Whale/dolphin watching boat",
+        55
+      ],
+      [
+        "Ponta de Sao Lourenco hike",
+        0
+      ],
+      [
+        "Funchal-Monte cable car",
+        15
+      ],
+      [
+        "Ribeira Brava village day trip",
+        8
+      ],
+      [
+        "Curral das Freiras viewpoint",
+        10
       ]
     ],
     "f": [
@@ -9002,6 +10942,46 @@ export const TRIPS: Trip[] = [
       [
         "Lagoa do Fogo trail",
         0
+      ],
+      [
+        "Ponta Delgada old-town walk",
+        0
+      ],
+      [
+        "Cozido volcanic-steam-cooked lunch",
+        25
+      ],
+      [
+        "Vila Franca islet boat + swim",
+        25
+      ],
+      [
+        "Gorreana tea plantation",
+        0
+      ],
+      [
+        "Canyoning half-day",
+        65
+      ],
+      [
+        "Miradouro da Vista do Rei viewpoint",
+        0
+      ],
+      [
+        "Ferraria natural volcanic pool",
+        0
+      ],
+      [
+        "Pineapple-plantation visit",
+        5
+      ],
+      [
+        "Sao Miguel scuba diving",
+        70
+      ],
+      [
+        "Jeep safari tour",
+        55
       ]
     ],
     "f": [
@@ -9055,8 +11035,52 @@ export const TRIPS: Trip[] = [
         3
       ],
       [
-        "Conímbriga Roman ruins",
+        "Conimbriga Roman ruins",
         6
+      ],
+      [
+        "Old-town walking tour",
+        0
+      ],
+      [
+        "Se Nova church",
+        0
+      ],
+      [
+        "Botanical Garden",
+        3
+      ],
+      [
+        "Mondego river walk",
+        0
+      ],
+      [
+        "Student-tradition (praxe) walking tour",
+        0
+      ],
+      [
+        "Portugal dos Pequenitos park",
+        10
+      ],
+      [
+        "Craft-beer bar",
+        12
+      ],
+      [
+        "Santa Clara-a-Velha convent ruins",
+        3
+      ],
+      [
+        "Bucaco Forest day trip",
+        10
+      ],
+      [
+        "Riverside cafe evening",
+        0
+      ],
+      [
+        "Fado guitar workshop",
+        25
       ]
     ],
     "f": [
@@ -9119,6 +11143,46 @@ export const TRIPS: Trip[] = [
       [
         "Los Gigantes cliffs boat",
         30
+      ],
+      [
+        "Black-sand beach day",
+        0
+      ],
+      [
+        "Loro Parque animal park",
+        40
+      ],
+      [
+        "Santa Cruz old-town walk",
+        0
+      ],
+      [
+        "La Laguna UNESCO old-town day trip",
+        0
+      ],
+      [
+        "Teide stargazing tour",
+        45
+      ],
+      [
+        "Siam Park water park day",
+        45
+      ],
+      [
+        "Garachico natural pools",
+        0
+      ],
+      [
+        "Scuba diving",
+        65
+      ],
+      [
+        "Drago Milenario tree day trip",
+        5
+      ],
+      [
+        "Paragliding tandem flight",
+        100
       ]
     ],
     "f": [
@@ -9176,6 +11240,50 @@ export const TRIPS: Trip[] = [
       [
         "Postojna Cave day trip",
         30
+      ],
+      [
+        "Riverside cafe crawl",
+        0
+      ],
+      [
+        "Central Market food walk",
+        0
+      ],
+      [
+        "Dragon Bridge walk",
+        0
+      ],
+      [
+        "Tivoli Park stroll",
+        0
+      ],
+      [
+        "Craft-beer crawl",
+        15
+      ],
+      [
+        "Lake Bled day trip",
+        20
+      ],
+      [
+        "Predjama Castle day trip",
+        15
+      ],
+      [
+        "National Museum of Slovenia",
+        8
+      ],
+      [
+        "Street-art walk",
+        0
+      ],
+      [
+        "Wine-bar tasting",
+        20
+      ],
+      [
+        "Skofja Loka medieval-town day trip",
+        10
       ]
     ],
     "f": [
@@ -9232,6 +11340,50 @@ export const TRIPS: Trip[] = [
       [
         "Mirogoj cemetery arcades",
         0
+      ],
+      [
+        "Zagreb Cathedral",
+        0
+      ],
+      [
+        "Tkalciceva Street bar crawl",
+        15
+      ],
+      [
+        "Craft-beer tasting",
+        15
+      ],
+      [
+        "Museum of Illusions",
+        12
+      ],
+      [
+        "Zagreb 360 observation deck",
+        8
+      ],
+      [
+        "Samobor day trip",
+        12
+      ],
+      [
+        "Street-food crawl",
+        12
+      ],
+      [
+        "Lotrscak Tower + cannon",
+        3
+      ],
+      [
+        "Christmas market walk (seasonal)",
+        0
+      ],
+      [
+        "Botanical Garden",
+        0
+      ],
+      [
+        "Medvednica mountain hike",
+        0
       ]
     ],
     "f": [
@@ -9281,6 +11433,54 @@ export const TRIPS: Trip[] = [
       [
         "Guided nature walk",
         18
+      ],
+      [
+        "Sunrise photography walk",
+        0
+      ],
+      [
+        "Rastoke village day trip",
+        8
+      ],
+      [
+        "Electric boat cruise",
+        0
+      ],
+      [
+        "Upper-lakes hiking trail",
+        0
+      ],
+      [
+        "Picnic-area lunch stop",
+        0
+      ],
+      [
+        "Barac Caves day trip",
+        15
+      ],
+      [
+        "Waterfall viewpoint hike",
+        0
+      ],
+      [
+        "Corkova Uvala old-growth forest trail",
+        0
+      ],
+      [
+        "Second-day extended trail pass",
+        20
+      ],
+      [
+        "Slunj mini-waterfalls day trip",
+        10
+      ],
+      [
+        "Licka kuca traditional lunch",
+        20
+      ],
+      [
+        "Rakovica cave day trip",
+        12
       ]
     ],
     "f": [
@@ -9326,7 +11526,7 @@ export const TRIPS: Trip[] = [
         35
       ],
       [
-        "Cable car to Mount Srđ",
+        "Cable car to Mount Srd",
         27
       ],
       [
@@ -9340,6 +11540,46 @@ export const TRIPS: Trip[] = [
       [
         "Game of Thrones tour",
         25
+      ],
+      [
+        "Free old-town walking tour",
+        0
+      ],
+      [
+        "Buza Bar cliff sunset",
+        10
+      ],
+      [
+        "Banje Beach day",
+        0
+      ],
+      [
+        "Ston oyster tasting",
+        20
+      ],
+      [
+        "Elaphiti Islands boat trip",
+        45
+      ],
+      [
+        "Dubrovnik cooking class",
+        55
+      ],
+      [
+        "Konavle wine-region day trip",
+        30
+      ],
+      [
+        "Franciscan Monastery + pharmacy",
+        5
+      ],
+      [
+        "Summer festival concert (seasonal)",
+        25
+      ],
+      [
+        "Trsteno Arboretum day trip",
+        8
       ]
     ],
     "f": [
@@ -9399,6 +11639,46 @@ export const TRIPS: Trip[] = [
       [
         "Krka Falls day trip",
         25
+      ],
+      [
+        "Riva promenade walk",
+        0
+      ],
+      [
+        "Old-town food crawl",
+        15
+      ],
+      [
+        "Hvar old-town + fortress climb",
+        8
+      ],
+      [
+        "Hvar lavender-fields day trip",
+        10
+      ],
+      [
+        "Cathedral bell-tower climb",
+        6
+      ],
+      [
+        "Bacvice beach day",
+        0
+      ],
+      [
+        "Pakleni Islands boat day",
+        25
+      ],
+      [
+        "Split nightlife crawl",
+        20
+      ],
+      [
+        "Trogir UNESCO day trip",
+        12
+      ],
+      [
+        "Riva sunset drink",
+        0
       ]
     ],
     "f": [
@@ -9453,6 +11733,50 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Krka waterfalls day trip",
+        25
+      ],
+      [
+        "Old-town walking tour",
+        0
+      ],
+      [
+        "City-wall walk (UNESCO)",
+        0
+      ],
+      [
+        "Seafood-tasting crawl",
+        15
+      ],
+      [
+        "Five Wells Square walk",
+        0
+      ],
+      [
+        "Nin salt-pan day trip",
+        12
+      ],
+      [
+        "Archaeological Museum",
+        5
+      ],
+      [
+        "Ugljan island ferry day trip",
+        10
+      ],
+      [
+        "Craft-beer bar",
+        12
+      ],
+      [
+        "Pag island cheese-tasting day trip",
+        20
+      ],
+      [
+        "Sunset kayak",
+        20
+      ],
+      [
+        "Telascica Nature Park boat trip",
         25
       ]
     ],
@@ -9510,6 +11834,50 @@ export const TRIPS: Trip[] = [
       [
         "Pula Roman amphitheatre",
         12
+      ],
+      [
+        "Old-town photography walk",
+        0
+      ],
+      [
+        "Seafood-tasting crawl",
+        20
+      ],
+      [
+        "Lim Fjord boat cruise",
+        20
+      ],
+      [
+        "Olive-oil tasting",
+        15
+      ],
+      [
+        "Bike coastal ride",
+        12
+      ],
+      [
+        "Motovun hilltop-village day trip",
+        15
+      ],
+      [
+        "Istrian wine-tasting tour",
+        25
+      ],
+      [
+        "Rovinj aquarium",
+        8
+      ],
+      [
+        "Vrsar day trip",
+        10
+      ],
+      [
+        "Sunset sailing trip",
+        35
+      ],
+      [
+        "Baredine cave day trip",
+        12
       ]
     ],
     "f": [
@@ -9563,11 +11931,51 @@ export const TRIPS: Trip[] = [
         5
       ],
       [
-        "Lovćen NP viewpoint",
+        "Lovcen NP viewpoint",
         15
       ],
       [
         "Sea-kayak the bay",
+        30
+      ],
+      [
+        "Old-town walking tour",
+        0
+      ],
+      [
+        "Perast village day trip",
+        10
+      ],
+      [
+        "Kotor cat museum",
+        3
+      ],
+      [
+        "Budva day trip",
+        12
+      ],
+      [
+        "Seafood-tasting dinner",
+        25
+      ],
+      [
+        "Njegusi cheese/prosciutto tasting",
+        20
+      ],
+      [
+        "Serpentine-road viewpoint drive",
+        15
+      ],
+      [
+        "Herceg Novi day trip",
+        12
+      ],
+      [
+        "Scuba diving",
+        55
+      ],
+      [
+        "Blue Cave boat trip",
         30
       ]
     ],
@@ -9622,6 +12030,50 @@ export const TRIPS: Trip[] = [
       [
         "Zip-line over Tara bridge",
         20
+      ],
+      [
+        "Sedlo Pass scenic drive",
+        0
+      ],
+      [
+        "Zabljak village walk",
+        0
+      ],
+      [
+        "Ledena Pecina ice-cave exploration",
+        8
+      ],
+      [
+        "Tara Bridge viewpoint walk",
+        0
+      ],
+      [
+        "Horseback riding",
+        30
+      ],
+      [
+        "Mlinski potok waterfall walk",
+        0
+      ],
+      [
+        "Mountain-hut lunch",
+        15
+      ],
+      [
+        "Nevidio Canyon canyoning",
+        55
+      ],
+      [
+        "Curevac viewpoint hike",
+        0
+      ],
+      [
+        "Skrcka lakes hike",
+        0
+      ],
+      [
+        "Piva Canyon scenic drive",
+        0
       ]
     ],
     "f": [
@@ -9677,6 +12129,50 @@ export const TRIPS: Trip[] = [
       [
         "Beach-club night",
         20
+      ],
+      [
+        "Old-town walking tour",
+        0
+      ],
+      [
+        "Petrovac beach day trip",
+        8
+      ],
+      [
+        "Jaz Beach day",
+        0
+      ],
+      [
+        "Seafood-tasting dinner",
+        25
+      ],
+      [
+        "Ballerina/Milocer coastal walk",
+        0
+      ],
+      [
+        "Riviera boat cruise",
+        30
+      ],
+      [
+        "Podgorica day trip",
+        12
+      ],
+      [
+        "Nightlife crawl",
+        20
+      ],
+      [
+        "Rezevici Monastery day trip",
+        8
+      ],
+      [
+        "Sunset viewpoint",
+        0
+      ],
+      [
+        "Sveti Nikola island boat + swim",
+        15
       ]
     ],
     "f": [
@@ -9723,7 +12219,7 @@ export const TRIPS: Trip[] = [
         12
       ],
       [
-        "Baščaršija Ottoman bazaar",
+        "Bascarsija Ottoman bazaar",
         0
       ],
       [
@@ -9731,12 +12227,52 @@ export const TRIPS: Trip[] = [
         0
       ],
       [
-        "Trebević cable car + bobsled",
+        "Trebevic cable car + bobsled",
         8
       ],
       [
         "Srebrenica memorial day trip",
         25
+      ],
+      [
+        "War Childhood Museum",
+        8
+      ],
+      [
+        "Cevapi-tasting crawl",
+        10
+      ],
+      [
+        "Yellow Fortress sunset viewpoint",
+        0
+      ],
+      [
+        "City Hall (Vijecnica)",
+        5
+      ],
+      [
+        "Turkish coffee-house crawl",
+        8
+      ],
+      [
+        "Mostar day trip",
+        20
+      ],
+      [
+        "Sarajevo Brewery museum",
+        6
+      ],
+      [
+        "Sarajevo Roses memorial walk",
+        0
+      ],
+      [
+        "Vrelo Bosne park day trip",
+        8
+      ],
+      [
+        "Craft market walk",
+        0
       ]
     ],
     "f": [
