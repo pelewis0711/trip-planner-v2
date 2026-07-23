@@ -25,6 +25,7 @@ export default function CalendarPage() {
   const updateSlotDates = usePlanStore((s) => s.updateSlotDates);
   const updateSlotNote = usePlanStore((s) => s.updateSlotNote);
   const deleteSlot = usePlanStore((s) => s.deleteSlot);
+  const studyingInEurope = usePlanStore((s) => s.defaultStudyingInEurope);
 
   const [view, setView] = useState<"weekend" | "month">("weekend");
   const [armedId, setArmedId] = useState<string | null>(null);
@@ -171,7 +172,7 @@ export default function CalendarPage() {
             </button>
             <span className="text-xs text-zinc-500">
               {filledCount ? `${filledCount} of ${slots.length} slots filled` : "all slots empty — tap or drag to begin"}
-              {filledCount > 0 && (
+              {filledCount > 0 && studyingInEurope && (
                 <>
                   {" · "}
                   <span

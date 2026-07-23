@@ -123,6 +123,25 @@ export function getSlotsForPlan(plan: Plan): Slot[] {
   return plan.slots ?? [];
 }
 
+export type Season = "Winter" | "Spring" | "Summer" | "Fall";
+
+/** A plain-English "Spring 2027"-style label, generated from a plan's own
+ * semester dates instead of hardcoded -- null for an unconfigured plan
+ * (no semester at all), which callers should treat as "don't show a term". */
+export function describeTerm(semester: SemesterConfig | undefined): { season: Season; year: number } | null {
+  if (!semester) return null;
+  const [y, m] = semester.start.split("-").map(Number);
+  const days = (parseISO(semester.end).getTime() - parseISO(semester.start).getTime()) / 86400000;
+  // Spring and Winter terms both start in January (smartDefaultSemester:
+  // winter is a short ~3-week Jan window, spring is the full ~4-month Jan-
+  // May term) -- duration is what actually tells them apart, not the start
+  // month alone. Fall starts late Aug; "Summer" only comes up for an odd
+  // manually-entered mid-year date, since this app has no summer-term
+  // concept of its own.
+  const season: Season = days < 45 ? "Winter" : m <= 5 ? "Spring" : m <= 7 ? "Summer" : "Fall";
+  return { season, year: y };
+}
+
 /** Union of slots across several plans (by id, first-seen wins), sorted by
  * month/day — used by Compare when the plans being compared have different
  * semesters and therefore different slot sets. */

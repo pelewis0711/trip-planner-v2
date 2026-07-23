@@ -28,6 +28,10 @@ export default function ItineraryPage() {
   const setBudget = usePlanStore((s) => s.setBudget);
   const setUseLivePrices = usePlanStore((s) => s.setUseLivePrices);
   const setDefaultTravelers = usePlanStore((s) => s.setDefaultTravelers);
+  // Phase 9: the Schengen tracker and Eurail tips only make sense for
+  // someone actually studying in Europe under a Schengen study visa --
+  // hidden everywhere when this profile toggle (Settings) is off.
+  const studyingInEurope = usePlanStore((s) => s.defaultStudyingInEurope);
   const livePrices = useLivePriceStore((s) => s.prices);
 
   const [editingBudget, setEditingBudget] = useState(false);
@@ -113,21 +117,23 @@ export default function ItineraryPage() {
 
         <SummaryBar travel={g.travel} lodg={g.lodg} food={g.food} act={g.act} total={g.total} />
 
-        <div className="mt-3 flex flex-wrap items-center gap-4 text-sm">
-          <span
-            className={
-              schStatus === "red"
-                ? "font-bold text-rose-400"
-                : schStatus === "amber"
-                  ? "font-semibold text-amber-400"
-                  : "text-zinc-300"
-            }
-          >
-            🛂 Schengen days: <b>{schD}</b> / 90 per 180
-            {schStatus === "red" && " — OVER the limit. Swap a trip for a non-Schengen one."}
-            {schStatus === "amber" && " — cutting it close, leave buffer for spontaneous trips."}
-          </span>
-        </div>
+        {studyingInEurope && (
+          <div className="mt-3 flex flex-wrap items-center gap-4 text-sm">
+            <span
+              className={
+                schStatus === "red"
+                  ? "font-bold text-rose-400"
+                  : schStatus === "amber"
+                    ? "font-semibold text-amber-400"
+                    : "text-zinc-300"
+              }
+            >
+              🛂 Schengen days: <b>{schD}</b> / 90 per 180
+              {schStatus === "red" && " — OVER the limit. Swap a trip for a non-Schengen one."}
+              {schStatus === "amber" && " — cutting it close, leave buffer for spontaneous trips."}
+            </span>
+          </div>
+        )}
 
         <div className="mt-2.5 flex flex-wrap items-center gap-3 text-xs">
           <label className="flex items-center gap-1.5 text-zinc-400">
@@ -236,15 +242,17 @@ export default function ItineraryPage() {
         </div>
 
         <div className="mt-3 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-2.5 text-[12.5px] text-amber-200">
-          ➕ Eurail Global Pass (Youth, 10 days/2 mo) ≈ <b>$296</b> if you&apos;re doing the rail-heavy
-          trips · +12% contingency buffer ≈ <b>{money(contingency)}</b> → <b>estimated grand total ≈{" "}
-          {money(g.total + 296 + contingency)}</b>. Excludes normal {home || "home-city"} weekday living/housing.
+          {studyingInEurope && (
+            <>➕ Eurail Global Pass (Youth, 10 days/2 mo) ≈ <b>$296</b> if you&apos;re doing the rail-heavy trips · </>
+          )}
+          +12% contingency buffer ≈ <b>{money(contingency)}</b> → <b>estimated grand total ≈{" "}
+          {money(g.total + (studyingInEurope ? 296 : 0) + contingency)}</b>. Excludes normal {home || "home-city"} weekday living/housing.
         </div>
       </div>
 
       <div className="print:hidden">
         <div className="mt-4">
-          <CheatSheet />
+          <CheatSheet studyingInEurope={studyingInEurope} />
         </div>
       </div>
 

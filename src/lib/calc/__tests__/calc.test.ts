@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { legEstimate } from "../routing";
 import { pricedLegs } from "../pricing";
 import { schengenDays } from "../schengen";
-import { generateSlots, getSlotsForPlan, DEFAULT_SEMESTER } from "../semester";
+import { generateSlots, getSlotsForPlan, DEFAULT_SEMESTER, describeTerm } from "../semester";
 import { smartDefaultSemester, postFinalsBreak } from "../onboarding";
 import type { Placements, Stop } from "../types";
 import type { Plan } from "@/lib/store/plan";
@@ -174,6 +174,20 @@ describe("Phase 9 step 4: generateSlots as a standalone pure function (spring + 
       breaks: [{ id: "post", label: "POST-FINALS", start: "2027-05-15", end: "2027-05-24", kind: "post" }],
     });
     expect(slots.filter((s) => s.kind === "post").length).toBe(1);
+  });
+});
+
+describe("Phase 9 step 7: describeTerm (profile-driven Overview/Header labels)", () => {
+  it("a spring-start semester describes as Spring, with the real year", () => {
+    expect(describeTerm({ start: "2027-01-24", end: "2027-05-24", breaks: [] })).toEqual({ season: "Spring", year: 2027 });
+  });
+
+  it("a fall-start semester describes as Fall, with the real year", () => {
+    expect(describeTerm({ start: "2026-08-25", end: "2026-12-12", breaks: [] })).toEqual({ season: "Fall", year: 2026 });
+  });
+
+  it("returns null for an unconfigured plan (no semester at all) -- never guesses a term", () => {
+    expect(describeTerm(undefined)).toBeNull();
   });
 });
 

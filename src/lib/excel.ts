@@ -3,8 +3,9 @@
 // frozen on an old, unpatched build) instead of a CDN <script> loaded at runtime.
 import type { CellObject } from "xlsx";
 import type { Plan } from "@/lib/store/plan";
+import { usePlanStore } from "@/lib/store/plan";
 import type { Slot } from "@/data/slots";
-import { getSlotsForPlan } from "@/lib/calc/semester";
+import { getSlotsForPlan, describeTerm } from "@/lib/calc/semester";
 import { makeCtx } from "@/lib/calc/context";
 import {
   actualEntered,
@@ -97,12 +98,17 @@ export function buildXlsxSheets(
   const bt = blendedTotals(plan.placements, ctx, defaultTravelers);
   const homeC = resolveHome(plan.home)?.country || plan.home;
   const schD = schengenDays(plan.placements, plan.home, ctx.tripOf);
+  // Phase 9: a global profile setting (Settings), not per-plan -- Schengen/
+  // Eurail rows only make sense for someone actually studying in Europe.
+  const studyingInEurope = usePlanStore.getState().defaultStudyingInEurope;
+  const currency = usePlanStore.getState().defaultCurrency;
+  const term = describeTerm(plan.semester);
 
   const bud: Row[] = [
     [`STUDY ABROAD BUDGET — ${plan.name || "Plan"}`],
     ["Home base", plan.home],
-    ["Semester", plan.semester ? `Custom (${plan.semester.start} to ${plan.semester.end})` : "Spring 2027 (AAU Prague calendar)"],
-    ["Currency", "USD, per person (group totals shown alongside where travelers > 1)"],
+    ["Semester", term ? `${term.season} ${term.year} (${plan.semester!.start} to ${plan.semester!.end})` : "Not set yet"],
+    ["Currency", `${currency}, per person (group totals shown alongside where travelers > 1)`],
     ["Exported", today],
     [
       "Flight pricing includes",
@@ -132,6 +138,7 @@ export function buildXlsxSheets(
     ]);
   });
   const buf = g.total * 0.12;
+  const eurail = studyingInEurope ? 296 : 0;
   bud.push(
     [],
     ["TOTALS", "", "", nightsAll, "", XM(g.travel), XM(g.lodg), XM(g.lodgGroup), XM(g.food), XM(g.act), XM(g.total), XM(g.totalGroup), bt.booked ? XM(bt.blend) : "", bt.booked ? XM(bt.blend - bt.est) : ""],
@@ -140,8 +147,8 @@ export function buildXlsxSheets(
     ["Trips subtotal (estimates, group)", "", "", "", "", "", "", "", "", "", XM(g.totalGroup)],
     ["Projected spend (booked actuals where entered, per person)", "", "", "", "", "", "", "", "", "", XM(bt.blend)],
     ["+12% contingency buffer", "", "", "", "", "", "", "", "", "", XM(buf)],
-    ["Optional: Eurail Global Pass (Youth, 10d/2mo)", "", "", "", "", "", "", "", "", "", XM(296)],
-    ["ESTIMATED GRAND TOTAL (projection + buffer + Eurail, per person)", "", "", "", "", "", "", "", "", "", XM(bt.blend + buf + 296)],
+    ...(studyingInEurope ? [["Optional: Eurail Global Pass (Youth, 10d/2mo)", "", "", "", "", "", "", "", "", "", XM(296)] as Row] : []),
+    [`ESTIMATED GRAND TOTAL (projection + buffer${studyingInEurope ? " + Eurail" : ""}, per person)`, "", "", "", "", "", "", "", "", "", XM(bt.blend + buf + eurail)],
     []
   );
   if (plan.budget) {
@@ -152,11 +159,15 @@ export function buildXlsxSheets(
   }
   bud.push(
     ["Cost per night away (per person)", "", "", "", "", "", "", "", "", "", nightsAll ? XM(g.total / nightsAll) : "—"],
-    [
-      `🛂 Schengen days used (${SCHENGEN.has(homeC) ? `outside ${homeC}` : "in the Schengen area"})`,
-      "", "", "", "", "", "", "", "", "",
-      `${schD} of 90 per 180${schD > 90 ? " — OVER THE LEGAL LIMIT" : schD > 80 ? " — cutting it close" : ""}`,
-    ],
+    ...(studyingInEurope
+      ? [
+          [
+            `🛂 Schengen days used (${SCHENGEN.has(homeC) ? `outside ${homeC}` : "in the Schengen area"})`,
+            "", "", "", "", "", "", "", "", "",
+            `${schD} of 90 per 180${schD > 90 ? " — OVER THE LEGAL LIMIT" : schD > 80 ? " — cutting it close" : ""}`,
+          ] as Row,
+        ]
+      : []),
     [`Note: excludes normal weekday living costs in ${plan.home}.`]
   );
   if (!ordered.length) bud.push([], ["(No trips scheduled in this plan yet — fill the calendar and re-export.)"]);
