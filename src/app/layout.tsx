@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import Header from "@/components/Header";
 import AuthSync from "@/components/AuthSync";
 import CustomTripsSync from "@/components/CustomTripsSync";
@@ -19,6 +19,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// bold, friendly display font for headings/card titles -- the "playful
+// college" half of the visual direction; body text stays on Geist Sans for
+// legibility in dense screens (tables, forms).
+const poppins = Poppins({
+  variable: "--font-poppins",
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+});
+
 export const metadata: Metadata = {
   title: "Semesterly",
   description: "Plan your study-abroad semester of travel — budgets, calendar, and bookings in one place.",
@@ -30,7 +39,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#09090b",
+  themeColor: "#faf9fc",
 };
 
 export default function RootLayout({
@@ -41,9 +50,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-zinc-950 text-zinc-100">
+      <body className="flex min-h-full flex-col bg-bg text-ink">
         <RegisterServiceWorker />
         <AuthSync />
         <CustomTripsSync />
