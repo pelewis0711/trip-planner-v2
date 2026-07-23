@@ -20,12 +20,22 @@ export default function CalendarPage() {
   const addStop = usePlanStore((s) => s.addStop);
   const removeStop = usePlanStore((s) => s.removeStop);
   const clearAll = usePlanStore((s) => s.clearAll);
+  const addSlot = usePlanStore((s) => s.addSlot);
+  const renameSlot = usePlanStore((s) => s.renameSlot);
+  const updateSlotDates = usePlanStore((s) => s.updateSlotDates);
+  const updateSlotNote = usePlanStore((s) => s.updateSlotNote);
+  const deleteSlot = usePlanStore((s) => s.deleteSlot);
 
   const [view, setView] = useState<"weekend" | "month">("weekend");
   const [armedId, setArmedId] = useState<string | null>(null);
   const [editingSlotId, setEditingSlotId] = useState<string | null>(null);
   const [trayOpen, setTrayOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [editSlotsMode, setEditSlotsMode] = useState(false);
+  const [addingSlot, setAddingSlot] = useState(false);
+  const [newSlotLabel, setNewSlotLabel] = useState("");
+  const [newSlotStart, setNewSlotStart] = useState("2001-01-01");
+  const [newSlotEnd, setNewSlotEnd] = useState("2001-01-02");
 
   // Phase 9 step 3: a plan with no home AND no semester has never been
   // configured at all (true for every brand-new anonymous visitor's default
@@ -148,6 +158,17 @@ export default function CalendarPage() {
             >
               Clear all
             </button>
+            <button
+              type="button"
+              onClick={() => setEditSlotsMode((m) => !m)}
+              className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
+                editSlotsMode
+                  ? "border-emerald-500 bg-emerald-500/10 text-emerald-300"
+                  : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-emerald-500/50"
+              }`}
+            >
+              {editSlotsMode ? "Done editing" : "✏️ Edit slots"}
+            </button>
             <span className="text-xs text-zinc-500">
               {filledCount ? `${filledCount} of ${slots.length} slots filled` : "all slots empty — tap or drag to begin"}
               {filledCount > 0 && (
@@ -180,12 +201,77 @@ export default function CalendarPage() {
                     ctx={ctx}
                     travelers={travelersFor(placements[slot.id], activePlan.defaultTravelers ?? 1)}
                     armed={!!armedId}
+                    editMode={editSlotsMode}
                     onActivate={() => activate(slot.id)}
                     onDropTrip={(tripId) => dropTrip(slot.id, tripId)}
                     onEdit={() => setEditingSlotId(slot.id)}
                     onRemoveStop={(idx) => removeStop(slot.id, idx)}
+                    onRename={(label) => renameSlot(slot.id, label)}
+                    onUpdateDates={(start, end) => updateSlotDates(slot.id, start, end)}
+                    onUpdateNote={(note) => updateSlotNote(slot.id, note)}
+                    onDelete={() => deleteSlot(slot.id)}
                   />
                 ))}
+                {editSlotsMode && (
+                  <div className="rounded-xl border-2 border-dashed border-zinc-800 bg-zinc-900/40 p-3.5">
+                    {addingSlot ? (
+                      <div className="space-y-2">
+                        <input
+                          autoFocus
+                          value={newSlotLabel}
+                          onChange={(e) => setNewSlotLabel(e.target.value)}
+                          placeholder="Slot label…"
+                          className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-sm text-zinc-100 placeholder:text-zinc-600"
+                        />
+                        <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                          <input
+                            type="date"
+                            value={newSlotStart}
+                            onChange={(e) => setNewSlotStart(e.target.value)}
+                            className="rounded-md border border-zinc-800 bg-zinc-950 px-1.5 py-1 text-zinc-100"
+                          />
+                          <span>–</span>
+                          <input
+                            type="date"
+                            value={newSlotEnd}
+                            onChange={(e) => setNewSlotEnd(e.target.value)}
+                            className="rounded-md border border-zinc-800 bg-zinc-950 px-1.5 py-1 text-zinc-100"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const s = newSlotStart.split("-").map(Number);
+                              const e = newSlotEnd.split("-").map(Number);
+                              addSlot(newSlotLabel || "Untitled", [s[1], s[2]], [e[1], e[2]], "weekend");
+                              setNewSlotLabel("");
+                              setAddingSlot(false);
+                            }}
+                            className="rounded-md bg-emerald-500 px-3 py-1.5 text-xs font-bold text-zinc-950"
+                          >
+                            Add
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setAddingSlot(false)}
+                            className="rounded-md border border-zinc-700 px-3 py-1.5 text-xs font-semibold text-zinc-300"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setAddingSlot(true)}
+                        className="flex h-full w-full items-center justify-center rounded-lg border border-dashed border-zinc-700 py-6 text-sm font-semibold text-zinc-400 hover:border-emerald-500/50 hover:text-emerald-300"
+                      >
+                        + Add slot
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             ) : (
               <MonthGrid
