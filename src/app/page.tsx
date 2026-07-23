@@ -44,10 +44,15 @@ export default function OverviewPage() {
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
       <div className="rounded-2xl border border-zinc-800 bg-gradient-to-br from-zinc-900 to-zinc-900/60 p-6 sm:p-8">
         <h1 className="text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
-          Plan your semester of travel from {home} ✈️
+          {home ? `Plan your semester of travel from ${home} ✈️` : "Plan your semester of travel ✈️"}
         </h1>
         <p className="mt-3 max-w-2xl text-zinc-400">
-          {isPrague ? (
+          {!home ? (
+            <>
+              <b className="text-zinc-200">Pick your home city</b> up in the header to get flight/train
+              prices routed from where you actually are. Until then, prices below are just illustrative.
+            </>
+          ) : isPrague ? (
             <>
               You&apos;re based in <b className="text-zinc-200">Prague</b>{" "}
               (this plan was built around Anglo-American University&apos;s{" "}

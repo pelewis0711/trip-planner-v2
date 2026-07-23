@@ -70,7 +70,8 @@ export default function CatalogPage() {
           Trip Catalog <span className="text-sm font-normal text-zinc-500">— {visible.length} of {allTrips.length} options</span>
         </h2>
         <p className="mt-1 text-sm text-zinc-400">
-          Prices are per person, round-trip from {home}, mid-range estimates. Head to{" "}
+          Prices are per person, round-trip from {home || "your home city (not set yet)"}, mid-range
+          estimates. Head to{" "}
           <b className="text-zinc-200">My Calendar</b> to drop a trip onto a slot.
         </p>
       </div>

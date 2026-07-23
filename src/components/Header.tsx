@@ -150,6 +150,11 @@ export default function Header() {
               onChange={(e) => (e.target.value === OTHER_CITY ? setAddingCity(true) : setHome(e.target.value))}
               className="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-sm font-semibold text-zinc-100"
             >
+              {!home && (
+                <option value="" disabled>
+                  Choose a city…
+                </option>
+              )}
               {Object.keys(HOMES).map((h) => (
                 <option key={h} value={h}>
                   {h}

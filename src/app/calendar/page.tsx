@@ -61,7 +61,8 @@ export default function CalendarPage() {
         <h2 className="text-xl font-semibold text-zinc-50">My Calendar</h2>
         <p className="mt-1 text-sm text-zinc-400">
           Tap a trip in the tray then tap a slot, or drag it onto one. Drop several trips on one slot
-          for multi-city stretches like spring break — travel routes automatically from {home}.
+          for multi-city stretches like spring break — travel routes automatically from{" "}
+          {home || "your home city (choose one in the header)"}.
         </p>
       </div>
 
