@@ -1,4 +1,8 @@
+"use client";
+
 import type { Trip } from "@/data/trips";
+import { usePlanStore } from "@/lib/store/plan";
+import { formatMoney } from "@/lib/calc/currency";
 
 const TYPE_LABEL: Record<string, string> = {
   history: "History & Culture",
@@ -40,6 +44,7 @@ export default function TripCard({
   ceiling: number;
 }) {
   const tier = tierOf(trip.ci);
+  const currency = usePlanStore((s) => s.defaultCurrency);
   return (
     <div className="flex flex-col rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 transition-colors hover:border-emerald-500/40">
       <div className="flex items-start justify-between gap-2">
@@ -73,7 +78,7 @@ export default function TripCard({
           {trip.m.map((m) => MO_SHORT[m]).join("/")}
         </span>
         <span className="text-[15px] font-extrabold text-emerald-400">
-          ${Math.round(floor)}–${Math.round(ceiling)}
+          {formatMoney(floor, currency)}–{formatMoney(ceiling, currency)}
         </span>
       </div>
     </div>

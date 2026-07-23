@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import type { Plan } from "@/lib/store/plan";
+import { usePlanStore } from "@/lib/store/plan";
 import { planGrandTotals } from "@/lib/planTotals";
 import { exportPlanXlsx } from "@/lib/excel";
 import { useLivePriceStore } from "@/lib/store/livePrices";
 import { useLiveHotelPriceStore } from "@/lib/store/liveHotelPrices";
+import { formatMoney } from "@/lib/calc/currency";
 import SharePanel from "./SharePanel";
 import SemesterPanel from "./SemesterPanel";
-
-const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
 
 export default function PlanCard({
   plan,
@@ -47,6 +47,8 @@ export default function PlanCard({
   const isCollaboration = !plan.readOnly && plan.ownerId && plan.ownerId !== currentUserId;
   const livePrices = useLivePriceStore((s) => s.prices);
   const liveHotelPrices = useLiveHotelPriceStore((s) => s.prices);
+  const currency = usePlanStore((s) => s.defaultCurrency);
+  const money = (n: number) => formatMoney(n, currency);
 
   const handleExportXlsx = async () => {
     setBuildingXlsx(true);

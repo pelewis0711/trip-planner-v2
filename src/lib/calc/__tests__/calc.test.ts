@@ -15,6 +15,7 @@ import { TRIPS } from "@/data/trips";
 import { slotCosts, tripPriceRange, travelersFor, grandTotals } from "../costs";
 import { makeCtx } from "../context";
 import { foodTiers, daysOf, lodgingTiers } from "../cost";
+import { convert, formatMoney, RATES } from "../currency";
 
 const rome = TRIPS.find((t) => t.id === "rome")!;
 const dublin = TRIPS.find((t) => t.id === "dublin")!;
@@ -188,6 +189,36 @@ describe("Phase 9 step 7: describeTerm (profile-driven Overview/Header labels)",
 
   it("returns null for an unconfigured plan (no semester at all) -- never guesses a term", () => {
     expect(describeTerm(undefined)).toBeNull();
+  });
+});
+
+describe("Phase 9 step 8: display-only currency conversion (calc engine stays USD)", () => {
+  it("the same plan's real grandTotals convert to mathematically equivalent amounts in EUR and GBP -- not different numbers", () => {
+    const ctx = makeCtx("Prague");
+    const placements: Placements = {
+      s06: { stops: [{ tripId: "rome", nights: 2, act: [], sig: [], l: 0, fd: 0 }] },
+    };
+    const g = grandTotals(placements, ctx, 1);
+
+    // the calc engine only ever produces plain USD numbers -- untouched by
+    // this feature, verified directly before checking the display layer
+    expect(typeof g.total).toBe("number");
+
+    const eur = convert(g.total, "EUR");
+    const gbp = convert(g.total, "GBP");
+    expect(eur).toBeCloseTo(g.total * RATES.EUR, 6);
+    expect(gbp).toBeCloseTo(g.total * RATES.GBP, 6);
+
+    // formatMoney shows the right symbol for the same underlying total --
+    // same plan, same trip, three different display strings
+    expect(formatMoney(g.total, "USD")).toBe(`$${Math.round(g.total).toLocaleString()}`);
+    expect(formatMoney(g.total, "EUR")).toBe(`€${Math.round(eur).toLocaleString()}`);
+    expect(formatMoney(g.total, "GBP")).toBe(`£${Math.round(gbp).toLocaleString()}`);
+  });
+
+  it("USD is always an exact 1:1 passthrough (no rounding drift from the identity rate)", () => {
+    expect(convert(123.45, "USD")).toBe(123.45);
+    expect(RATES.USD).toBe(1);
   });
 });
 

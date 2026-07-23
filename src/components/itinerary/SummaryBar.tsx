@@ -1,3 +1,8 @@
+"use client";
+
+import { usePlanStore } from "@/lib/store/plan";
+import { formatMoney } from "@/lib/calc/currency";
+
 const SEGMENTS: { key: "travel" | "lodg" | "food" | "act"; label: string; color: string }[] = [
   { key: "travel", label: "Travel", color: "#4bc4ff" },
   { key: "lodg", label: "Lodging", color: "#c48cff" },
@@ -18,6 +23,7 @@ export default function SummaryBar({
   act: number;
   total: number;
 }) {
+  const currency = usePlanStore((s) => s.defaultCurrency);
   const values = { travel, lodg, food, act };
   if (total <= 0) return null;
 
@@ -32,7 +38,7 @@ export default function SummaryBar({
             key={s.key}
             style={{ width: `${pct.toFixed(2)}%`, backgroundColor: s.color }}
             className="flex items-center justify-center overflow-hidden text-[11px] font-bold whitespace-nowrap text-zinc-950"
-            title={`${s.label}: $${Math.round(v)}`}
+            title={`${s.label}: ${formatMoney(v, currency)}`}
           >
             {pct > 7 ? s.label : ""}
           </div>

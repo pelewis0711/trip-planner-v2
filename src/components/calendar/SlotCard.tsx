@@ -6,6 +6,8 @@ import type { Placement } from "@/lib/calc/types";
 import type { PlannerCtx } from "@/lib/calc/context";
 import { slotCosts } from "@/lib/calc/costs";
 import { slotWarnings } from "@/lib/calc/warnings";
+import { usePlanStore } from "@/lib/store/plan";
+import { formatMoney } from "@/lib/calc/currency";
 
 const KIND_STYLE: Record<string, string> = {
   weekend: "border-zinc-800",
@@ -62,6 +64,7 @@ export default function SlotCard({
 
   const [label, setLabel] = useState(slot.label);
   const [note, setNote] = useState(slot.note ?? "");
+  const currency = usePlanStore((s) => s.defaultCurrency);
 
   if (editMode) {
     return (
@@ -131,10 +134,10 @@ export default function SlotCard({
         </div>
         {costs && (
           <span className="shrink-0 text-right text-sm font-extrabold text-emerald-400">
-            ${Math.round(costs.total)}
+            {formatMoney(costs.total, currency)}
             {travelers > 1 && (
               <span className="block text-[10px] font-normal text-zinc-500">
-                ${Math.round(costs.total * travelers)} · 👥{travelers}
+                {formatMoney(costs.total * travelers, currency)} · 👥{travelers}
               </span>
             )}
           </span>

@@ -22,6 +22,7 @@ import { hotelKey, type LiveHotelPrice } from "@/lib/store/liveHotelPrices";
 import { daysOf, foodTiers, lodgingTiers } from "@/lib/calc/cost";
 import { SCHENGEN, schengenDays } from "@/lib/calc/schengen";
 import { resolveHome } from "@/lib/resolveHome";
+import { convert, formatMoney, SYMBOLS, RATES_AS_OF } from "@/lib/calc/currency";
 import { slotWarnings } from "@/lib/calc/warnings";
 import { iso, nice, stopDates, legDateFor } from "@/lib/calc/dates";
 import { BAGS } from "@/lib/calc/pricing";
@@ -46,11 +47,6 @@ const XL = (label: string, url: string): CellObject => ({
   v: label,
   t: "s",
   l: { Target: url, Tooltip: url },
-});
-const XM = (n: number): CellObject => ({
-  v: Math.round(n),
-  t: "n",
-  z: '"$"#,##0',
 });
 
 export function buildXlsxSheets(
@@ -103,12 +99,25 @@ export function buildXlsxSheets(
   const studyingInEurope = usePlanStore.getState().defaultStudyingInEurope;
   const currency = usePlanStore.getState().defaultCurrency;
   const term = describeTerm(plan.semester);
+  // Display-only: every number below is computed in USD by the calc engine
+  // (untouched) and converted just for this cell, same as everywhere else
+  // in the app -- see src/lib/calc/currency.ts.
+  const XM = (n: number): CellObject => ({
+    v: Math.round(convert(n, currency)),
+    t: "n",
+    z: `"${SYMBOLS[currency]}"#,##0`,
+  });
 
   const bud: Row[] = [
     [`STUDY ABROAD BUDGET — ${plan.name || "Plan"}`],
     ["Home base", plan.home],
     ["Semester", term ? `${term.season} ${term.year} (${plan.semester!.start} to ${plan.semester!.end})` : "Not set yet"],
-    ["Currency", `${currency}, per person (group totals shown alongside where travelers > 1)`],
+    [
+      "Currency",
+      currency === "USD"
+        ? "USD, per person (group totals shown alongside where travelers > 1)"
+        : `${currency}, per person, converted from USD at an approximate rate (as of ${RATES_AS_OF}) — not live FX`,
+    ],
     ["Exported", today],
     [
       "Flight pricing includes",
@@ -213,10 +222,10 @@ export function buildXlsxSheets(
         const liveHit = isLiveTier && sdi
           ? liveHotelPrices[hotelKey(t.n, iso(sdi.in), iso(sdi.out), travelers, st.l === 2 ? "private" : "boutique")]
           : undefined;
-        const liveNote = liveHit && liveHit.price !== null ? `LIVE: $${Math.round(liveHit.price)}` : isLiveTier ? "estimate (live price not checked yet)" : "estimate (no free live-price API for this tier)";
+        const liveNote = liveHit && liveHit.price !== null ? `LIVE: ${formatMoney(liveHit.price, currency)}` : isLiveTier ? "estimate (live price not checked yet)" : "estimate (no free live-price API for this tier)";
         tp.push([
           "", "", `Lodging (per person)`, `${lt[0]} × ${st.nights}n`, XM(perPerson),
-          travelers > 1 ? `${XM(perPerson * travelers).v} for ${travelers} — ${liveNote}` : liveNote,
+          travelers > 1 ? `${formatMoney(perPerson * travelers, currency)} for ${travelers} — ${liveNote}` : liveNote,
         ]);
       }
       const ft = foodTiers(t.ci)[st.fd];
@@ -229,7 +238,7 @@ export function buildXlsxSheets(
     });
     tp.push([
       "", "SLOT TOTAL (per person)", "", "", "", "", XM(c.total),
-      travelers > 1 ? `${XM(c.total * travelers).v} for ${travelers} total` : "",
+      travelers > 1 ? `${formatMoney(c.total * travelers, currency)} for ${travelers} total` : "",
     ]);
     tp.push([]);
   });
