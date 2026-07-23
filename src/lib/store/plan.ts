@@ -10,8 +10,9 @@ import { HOMES } from "@/data/homes";
 import { useCustomHomesStore } from "@/lib/store/customHomes";
 import type { BagOption } from "@/lib/calc/pricing";
 import type { Placement, Placements, SlotActuals, Stop } from "@/lib/calc/types";
-import type { SemesterConfig } from "@/lib/calc/semester";
+import { generateSlots, DEFAULT_SEMESTER, fmtMonthDay, type SemesterConfig } from "@/lib/calc/semester";
 import type { Currency } from "@/components/onboarding/OnboardingFlow";
+import { LEGACY_SLOTS, type Slot, type SlotKind } from "@/data/slots";
 
 function isKnownHome(home: string): boolean {
   return !!HOMES[home] || !!useCustomHomesStore.getState().homes[home];
@@ -28,8 +29,15 @@ export interface Plan {
   placements: Placements;
   created: number;
   updated: number;
-  // custom semester dates/breaks — undefined means "use the default AAU
-  // Spring 2027 SLOTS list unchanged" (see src/lib/calc/semester.ts)
+  // this plan's actual calendar -- generated from `semester` (see below) the
+  // moment it's set/changed, then directly editable afterward (add/rename/
+  // delete/adjust dates from the Calendar page's "Edit slots" mode).
+  // Undefined/empty means "not configured yet" (Phase 9's setup-wizard
+  // empty state), same signal as `semester` being unset.
+  slots?: Slot[];
+  // the start/end/breaks slots were last generated from -- kept alongside
+  // `slots` so the "customize semester" panel has something to pre-fill and
+  // so regenerating (changing dates) has a starting point to diff against.
   semester?: SemesterConfig;
   // when true, totals use live flight prices (where fetched) in place of
   // the estimate for flight legs — see src/lib/calc/livePricing.ts
@@ -93,6 +101,7 @@ const DEFAULT_PLAN: Plan = {
   bag: "cabin",
   budget: null,
   placements: {},
+  slots: [],
   created: 0,
   updated: 0,
 };
@@ -111,6 +120,10 @@ interface PlanStoreState {
   // forward (newPlan() below) — never applied to existing plans.
   defaultHome: string;
   defaultSemester: SemesterConfig | undefined;
+  // generated from defaultSemester the moment it's set (see
+  // setOnboardingDefaults) -- newPlan() seeds every new plan's `slots` from
+  // this, same seeding pattern as defaultHome/defaultSemester.
+  defaultSlots: Slot[];
   // Phase 9 step 3: local mirror of the two Phase 9 step 2 fields, so an
   // anonymous visitor who completes the setup wizard locally (no account)
   // has somewhere to keep these -- previously they only ever reached
@@ -147,6 +160,14 @@ interface PlanStoreState {
   setDefaultTravelers: (travelers: number) => void;
   setTravelersFor: (slotId: string, travelers: number) => void;
 
+  // slot editing (Calendar page's "Edit slots" mode) -- all act on the
+  // ACTIVE plan's own `slots` array
+  addSlot: (label: string, start: [number, number], end: [number, number], kind: SlotKind) => void;
+  renameSlot: (slotId: string, label: string) => void;
+  updateSlotDates: (slotId: string, start: [number, number], end: [number, number]) => void;
+  updateSlotNote: (slotId: string, note: string) => void;
+  deleteSlot: (slotId: string) => void;
+
   // plan management
   newPlan: (name?: string) => string;
   duplicatePlan: (id: string) => string;
@@ -167,8 +188,12 @@ interface PlanStoreState {
   // -- does NOT bump `updated`, so patching sync metadata never re-triggers a sync
   patchPlan: (id: string, patch: Partial<Plan>) => void;
   // like patchPlan, but for real content edits from a specific plan card
-  // (not necessarily the active plan) -- bumps `updated` so it syncs
-  setSemesterFor: (id: string, semester: SemesterConfig | undefined) => void;
+  // (not necessarily the active plan). Recomputes the auto-generated slots
+  // (weekend/break/post) from the new semester, leaves any user-added
+  // custom_* slots untouched, and drops placements for any slot that no
+  // longer exists -- callers should check slotsToBeLost() first and confirm
+  // with the user before calling this if it's non-empty (see SemesterPanel).
+  regenerateSlotsFor: (id: string, semester: SemesterConfig) => void;
   // add/refresh a friend's plan pulled in via a share link — always readOnly
   addSharedPlan: (plan: Plan) => void;
   removeSharedPlan: (id: string) => void;
@@ -217,6 +242,73 @@ function uid() {
   return "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
+function newSlotId() {
+  return "custom_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+const isCustomSlot = (id: string) => id.startsWith("custom_");
+
+// Recomputes the auto-generated (weekend/break/post) slots from `semester`,
+// keeps any user-added custom_* slots as-is, and drops placements for any
+// slot id that no longer exists in the result. Pure -- used by both
+// slotsToBeLost() (preview, no mutation) and the real regenerateSlotsFor
+// store action below.
+function recomputeSlots(plan: Plan, semester: SemesterConfig): { slots: Slot[]; placements: Placements } {
+  const auto = generateSlots(semester);
+  const custom = (plan.slots ?? []).filter((s) => isCustomSlot(s.id));
+  const slots = [...auto, ...custom].sort((a, b) => a.s[0] - b.s[0] || a.s[1] - b.s[1]);
+  const keep = new Set(slots.map((s) => s.id));
+  const placements: Placements = {};
+  Object.entries(plan.placements).forEach(([id, p]) => {
+    if (keep.has(id)) placements[id] = p;
+  });
+  return { slots, placements };
+}
+
+// Which of this plan's currently-placed slots (with real trips in them)
+// would disappear if `semester` were applied -- for the calling UI to warn
+// about *before* actually regenerating, per "warn me first instead of
+// silently deleting."
+export function slotsToBeLost(plan: Plan, semester: SemesterConfig): Slot[] {
+  const { slots: nextSlots } = recomputeSlots(plan, semester);
+  const keep = new Set(nextSlots.map((s) => s.id));
+  return (plan.slots ?? []).filter(
+    (s) => !keep.has(s.id) && (plan.placements[s.id]?.stops.length ?? 0) > 0
+  );
+}
+
+// One-time migration helper: turns a pre-existing plan (no `slots` field --
+// either the ancient pre-Stage-6 shape or any real Stage-6+ plan that relied
+// on the old implicit "no semester -> hardcoded AAU SLOTS" fallback) into an
+// explicit, generated slot list, remapping its placements so nothing placed
+// gets silently orphaned. A plan that already has `slots`, or one with no
+// real home chosen (never actually configured/used), is left alone --
+// exactly the same "configured vs not" signal Phase 9 step 3 already uses.
+export function migratePlanToSlots(plan: Plan): Plan {
+  if (plan.slots) return plan;
+  if (!plan.home) return { ...plan, slots: [] };
+
+  if (plan.semester) {
+    // already using the dynamic generator (a friend's custom semester) --
+    // its placement ids already came from generateSlots, so no remap needed
+    return { ...plan, slots: generateSlots(plan.semester) };
+  }
+
+  // the implicit AAU-fallback case (Parker's real plan, most likely) --
+  // migrate to an explicit semester and remap old static-file ids (s01,
+  // sSP, ...) to whichever new slot covers the same dates
+  const newSlots = generateSlots(DEFAULT_SEMESTER);
+  const placements: Placements = {};
+  Object.entries(plan.placements).forEach(([oldId, p]) => {
+    const oldSlot = LEGACY_SLOTS.find((s) => s.id === oldId);
+    const match = oldSlot && newSlots.find((s) => s.s[0] === oldSlot.s[0] && s.s[1] === oldSlot.s[1] && s.e[0] === oldSlot.e[0] && s.e[1] === oldSlot.e[1]);
+    // never drop a placement -- fall back to keeping it under its original
+    // id if (unexpectedly) no matching new slot is found
+    placements[match ? match.id : oldId] = p;
+  });
+  return { ...plan, semester: DEFAULT_SEMESTER, slots: newSlots, placements };
+}
+
 export const usePlanStore = create<PlanStoreState>()(
   persist(
     (set, get) => ({
@@ -227,6 +319,7 @@ export const usePlanStore = create<PlanStoreState>()(
       pendingSyncIds: [],
       defaultHome: NO_HOME,
       defaultSemester: undefined,
+      defaultSlots: [],
       defaultStudyingInEurope: true,
       defaultCurrency: "USD",
       foodFixNoticeSeen: false,
@@ -357,10 +450,57 @@ export const usePlanStore = create<PlanStoreState>()(
           })
         ),
 
+      addSlot: (label, start, end, kind) =>
+        set((state) =>
+          withActive(state, (p) => {
+            const newSlot: Slot = {
+              id: newSlotId(),
+              label: label.trim() || "Untitled",
+              date: fmtMonthDay(start, end),
+              s: start,
+              e: end,
+              kind,
+            };
+            return { slots: [...(p.slots ?? []), newSlot].sort((a, b) => a.s[0] - b.s[0] || a.s[1] - b.s[1]) };
+          })
+        ),
+
+      renameSlot: (slotId, label) =>
+        set((state) =>
+          withActive(state, (p) => ({
+            slots: (p.slots ?? []).map((s) => (s.id === slotId ? { ...s, label: label.trim() || s.label } : s)),
+          }))
+        ),
+
+      updateSlotDates: (slotId, start, end) =>
+        set((state) =>
+          withActive(state, (p) => ({
+            slots: (p.slots ?? [])
+              .map((s) => (s.id === slotId ? { ...s, s: start, e: end, date: fmtMonthDay(start, end) } : s))
+              .sort((a, b) => a.s[0] - b.s[0] || a.s[1] - b.s[1]),
+          }))
+        ),
+
+      updateSlotNote: (slotId, note) =>
+        set((state) =>
+          withActive(state, (p) => ({
+            slots: (p.slots ?? []).map((s) => (s.id === slotId ? { ...s, note: note.trim() || undefined } : s)),
+          }))
+        ),
+
+      deleteSlot: (slotId) =>
+        set((state) =>
+          withActive(state, (p) => {
+            const next = { ...p.placements };
+            delete next[slotId];
+            return { slots: (p.slots ?? []).filter((s) => s.id !== slotId), placements: next };
+          })
+        ),
+
       newPlan: (name) => {
         const id = uid();
         const now = Date.now();
-        const { defaultHome, defaultSemester } = get();
+        const { defaultHome, defaultSemester, defaultSlots } = get();
         set((state) => ({
           plans: {
             ...state.plans,
@@ -374,6 +514,7 @@ export const usePlanStore = create<PlanStoreState>()(
               created: now,
               updated: now,
               semester: defaultSemester,
+              slots: defaultSlots.map((s) => ({ ...s })),
             },
           },
           activeId: id,
@@ -394,6 +535,7 @@ export const usePlanStore = create<PlanStoreState>()(
               id: newId,
               name: `${src.name} (copy)`,
               placements: JSON.parse(JSON.stringify(src.placements)),
+              slots: (src.slots ?? []).map((s) => ({ ...s })),
               created: now,
               updated: now,
               // a duplicate is always your own fresh, unshared, unsynced
@@ -453,7 +595,10 @@ export const usePlanStore = create<PlanStoreState>()(
           const now = Date.now();
           incoming.forEach((pl) => {
             const id = uid();
-            plans[id] = {
+            // a JSON export predates Plan.slots the same way an old
+            // localStorage save might -- migratePlanToSlots gives it real,
+            // correctly-remapped slots instead of an empty calendar
+            plans[id] = migratePlanToSlots({
               id,
               name: `${pl.name || "Imported"} (imported)`,
               home: pl.home && isKnownHome(pl.home) ? pl.home : NO_HOME,
@@ -462,7 +607,7 @@ export const usePlanStore = create<PlanStoreState>()(
               placements: pl.placements ?? {},
               created: now,
               updated: now,
-            };
+            });
           });
           return { plans };
         }),
@@ -504,11 +649,12 @@ export const usePlanStore = create<PlanStoreState>()(
           return { plans: { ...state.plans, [id]: { ...p, ...patch } } };
         }),
 
-      setSemesterFor: (id, semester) =>
+      regenerateSlotsFor: (id, semester) =>
         set((state) => {
           const p = state.plans[id];
           if (!p) return state;
-          return { plans: { ...state.plans, [id]: { ...p, semester, updated: Date.now() } } };
+          const { slots, placements } = recomputeSlots(p, semester);
+          return { plans: { ...state.plans, [id]: { ...p, semester, slots, placements, updated: Date.now() } } };
         }),
 
       addSharedPlan: (plan) =>
@@ -535,6 +681,7 @@ export const usePlanStore = create<PlanStoreState>()(
         set({
           defaultHome: home,
           defaultSemester: semester,
+          defaultSlots: semester ? generateSlots(semester) : [],
           defaultStudyingInEurope: studyingInEurope,
           defaultCurrency: currency,
         }),
@@ -544,7 +691,7 @@ export const usePlanStore = create<PlanStoreState>()(
     }),
     {
       name: "activePlan",
-      version: 1,
+      version: 2,
       partialize: (state) => ({
         plans: state.plans,
         activeId: state.activeId,
@@ -552,6 +699,7 @@ export const usePlanStore = create<PlanStoreState>()(
         pendingSyncIds: state.pendingSyncIds,
         defaultHome: state.defaultHome,
         defaultSemester: state.defaultSemester,
+        defaultSlots: state.defaultSlots,
         defaultStudyingInEurope: state.defaultStudyingInEurope,
         defaultCurrency: state.defaultCurrency,
         foodFixNoticeSeen: state.foodFixNoticeSeen,
@@ -559,13 +707,23 @@ export const usePlanStore = create<PlanStoreState>()(
       }),
       migrate: (persisted, version) => {
         const state = (persisted ?? {}) as Record<string, unknown>;
-        if (version >= 1 && state.plans) return state as unknown as PlanStoreState;
+        if (version >= 2 && state.plans) return state as unknown as PlanStoreState;
+
+        // version 1 -> 2: real multi-plan shape already, just needs every
+        // plan given real, correctly-remapped slots (see migratePlanToSlots
+        // for why this can't just be "start from an empty calendar" --
+        // Parker's own real placed trips depend on this being right).
+        if (version >= 1 && state.plans) {
+          const plans = state.plans as Record<string, Plan>;
+          const migratedPlans: Record<string, Plan> = {};
+          for (const [id, p] of Object.entries(plans)) migratedPlans[id] = migratePlanToSlots(p);
+          return { ...state, plans: migratedPlans } as unknown as PlanStoreState;
+        }
 
         // pre-Stage-6 shape: a single flat {placements, bag, budget}. Carry it
         // forward as a real plan instead of silently dropping it. This branch
         // only runs for truly ancient (version 0, no `plans`) localStorage --
-        // anyone already on version 1+ (everyone by now) hits the early
-        // return above untouched, so this never touches real saved plans.
+        // anyone already on version 1+ hits the branch above instead.
         let home = NO_HOME;
         try {
           const raw = window.localStorage.getItem("homeBase");
@@ -575,7 +733,7 @@ export const usePlanStore = create<PlanStoreState>()(
         }
         const id = uid();
         const now = Date.now();
-        const migrated: Plan = {
+        const migrated: Plan = migratePlanToSlots({
           id,
           name: "My semester plan",
           home,
@@ -584,7 +742,7 @@ export const usePlanStore = create<PlanStoreState>()(
           placements: (state.placements as Placements) || {},
           created: now,
           updated: now,
-        };
+        });
         return { plans: { [id]: migrated }, activeId: id, compareIds: [] } as unknown as PlanStoreState;
       },
     }

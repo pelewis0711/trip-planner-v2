@@ -6,10 +6,10 @@ import { generateSlots, getSlotsForPlan, DEFAULT_SEMESTER } from "../semester";
 import { smartDefaultSemester, postFinalsBreak } from "../onboarding";
 import type { Placements, Stop } from "../types";
 import type { Plan } from "@/lib/store/plan";
-import { usePlanStore, presetActivityChecks } from "@/lib/store/plan";
+import { usePlanStore, presetActivityChecks, migratePlanToSlots, slotsToBeLost } from "@/lib/store/plan";
 import { useCustomHomesStore } from "@/lib/store/customHomes";
 import { HOMES } from "@/data/homes";
-import { SLOTS } from "@/data/slots";
+import { LEGACY_SLOTS } from "@/data/slots";
 import { TRIPS } from "@/data/trips";
 import { slotCosts, tripPriceRange, travelersFor, grandTotals } from "../costs";
 import { makeCtx } from "../context";
@@ -82,16 +82,19 @@ describe("Schengen tracker", () => {
 });
 
 describe("Phase 6: dynamic semester slots", () => {
-  it("a plan with no semester set keeps using the exact static SLOTS array (zero regression)", () => {
-    const plan = { semester: undefined } as unknown as Plan;
-    expect(getSlotsForPlan(plan)).toBe(SLOTS);
-  });
-
-  it("generateSlots produces the same weekend count for the AAU default as the hardcoded SLOTS", () => {
+  it("generateSlots produces the same weekend count for the AAU default as the historical (legacy) hardcoded slots", () => {
     const generated = generateSlots(DEFAULT_SEMESTER);
     const weekends = generated.filter((s) => s.kind === "weekend");
-    const staticWeekends = SLOTS.filter((s) => s.kind === "weekend");
-    expect(weekends.length).toBe(staticWeekends.length);
+    const legacyWeekends = LEGACY_SLOTS.filter((s) => s.kind === "weekend");
+    expect(weekends.length).toBe(legacyWeekends.length);
+  });
+
+  it("generateSlots produces the exact same dates as the historical hardcoded slots for the AAU default (migration safety)", () => {
+    const generated = generateSlots(DEFAULT_SEMESTER);
+    for (const legacy of LEGACY_SLOTS) {
+      const match = generated.find((s) => s.s[0] === legacy.s[0] && s.s[1] === legacy.s[1] && s.e[0] === legacy.e[0] && s.e[1] === legacy.e[1]);
+      expect(match, `no generated slot matches legacy ${legacy.id} (${legacy.date})`).toBeTruthy();
+    }
   });
 
   it("smartDefaultSemester always includes a computed post-finals window", () => {
@@ -103,6 +106,36 @@ describe("Phase 6: dynamic semester slots", () => {
     const brk = postFinalsBreak("2027-05-24", 9);
     expect(brk.end).toBe("2027-05-24");
     expect(brk.start).toBe("2027-05-15");
+  });
+});
+
+describe("Phase 9 step 4: generateSlots as a standalone pure function (spring + fall)", () => {
+  it("spring term: produces weekend slots, the supplied breaks, and a guaranteed post-term slot even when none was supplied", () => {
+    const slots = generateSlots({
+      start: "2027-01-24",
+      end: "2027-05-24",
+      breaks: [{ id: "brk", label: "SPRING BREAK", start: "2027-03-26", end: "2027-04-04", kind: "break" }],
+    });
+    expect(slots.some((s) => s.kind === "weekend")).toBe(true);
+    expect(slots.some((s) => s.kind === "break" && s.label === "SPRING BREAK")).toBe(true);
+    // no post-kind break was supplied -- generateSlots must add one itself
+    expect(slots.some((s) => s.kind === "post")).toBe(true);
+  });
+
+  it("fall term: produces weekend slots across a full Aug-Dec term and a guaranteed post-term slot", () => {
+    const slots = generateSlots({ start: "2026-08-25", end: "2026-12-12", breaks: [] });
+    const weekends = slots.filter((s) => s.kind === "weekend");
+    expect(weekends.length).toBeGreaterThan(10);
+    expect(slots.some((s) => s.kind === "post")).toBe(true);
+  });
+
+  it("does not duplicate a post-term slot when the caller already supplied one", () => {
+    const slots = generateSlots({
+      start: "2027-01-24",
+      end: "2027-05-24",
+      breaks: [{ id: "post", label: "POST-FINALS", start: "2027-05-15", end: "2027-05-24", kind: "post" }],
+    });
+    expect(slots.filter((s) => s.kind === "post").length).toBe(1);
   });
 });
 
@@ -137,9 +170,74 @@ describe("Phase 9 step 3: local setup wizard defaults", () => {
     expect(usePlanStore.getState().setupPromptDismissed).toBe(true);
   });
 
-  it("a plan with no semester set still keeps using the exact static SLOTS array regardless of home (Part B fix is page-level only, not in getSlotsForPlan)", () => {
-    const plan = { semester: undefined } as unknown as Plan;
-    expect(getSlotsForPlan(plan)).toBe(SLOTS);
+  it("getSlotsForPlan returns plan.slots directly -- no more static-file fallback (superseded by step 4's dynamic-slots system)", () => {
+    const withSlots = { slots: [{ id: "w1", label: "Weekend 1", date: "Jan 1-2", s: [1, 1], e: [1, 2], kind: "weekend" }] } as unknown as Plan;
+    expect(getSlotsForPlan(withSlots)).toBe(withSlots.slots);
+
+    const withoutSlots = { semester: undefined } as unknown as Plan;
+    expect(getSlotsForPlan(withoutSlots)).toEqual([]);
+  });
+});
+
+describe("Phase 9 step 4: migrating a pre-existing plan onto dynamic slots without losing placed trips", () => {
+  it("a plan that relied on the old implicit AAU fallback (real home, no semester) gets an explicit semester and every placement remapped to the correctly-dated new slot", () => {
+    const legacyPlan = {
+      home: "Prague",
+      semester: undefined,
+      placements: {
+        sSP: { stops: [{ tripId: "dublin", nights: 2, act: [], sig: [], l: 0, fd: 0 }] }, // St. Patrick's
+        s01: { stops: [{ tripId: "rome", nights: 2, act: [], sig: [], l: 0, fd: 0 }] }, // Weekend 1, Jan 30-31
+      },
+    } as unknown as Plan;
+
+    const migrated = migratePlanToSlots(legacyPlan);
+
+    expect(migrated.semester).toEqual(DEFAULT_SEMESTER);
+    expect(migrated.slots?.length).toBeGreaterThan(0);
+
+    // the St. Patrick's placement must land on whichever new slot covers
+    // Mar 16-18, and the Weekend 1 placement on whichever covers Jan 30-31
+    // -- not necessarily the same ids as the old static file
+    const spSlot = migrated.slots!.find((s) => s.s[0] === 3 && s.s[1] === 16 && s.e[0] === 3 && s.e[1] === 18)!;
+    const w1Slot = migrated.slots!.find((s) => s.s[0] === 1 && s.s[1] === 30 && s.e[0] === 1 && s.e[1] === 31)!;
+    expect(spSlot).toBeTruthy();
+    expect(w1Slot).toBeTruthy();
+    expect(migrated.placements[spSlot.id]?.stops[0].tripId).toBe("dublin");
+    expect(migrated.placements[w1Slot.id]?.stops[0].tripId).toBe("rome");
+
+    // nothing placed is ever silently dropped
+    const allTripIds = Object.values(migrated.placements).flatMap((p) => p.stops.map((s) => s.tripId));
+    expect(allTripIds.sort()).toEqual(["dublin", "rome"]);
+  });
+
+  it("a plan that already has slots is left completely untouched", () => {
+    const existing = { slots: [{ id: "w1" }] } as unknown as Plan;
+    expect(migratePlanToSlots(existing)).toBe(existing);
+  });
+
+  it("a truly unconfigured plan (no home, no semester) gets an empty slot list, not the AAU baseline", () => {
+    const fresh = { home: "", semester: undefined, placements: {} } as unknown as Plan;
+    expect(migratePlanToSlots(fresh).slots).toEqual([]);
+  });
+});
+
+describe("Phase 9 step 4: slotsToBeLost warns before a destructive regenerate", () => {
+  it("names a placed slot that would disappear under a shorter semester", () => {
+    const plan = {
+      slots: generateSlots(DEFAULT_SEMESTER),
+      placements: { w13: { stops: [{ tripId: "rome", nights: 2, act: [], sig: [], l: 0, fd: 0 }] } },
+    } as unknown as Plan;
+    const shorterSemester = { start: "2027-01-24", end: "2027-04-01", breaks: [] };
+    const lost = slotsToBeLost(plan, shorterSemester);
+    expect(lost.some((s) => s.id === "w13")).toBe(true);
+  });
+
+  it("reports nothing lost when every placed slot survives regeneration", () => {
+    const plan = {
+      slots: generateSlots(DEFAULT_SEMESTER),
+      placements: { w1: { stops: [{ tripId: "rome", nights: 2, act: [], sig: [], l: 0, fd: 0 }] } },
+    } as unknown as Plan;
+    expect(slotsToBeLost(plan, DEFAULT_SEMESTER)).toEqual([]);
   });
 });
 

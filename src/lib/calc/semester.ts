@@ -1,10 +1,12 @@
-// Per-plan semester config, for friends at other schools whose dates don't
-// match AAU's. A plan with no `semester` set keeps using the exact
-// hand-authored SLOTS list (zero behavior change for existing plans);
-// setting one switches that plan over to slots generated from its own
-// start/end + custom breaks.
-import { SLOTS, type Slot, type SlotKind } from "@/data/slots";
+// Per-plan semester config -- every plan's slots are generated from its own
+// start/end + custom breaks (generateSlots below) and then stored directly
+// on Plan.slots, fully editable afterward from the Calendar page. There is
+// no more hardcoded, single-semester fallback (see CLAUDE.md for the
+// migration that moved existing plans onto this system without losing any
+// placed trips).
+import type { Slot, SlotKind } from "@/data/slots";
 import type { Plan } from "@/lib/store/plan";
+import { postFinalsBreak } from "./onboarding";
 
 export interface CustomBreak {
   id: string;
@@ -20,9 +22,9 @@ export interface SemesterConfig {
   breaks: CustomBreak[];
 }
 
-// AAU Spring 2027 dates, used to pre-fill the "customize semester" form —
-// NOT consulted at slot-generation time (plans with no `semester` just use
-// the static SLOTS array directly, see getSlotsForPlan below).
+// AAU Spring 2027 dates -- still a real, generatable semester like any
+// other (used by the "customize semester" panel's reset button, and by the
+// one-time migration that moves a pre-existing plan onto explicit slots).
 export const DEFAULT_SEMESTER: SemesterConfig = {
   start: "2027-01-24",
   end: "2027-05-24",
@@ -33,7 +35,9 @@ export const DEFAULT_SEMESTER: SemesterConfig = {
   ],
 };
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+// exported for reuse by the Calendar page's slot-date-editing UI
+export const MONTH_ABBR = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTHS = MONTH_ABBR;
 
 function parseISO(s: string): Date {
   const [y, m, d] = s.split("-").map(Number);
@@ -46,18 +50,33 @@ function fmtRange(a: Date, b: Date): string {
   return `${left}–${right}`;
 }
 
+// [month, day] version of fmtRange, for UI code editing a Slot's raw s/e
+// tuples directly (a Slot has no year, so there's no Date to format from).
+export function fmtMonthDay(a: [number, number], b: [number, number]): string {
+  const left = `${MONTH_ABBR[a[0] - 1]} ${a[1]}`;
+  const right = a[0] === b[0] ? `${b[1]}` : `${MONTH_ABBR[b[0] - 1]} ${b[1]}`;
+  return `${left}–${right}`;
+}
+
 function overlaps(aStart: Date, aEnd: Date, bStart: Date, bEnd: Date): boolean {
   return aStart <= bEnd && bStart <= aEnd;
 }
 
 /** Weekend slots (every Sat–Sun in range, skipping ones inside a break) plus
- * one slot per custom break, all sorted chronologically. Assumes the
- * semester doesn't cross a Dec 31 -> Jan 1 boundary (fine for a single
- * study-abroad term). */
+ * one slot per custom break, all sorted chronologically. Always guarantees a
+ * post-term slot even if the caller's breaks don't include one -- computed
+ * the same way (last ~9 days ending on config.end) so nothing calling this
+ * directly can forget it; a caller that already supplies one (e.g. the
+ * onboarding wizard, so it shows as an editable row in the dates form) just
+ * has its own used instead of a duplicate. Assumes the semester doesn't
+ * cross a Dec 31 -> Jan 1 boundary (fine for a single study-abroad term). */
 export function generateSlots(config: SemesterConfig): Slot[] {
   const start = parseISO(config.start);
   const end = parseISO(config.end);
-  const breakRanges = config.breaks.map((b) => ({ ...b, s: parseISO(b.start), e: parseISO(b.end) }));
+  const breaks = config.breaks.some((b) => b.kind === "post")
+    ? config.breaks
+    : [...config.breaks, postFinalsBreak(config.end)];
+  const breakRanges = breaks.map((b) => ({ ...b, s: parseISO(b.start), e: parseISO(b.end) }));
 
   const dated: { slot: Slot; sortDate: Date }[] = breakRanges.map((b) => ({
     slot: {
@@ -101,7 +120,7 @@ export function generateSlots(config: SemesterConfig): Slot[] {
 }
 
 export function getSlotsForPlan(plan: Plan): Slot[] {
-  return plan.semester ? generateSlots(plan.semester) : SLOTS;
+  return plan.slots ?? [];
 }
 
 /** Union of slots across several plans (by id, first-seen wins), sorted by
