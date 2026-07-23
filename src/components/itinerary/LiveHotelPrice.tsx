@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 import { useLiveHotelPriceStore, hotelKey } from "@/lib/store/liveHotelPrices";
-
-const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
+import { usePlanStore } from "@/lib/store/plan";
+import { formatMoney } from "@/lib/calc/currency";
 
 function timeAgo(checkedAtIso: string): string {
   const ms = Date.now() - new Date(checkedAtIso).getTime();
@@ -34,6 +34,8 @@ export default function LiveHotelPrice({
   const fetchPrice = useLiveHotelPriceStore((s) => s.fetchPrice);
   const live = useLiveHotelPriceStore((s) => (key ? s.prices[key] : undefined));
   const loading = useLiveHotelPriceStore((s) => (key ? (s.loading[key] ?? false) : false));
+  const currency = usePlanStore((s) => s.defaultCurrency);
+  const money = (n: number) => formatMoney(n, currency);
 
   useEffect(() => {
     if (checkIn && checkOut) fetchPrice(city, checkIn, checkOut, guests, tier);

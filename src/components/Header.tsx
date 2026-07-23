@@ -13,6 +13,7 @@ import { lookupCity } from "@/lib/resolveHome";
 import { makeCtx } from "@/lib/calc/context";
 import { grandTotals } from "@/lib/calc/costs";
 import { describeTerm } from "@/lib/calc/semester";
+import { formatMoney, RATES_AS_OF } from "@/lib/calc/currency";
 import OfflineIndicator from "./OfflineIndicator";
 
 const NAV = [
@@ -110,7 +111,7 @@ export default function Header() {
   const planIds = Object.keys(plans).sort((a, b) => plans[b].updated - plans[a].updated);
   const totalPill = (
     <div className="shrink-0 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-zinc-300">
-      Total: <span className="text-emerald-400">${Math.round(total).toLocaleString()}</span>
+      Total: <span className="text-emerald-400">{formatMoney(total, currency)}</span>
     </div>
   );
 
@@ -122,6 +123,11 @@ export default function Header() {
             <div className="text-base font-semibold text-zinc-50">Trip Planner v2</div>
             <div className="text-[11px] font-medium tracking-wide text-zinc-500">
               {term ? `${term.season.toUpperCase()} ${term.year} · ` : ""}PER PERSON {currency}
+              {currency !== "USD" && (
+                <span className="ml-1 normal-case tracking-normal text-zinc-600">
+                  (rates approx., as of {RATES_AS_OF})
+                </span>
+              )}
             </div>
           </div>
           <div className="sm:hidden">{totalPill}</div>

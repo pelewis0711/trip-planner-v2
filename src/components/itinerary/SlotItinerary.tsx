@@ -26,8 +26,7 @@ import { liveSlotCosts } from "@/lib/calc/livePricing";
 import { useLivePriceStore } from "@/lib/store/livePrices";
 import LiveFlightPrice from "./LiveFlightPrice";
 import LiveHotelPrice from "./LiveHotelPrice";
-
-const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
+import { formatMoney } from "@/lib/calc/currency";
 
 export default function SlotItinerary({
   slot,
@@ -47,6 +46,8 @@ export default function SlotItinerary({
   useLive?: boolean;
 }) {
   const setActual = usePlanStore((s) => s.setActual);
+  const currency = usePlanStore((s) => s.defaultCurrency);
+  const money = (n: number) => formatMoney(n, currency);
   const livePrices = useLivePriceStore((s) => s.prices);
 
   const stops = placement.stops;

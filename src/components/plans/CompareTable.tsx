@@ -1,20 +1,20 @@
 "use client";
 
 import type { Plan } from "@/lib/store/plan";
+import { usePlanStore } from "@/lib/store/plan";
 import { planGrandTotals, planSlotSummary } from "@/lib/planTotals";
 import { unionSlots } from "@/lib/calc/semester";
-
-const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
+import { formatMoney } from "@/lib/calc/currency";
 
 function Row({
   label,
   values,
-  fmt = money,
+  fmt,
   lowerBetter = true,
 }: {
   label: string;
   values: number[];
-  fmt?: (n: number) => string;
+  fmt: (n: number) => string;
   lowerBetter?: boolean;
 }) {
   const valid = values.filter((v) => !Number.isNaN(v));
@@ -52,6 +52,9 @@ export default function CompareTable({
   planIds: string[];
   activeId: string;
 }) {
+  const currency = usePlanStore((s) => s.defaultCurrency);
+  const money = (n: number) => formatMoney(n, currency);
+
   if (planIds.length < 2) {
     return (
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5">
@@ -127,17 +130,18 @@ export default function CompareTable({
               Cost by category
             </td>
           </tr>
-          <Row label="✈️ Travel" values={totals.map((t) => t.travel)} />
-          <Row label="🛏️ Lodging (per person)" values={totals.map((t) => t.lodg)} />
-          <Row label="🛏️ Lodging (group)" values={totals.map((t) => t.lodgGroup)} />
-          <Row label="🍽️ Food" values={totals.map((t) => t.food)} />
-          <Row label="🎟️ Activities" values={totals.map((t) => t.act)} />
-          <Row label="Subtotal (per person)" values={totals.map((t) => t.total)} />
-          <Row label="Subtotal (group)" values={totals.map((t) => t.totalGroup)} />
-          <Row label="+12% buffer" values={totals.map((t) => t.total * 1.12)} />
+          <Row label="✈️ Travel" values={totals.map((t) => t.travel)} fmt={money} />
+          <Row label="🛏️ Lodging (per person)" values={totals.map((t) => t.lodg)} fmt={money} />
+          <Row label="🛏️ Lodging (group)" values={totals.map((t) => t.lodgGroup)} fmt={money} />
+          <Row label="🍽️ Food" values={totals.map((t) => t.food)} fmt={money} />
+          <Row label="🎟️ Activities" values={totals.map((t) => t.act)} fmt={money} />
+          <Row label="Subtotal (per person)" values={totals.map((t) => t.total)} fmt={money} />
+          <Row label="Subtotal (group)" values={totals.map((t) => t.totalGroup)} fmt={money} />
+          <Row label="+12% buffer" values={totals.map((t) => t.total * 1.12)} fmt={money} />
           <Row
             label="Cost per night away"
             values={totals.map((t) => (t.nights ? t.total / t.nights : NaN))}
+            fmt={money}
           />
 
           <tr>

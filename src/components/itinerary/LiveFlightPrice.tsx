@@ -4,8 +4,8 @@ import { useEffect } from "react";
 import { iataFor } from "@/lib/calc/livePricing";
 import { useLivePriceStore, legKey } from "@/lib/store/livePrices";
 import { iso } from "@/lib/calc/dates";
-
-const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
+import { usePlanStore } from "@/lib/store/plan";
+import { formatMoney } from "@/lib/calc/currency";
 
 function timeAgo(checkedAtIso: string): string {
   const ms = Date.now() - new Date(checkedAtIso).getTime();
@@ -27,6 +27,8 @@ export default function LiveFlightPrice({ from, to, date }: { from: string; to: 
   const fetchPrice = useLivePriceStore((s) => s.fetchPrice);
   const live = useLivePriceStore((s) => (key ? s.prices[key] : undefined));
   const loading = useLivePriceStore((s) => (key ? (s.loading[key] ?? false) : false));
+  const currency = usePlanStore((s) => s.defaultCurrency);
+  const money = (n: number) => formatMoney(n, currency);
 
   useEffect(() => {
     if (origin && destination && dateStr) fetchPrice(origin, destination, dateStr);

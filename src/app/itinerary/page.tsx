@@ -13,8 +13,7 @@ import SummaryBar from "@/components/itinerary/SummaryBar";
 import SlotItinerary from "@/components/itinerary/SlotItinerary";
 import CheatSheet from "@/components/itinerary/CheatSheet";
 import SetupWizardModal from "@/components/onboarding/SetupWizardModal";
-
-const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
+import { formatMoney } from "@/lib/calc/currency";
 
 export default function ItineraryPage() {
   const activePlan = useActivePlan();
@@ -32,6 +31,8 @@ export default function ItineraryPage() {
   // someone actually studying in Europe under a Schengen study visa --
   // hidden everywhere when this profile toggle (Settings) is off.
   const studyingInEurope = usePlanStore((s) => s.defaultStudyingInEurope);
+  const currency = usePlanStore((s) => s.defaultCurrency);
+  const money = (n: number) => formatMoney(n, currency);
   const livePrices = useLivePriceStore((s) => s.prices);
 
   const [editingBudget, setEditingBudget] = useState(false);
@@ -146,7 +147,7 @@ export default function ItineraryPage() {
               {(Object.entries(BAGS) as [BagOption, [string, number]][]).map(([k, v]) => (
                 <option key={k} value={k}>
                   {v[0]}
-                  {v[1] ? ` (+$${v[1]}/flight)` : ""}
+                  {v[1] ? ` (+${formatMoney(v[1], currency)}/flight)` : ""}
                 </option>
               ))}
             </select>
@@ -243,7 +244,7 @@ export default function ItineraryPage() {
 
         <div className="mt-3 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-2.5 text-[12.5px] text-amber-200">
           {studyingInEurope && (
-            <>➕ Eurail Global Pass (Youth, 10 days/2 mo) ≈ <b>$296</b> if you&apos;re doing the rail-heavy trips · </>
+            <>➕ Eurail Global Pass (Youth, 10 days/2 mo) ≈ <b>{money(296)}</b> if you&apos;re doing the rail-heavy trips · </>
           )}
           +12% contingency buffer ≈ <b>{money(contingency)}</b> → <b>estimated grand total ≈{" "}
           {money(g.total + (studyingInEurope ? 296 : 0) + contingency)}</b>. Excludes normal {home || "home-city"} weekday living/housing.

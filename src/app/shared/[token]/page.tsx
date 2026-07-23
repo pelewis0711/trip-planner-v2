@@ -9,14 +9,15 @@ import { usePlanStore, type Plan } from "@/lib/store/plan";
 import { useAuthStore } from "@/lib/store/auth";
 import { planGrandTotals, planSlotSummary } from "@/lib/planTotals";
 import { getSlotsForPlan } from "@/lib/calc/semester";
-
-const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
+import { formatMoney } from "@/lib/calc/currency";
 
 export default function SharedPlanPage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = use(params);
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const authLoading = useAuthStore((s) => s.loading);
+  const currency = usePlanStore((s) => s.defaultCurrency);
+  const money = (n: number) => formatMoney(n, currency);
 
   const [plan, setPlan] = useState<Plan | null>(null);
   const [ownerEmail, setOwnerEmail] = useState<string | null>(null);

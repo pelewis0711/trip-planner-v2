@@ -9,6 +9,8 @@ import { slotCosts, tripPriceRange, stopCurrentEstimate, travelersFor } from "@/
 import { stopDates, iso } from "@/lib/calc/dates";
 import LiveHotelPrice from "@/components/itinerary/LiveHotelPrice";
 import SlotCollab from "./SlotCollab";
+import { formatMoney } from "@/lib/calc/currency";
+import type { Currency } from "@/components/onboarding/OnboardingFlow";
 
 const PRESETS: [ActivityPreset, string][] = [
   ["none", "None"],
@@ -38,6 +40,7 @@ export default function EditModal({
   const applyActivityPreset = usePlanStore((s) => s.applyActivityPreset);
   const moveStop = usePlanStore((s) => s.moveStop);
   const setTravelersFor = usePlanStore((s) => s.setTravelersFor);
+  const currency = usePlanStore((s) => s.defaultCurrency);
 
   const stops = placements[slot.id]?.stops ?? [];
   const travelers = travelersFor(placements[slot.id], plan.defaultTravelers ?? 1);
@@ -143,14 +146,14 @@ export default function EditModal({
                 <div className="mt-1.5 text-[11.5px]">
                   <span className="text-zinc-500">Range </span>
                   <span className="font-semibold text-zinc-300">
-                    ${Math.round(range.floor)}–${Math.round(range.ceiling)}
+                    {formatMoney(range.floor, currency)}–{formatMoney(range.ceiling, currency)}
                   </span>
                   <br />
                   <span className="text-zinc-500">Current </span>
                   <span className="font-semibold text-emerald-400">
-                    ${Math.round(current)}
+                    {formatMoney(current, currency)}
                     {travelers > 1 && (
-                      <span className="font-normal text-zinc-500"> (${Math.round(current * travelers)} for {travelers})</span>
+                      <span className="font-normal text-zinc-500"> ({formatMoney(current * travelers, currency)} for {travelers})</span>
                     )}
                   </span>
                 </div>
@@ -187,6 +190,7 @@ export default function EditModal({
                       travelers={travelers}
                       value={st.l}
                       onChange={(idx) => updateStop(slot.id, i, { l: idx })}
+                      currency={currency}
                     />
                     <div className="mt-1">
                       {st.l === 2 || st.l === 3 ? (
@@ -212,6 +216,7 @@ export default function EditModal({
                   nights={days}
                   value={st.fd}
                   onChange={(idx) => updateStop(slot.id, i, { fd: idx })}
+                  currency={currency}
                 />
 
                 {t.a.length > 0 && (
@@ -233,6 +238,7 @@ export default function EditModal({
                       items={t.a}
                       checked={st.act}
                       onToggle={(idx) => toggleAct(slot.id, i, idx)}
+                      currency={currency}
                     />
                   </>
                 )}
@@ -243,6 +249,7 @@ export default function EditModal({
                     checked={st.sig}
                     onToggle={(idx) => toggleSig(slot.id, i, idx)}
                     refOnly
+                    currency={currency}
                   />
                 )}
               </div>
@@ -260,9 +267,9 @@ export default function EditModal({
               ["Total (per person)", costs.total, costs.total * travelers],
             ].map(([label, val, group]) => (
               <div key={label as string} className="rounded-lg bg-zinc-900/60 p-2 text-center">
-                <b className="block text-sm text-emerald-400">${Math.round(val as number)}</b>
+                <b className="block text-sm text-emerald-400">{formatMoney(val as number, currency)}</b>
                 {group !== null && travelers > 1 && (
-                  <span className="block text-[10px] text-zinc-400">${Math.round(group as number)} for {travelers}</span>
+                  <span className="block text-[10px] text-zinc-400">{formatMoney(group as number, currency)} for {travelers}</span>
                 )}
                 <span className="text-[10px] text-zinc-500">{label}</span>
               </div>
@@ -286,6 +293,7 @@ function TierGroup({
   value,
   onChange,
   travelers,
+  currency,
 }: {
   label: string;
   tiers: [string, number][];
@@ -297,6 +305,7 @@ function TierGroup({
   // per-person price -- only lodging is group-aware, food/activities don't
   // split, so this is omitted for the food TierGroup.
   travelers?: number;
+  currency: Currency;
 }) {
   return (
     <div className="mt-3">
@@ -319,11 +328,11 @@ function TierGroup({
             >
               <span className="block truncate font-medium">{name}</span>
               <span className="text-emerald-400">
-                ${perPerson}
+                {formatMoney(perPerson, currency)}
                 {perNight ? "" : " total"}
               </span>
               {!!travelers && travelers > 1 && (
-                <span className="block text-[10px] text-zinc-500">${perPerson * travelers} for {travelers}</span>
+                <span className="block text-[10px] text-zinc-500">{formatMoney(perPerson * travelers, currency)} for {travelers}</span>
               )}
             </button>
           );
@@ -339,6 +348,7 @@ function CheckList({
   checked,
   onToggle,
   refOnly = false,
+  currency,
 }: {
   label: string;
   items: [string, number][];
@@ -348,6 +358,7 @@ function CheckList({
   // for reference only, not counted, so it renders greyed/labeled instead of
   // the normal counted-green style activities use.
   refOnly?: boolean;
+  currency: Currency;
 }) {
   return (
     <div className="mt-3">
@@ -368,7 +379,7 @@ function CheckList({
             />
             <span className="flex-1 text-zinc-300">{name}</span>
             <span className={refOnly ? "text-zinc-500" : "text-emerald-400"}>
-              {refOnly ? (price ? `ref $${price}` : "free") : price ? `$${price}` : "free"}
+              {refOnly ? (price ? `ref ${formatMoney(price, currency)}` : "free") : price ? formatMoney(price, currency) : "free"}
             </span>
           </label>
         ))}
