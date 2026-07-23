@@ -12,12 +12,18 @@ import { BAGS, type BagOption } from "@/lib/calc/pricing";
 import SummaryBar from "@/components/itinerary/SummaryBar";
 import SlotItinerary from "@/components/itinerary/SlotItinerary";
 import CheatSheet from "@/components/itinerary/CheatSheet";
+import SetupWizardModal from "@/components/onboarding/SetupWizardModal";
 
 const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
 
 export default function ItineraryPage() {
   const activePlan = useActivePlan();
   const { home, placements, bag, budget, useLivePrices, defaultTravelers } = activePlan;
+  const [wizardOpen, setWizardOpen] = useState(false);
+  // Phase 9 step 3: same "never configured at all" check as Calendar's —
+  // swaps this page's empty-state copy/CTA to point at setup instead of the
+  // generic "go place a trip" message, for a brand-new anonymous visitor.
+  const isUnconfigured = !home && !activePlan.semester;
   const setBag = usePlanStore((s) => s.setBag);
   const setBudget = usePlanStore((s) => s.setBudget);
   const setUseLivePrices = usePlanStore((s) => s.setUseLivePrices);
@@ -44,12 +50,25 @@ export default function ItineraryPage() {
     return (
       <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
         <div className="rounded-2xl border border-dashed border-zinc-800 p-14 text-center">
-          <h2 className="text-xl font-semibold text-zinc-50">No trips scheduled yet</h2>
+          <h2 className="text-xl font-semibold text-zinc-50">
+            {isUnconfigured ? "Let's set up your trip first" : "No trips scheduled yet"}
+          </h2>
           <p className="mt-2 text-sm text-zinc-500">
-            Head to the Trip Catalog and drag options onto your Calendar. Your live itinerary and
-            category totals will build here.
+            {isUnconfigured
+              ? "Pick your host city and semester dates so your calendar and totals match your own program."
+              : "Head to the Trip Catalog and drag options onto your Calendar. Your live itinerary and category totals will build here."}
           </p>
+          {isUnconfigured && (
+            <button
+              type="button"
+              onClick={() => setWizardOpen(true)}
+              className="mt-5 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-bold text-zinc-950"
+            >
+              Set up now
+            </button>
+          )}
         </div>
+        {wizardOpen && <SetupWizardModal onClose={() => setWizardOpen(false)} />}
       </div>
     );
   }

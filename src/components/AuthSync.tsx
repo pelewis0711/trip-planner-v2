@@ -8,9 +8,10 @@ import { useAuthStore } from "@/lib/store/auth";
 import { usePlanStore, type Plan } from "@/lib/store/plan";
 import { useCustomHomesStore } from "@/lib/store/customHomes";
 import { HOMES } from "@/data/homes";
+import { HOME_COUNTRY } from "@/lib/calc/schengen";
 import { fetchProfileEmails } from "@/lib/supabase/profiles";
 import { planToInsertRow, rowToPlan, savePlanData, type PlanRow } from "@/lib/supabase/sharing";
-import { fetchUserSettings, rowToOnboardingValues } from "@/lib/supabase/settings";
+import { fetchUserSettings, saveUserSettings, rowToOnboardingValues } from "@/lib/supabase/settings";
 
 interface SyncResult {
   succeeded: string[];
@@ -120,10 +121,45 @@ export default function AuthSync() {
     /** Phase 6: pulls the account's onboarding answers (if any) so this
      * device's plan defaults + custom home city match what was set up
      * elsewhere, and sends a never-onboarded account to /onboarding once.
-     * Runs after the plan merge above so a redirect doesn't race it. */
+     * Runs after the plan merge above so a redirect doesn't race it.
+     *
+     * Phase 9 step 3: if there's no Supabase row yet but this device already
+     * completed the anonymous setup wizard (defaultHome is set locally),
+     * push those local answers up as the account's first user_settings row
+     * instead of forcing a fresh /onboarding redirect that would make them
+     * re-answer questions they already answered. Host/home university are
+     * left blank on this path -- the local wizard doesn't collect them any
+     * differently than the signed-in one does (both treat them as
+     * optional), and this is disclosed in CLAUDE.md, not a silent gap. */
     async function checkOnboarding(userId: string) {
       const row = await fetchUserSettings(supabase, userId);
       if (!row) {
+        const { defaultHome, defaultSemester, defaultStudyingInEurope, defaultCurrency } = usePlanStore.getState();
+        if (defaultHome) {
+          const custom = useCustomHomesStore.getState().homes[defaultHome];
+          const host = HOMES[defaultHome]
+            ? { city: defaultHome, country: HOME_COUNTRY[defaultHome], lat: HOMES[defaultHome][0], lon: HOMES[defaultHome][1] }
+            : custom
+              ? { city: defaultHome, country: custom.country, lat: custom.lat, lon: custom.lon }
+              : null;
+          if (host && defaultSemester) {
+            await saveUserSettings(
+              supabase,
+              userId,
+              {
+                host,
+                hostUniversity: "",
+                homeUniversity: "",
+                term: "spring",
+                semester: defaultSemester,
+                studyingInEurope: defaultStudyingInEurope,
+                currency: defaultCurrency,
+              },
+              false
+            );
+            return;
+          }
+        }
         if (window.location.pathname !== "/onboarding") router.push("/onboarding");
         return;
       }
@@ -135,7 +171,7 @@ export default function AuthSync() {
           country: values.host.country,
         });
       }
-      usePlanStore.getState().setOnboardingDefaults(values.host.city, values.semester);
+      usePlanStore.getState().setOnboardingDefaults(values.host.city, values.semester, values.studyingInEurope, values.currency);
       if (!row.onboarded_at && window.location.pathname !== "/onboarding") router.push("/onboarding");
     }
 

@@ -110,11 +110,36 @@ describe("Phase 6: plan store onboarding defaults", () => {
   it("newPlan() seeds home/semester from setOnboardingDefaults, not the active plan's home", () => {
     const store = usePlanStore.getState();
     const customSemester = { start: "2026-09-01", end: "2026-12-15", breaks: [] };
-    store.setOnboardingDefaults("Barcelona", customSemester);
+    store.setOnboardingDefaults("Barcelona", customSemester, true, "USD");
     const id = usePlanStore.getState().newPlan("Test plan");
     const created = usePlanStore.getState().plans[id];
     expect(created.home).toBe("Barcelona");
     expect(created.semester).toEqual(customSemester);
+  });
+});
+
+describe("Phase 9 step 3: local setup wizard defaults", () => {
+  it("defaultStudyingInEurope/defaultCurrency start at true/USD and round-trip through setOnboardingDefaults", () => {
+    const store = usePlanStore.getState();
+    expect(usePlanStore.getState().defaultStudyingInEurope).toBe(true);
+    expect(usePlanStore.getState().defaultCurrency).toBe("USD");
+
+    const semester = { start: "2026-08-25", end: "2026-12-12", breaks: [] };
+    store.setOnboardingDefaults("Lisbon", semester, false, "EUR");
+    expect(usePlanStore.getState().defaultStudyingInEurope).toBe(false);
+    expect(usePlanStore.getState().defaultCurrency).toBe("EUR");
+  });
+
+  it("setupPromptDismissed starts false and dismissSetupPrompt flips it (mirrors dismissFoodFixNotice)", () => {
+    const store = usePlanStore.getState();
+    expect(usePlanStore.getState().setupPromptDismissed).toBe(false);
+    store.dismissSetupPrompt();
+    expect(usePlanStore.getState().setupPromptDismissed).toBe(true);
+  });
+
+  it("a plan with no semester set still keeps using the exact static SLOTS array regardless of home (Part B fix is page-level only, not in getSlotsForPlan)", () => {
+    const plan = { semester: undefined } as unknown as Plan;
+    expect(getSlotsForPlan(plan)).toBe(SLOTS);
   });
 });
 

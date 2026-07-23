@@ -38,7 +38,7 @@ export default function SettingsPage() {
     if (!HOMES[result.host.city]) {
       addHome(result.host.city, { lat: result.host.lat, lon: result.host.lon, country: result.host.country });
     }
-    setOnboardingDefaults(result.host.city, result.semester);
+    setOnboardingDefaults(result.host.city, result.semester, result.studyingInEurope, result.currency);
 
     const supabase = createClient();
     // this account has necessarily been through onboarding already to reach

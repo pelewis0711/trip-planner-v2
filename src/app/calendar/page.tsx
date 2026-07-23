@@ -10,6 +10,7 @@ import TripTray from "@/components/calendar/TripTray";
 import SlotCard from "@/components/calendar/SlotCard";
 import MonthGrid from "@/components/calendar/MonthGrid";
 import EditModal from "@/components/calendar/EditModal";
+import SetupWizardModal from "@/components/onboarding/SetupWizardModal";
 
 export default function CalendarPage() {
   const activePlan = useActivePlan();
@@ -24,6 +25,15 @@ export default function CalendarPage() {
   const [armedId, setArmedId] = useState<string | null>(null);
   const [editingSlotId, setEditingSlotId] = useState<string | null>(null);
   const [trayOpen, setTrayOpen] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
+
+  // Phase 9 step 3: a plan with no home AND no semester has never been
+  // configured at all (true for every brand-new anonymous visitor's default
+  // plan) -- getSlotsForPlan() would otherwise silently fall back to the
+  // hardcoded AAU Prague SLOTS list for it. Any plan that already has a home
+  // set (Parker's included) or an explicit semester keeps working exactly
+  // as before -- this only changes the true "never touched" case.
+  const isUnconfigured = !home && !activePlan.semester;
 
   const handleArm = (tripId: string) => {
     setArmedId((cur) => {
@@ -54,6 +64,28 @@ export default function CalendarPage() {
   };
 
   const editingSlot = editingSlotId ? slots.find((s) => s.id === editingSlotId) : undefined;
+
+  if (isUnconfigured) {
+    return (
+      <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6">
+        <div className="rounded-2xl border border-dashed border-zinc-800 p-14 text-center">
+          <h2 className="text-xl font-semibold text-zinc-50">Let&apos;s set up your trip first</h2>
+          <p className="mt-2 text-sm text-zinc-500">
+            Pick your host city and semester dates so your calendar shows your own program&apos;s
+            weekends — not anyone else&apos;s.
+          </p>
+          <button
+            type="button"
+            onClick={() => setWizardOpen(true)}
+            className="mt-5 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-bold text-zinc-950"
+          >
+            Set up now
+          </button>
+        </div>
+        {wizardOpen && <SetupWizardModal onClose={() => setWizardOpen(false)} />}
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6">

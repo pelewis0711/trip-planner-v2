@@ -6,6 +6,7 @@ import CustomTripsSync from "@/components/CustomTripsSync";
 import RegisterServiceWorker from "@/components/RegisterServiceWorker";
 import InstallPrompt from "@/components/InstallPrompt";
 import FoodFixNotice from "@/components/FoodFixNotice";
+import LocalSetupBanner from "@/components/onboarding/LocalSetupBanner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -49,6 +50,7 @@ export default function RootLayout({
         <Header />
         <InstallPrompt />
         <FoodFixNotice />
+        <LocalSetupBanner />
         <main className="flex flex-1 flex-col">{children}</main>
       </body>
     </html>

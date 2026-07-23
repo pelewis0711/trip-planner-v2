@@ -59,6 +59,22 @@ export const AAU_PRAGUE_DEFAULTS: OnboardingValues = {
   currency: "USD",
 };
 
+// Phase 9 step 3: the starting point for a brand-new, never-configured
+// visitor -- no city, so this doesn't quietly look like anyone in particular.
+// The host-city <select> below already falls through to "Other city..." for
+// any value that isn't a real HOMES key, and canNext already requires a real
+// hostCity before Step 1's Next enables, so an empty city here needs no
+// other changes to this component.
+export const EMPTY_ONBOARDING_DEFAULTS: OnboardingValues = {
+  host: { city: "", country: "", lat: 0, lon: 0 },
+  hostUniversity: "",
+  homeUniversity: "",
+  term: "spring",
+  semester: smartDefaultSemester("spring"),
+  studyingInEurope: true,
+  currency: "USD",
+};
+
 const OTHER_CITY = "__other__";
 
 export default function OnboardingFlow({

@@ -11,6 +11,7 @@ import { useCustomHomesStore } from "@/lib/store/customHomes";
 import type { BagOption } from "@/lib/calc/pricing";
 import type { Placement, Placements, SlotActuals, Stop } from "@/lib/calc/types";
 import type { SemesterConfig } from "@/lib/calc/semester";
+import type { Currency } from "@/components/onboarding/OnboardingFlow";
 
 function isKnownHome(home: string): boolean {
   return !!HOMES[home] || !!useCustomHomesStore.getState().homes[home];
@@ -110,11 +111,23 @@ interface PlanStoreState {
   // forward (newPlan() below) — never applied to existing plans.
   defaultHome: string;
   defaultSemester: SemesterConfig | undefined;
+  // Phase 9 step 3: local mirror of the two Phase 9 step 2 fields, so an
+  // anonymous visitor who completes the setup wizard locally (no account)
+  // has somewhere to keep these -- previously they only ever reached
+  // Supabase's user_settings table, which anonymous use has no access to.
+  defaultStudyingInEurope: boolean;
+  defaultCurrency: Currency;
 
   // Phase 7: one-time "food pricing was fixed" banner -- global, not
   // per-plan, since it's about the app's math changing, not any one plan.
   foodFixNoticeSeen: boolean;
   dismissFoodFixNotice: () => void;
+
+  // Phase 9 step 3: dismissible "set up your trip" banner shown to
+  // anonymous visitors with no home chosen yet -- global, not per-plan,
+  // same shape as foodFixNoticeSeen above.
+  setupPromptDismissed: boolean;
+  dismissSetupPrompt: () => void;
 
   // mutate the ACTIVE plan
   addStop: (slotId: string, tripId: string) => void;
@@ -165,7 +178,12 @@ interface PlanStoreState {
   clearPendingSync: (ids: string[]) => void;
 
   // onboarding
-  setOnboardingDefaults: (home: string, semester: SemesterConfig | undefined) => void;
+  setOnboardingDefaults: (
+    home: string,
+    semester: SemesterConfig | undefined,
+    studyingInEurope: boolean,
+    currency: Currency
+  ) => void;
 }
 
 function withStop(
@@ -209,7 +227,10 @@ export const usePlanStore = create<PlanStoreState>()(
       pendingSyncIds: [],
       defaultHome: NO_HOME,
       defaultSemester: undefined,
+      defaultStudyingInEurope: true,
+      defaultCurrency: "USD",
       foodFixNoticeSeen: false,
+      setupPromptDismissed: false,
 
       addStop: (slotId, tripId) =>
         set((state) =>
@@ -510,9 +531,16 @@ export const usePlanStore = create<PlanStoreState>()(
       clearPendingSync: (ids) =>
         set((state) => ({ pendingSyncIds: state.pendingSyncIds.filter((id) => !ids.includes(id)) })),
 
-      setOnboardingDefaults: (home, semester) => set({ defaultHome: home, defaultSemester: semester }),
+      setOnboardingDefaults: (home, semester, studyingInEurope, currency) =>
+        set({
+          defaultHome: home,
+          defaultSemester: semester,
+          defaultStudyingInEurope: studyingInEurope,
+          defaultCurrency: currency,
+        }),
 
       dismissFoodFixNotice: () => set({ foodFixNoticeSeen: true }),
+      dismissSetupPrompt: () => set({ setupPromptDismissed: true }),
     }),
     {
       name: "activePlan",
@@ -524,7 +552,10 @@ export const usePlanStore = create<PlanStoreState>()(
         pendingSyncIds: state.pendingSyncIds,
         defaultHome: state.defaultHome,
         defaultSemester: state.defaultSemester,
+        defaultStudyingInEurope: state.defaultStudyingInEurope,
+        defaultCurrency: state.defaultCurrency,
         foodFixNoticeSeen: state.foodFixNoticeSeen,
+        setupPromptDismissed: state.setupPromptDismissed,
       }),
       migrate: (persisted, version) => {
         const state = (persisted ?? {}) as Record<string, unknown>;
