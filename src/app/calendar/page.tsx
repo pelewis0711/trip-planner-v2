@@ -79,16 +79,16 @@ export default function CalendarPage() {
   if (isUnconfigured) {
     return (
       <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6">
-        <div className="rounded-2xl border border-dashed border-zinc-800 p-14 text-center">
-          <h2 className="text-xl font-semibold text-zinc-50">Let&apos;s set up your trip first</h2>
-          <p className="mt-2 text-sm text-zinc-500">
+        <div className="rounded-card border-2 border-dashed border-border p-14 text-center">
+          <h2 className="font-heading text-xl font-semibold text-ink">Let&apos;s set up your trip first</h2>
+          <p className="mt-2 text-sm text-muted">
             Pick your host city and semester dates so your calendar shows your own program&apos;s
             weekends — not anyone else&apos;s.
           </p>
           <button
             type="button"
             onClick={() => setWizardOpen(true)}
-            className="mt-5 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-bold text-zinc-950"
+            className="mt-5 rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-hover"
           >
             Set up now
           </button>
@@ -100,9 +100,9 @@ export default function CalendarPage() {
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6">
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5">
-        <h2 className="text-xl font-semibold text-zinc-50">My Calendar</h2>
-        <p className="mt-1 text-sm text-zinc-400">
+      <div className="rounded-card border border-border bg-surface p-5">
+        <h2 className="font-heading text-xl font-semibold text-ink">My Calendar</h2>
+        <p className="mt-1 text-sm text-muted">
           Tap a trip in the tray then tap a slot, or drag it onto one. Drop several trips on one slot
           for multi-city stretches like spring break — travel routes automatically from{" "}
           {home || "your home city (choose one in the header)"}.
@@ -110,12 +110,12 @@ export default function CalendarPage() {
       </div>
 
       {armedId && (
-        <div className="mt-3 flex items-center gap-3 rounded-xl border border-emerald-500 bg-emerald-500/10 px-4 py-2.5 text-sm font-medium text-emerald-300">
+        <div className="mt-3 flex items-center gap-3 rounded-xl border border-primary bg-primary-soft px-4 py-2.5 text-sm font-medium text-primary">
           <span>✓ {ctx.tripOf(armedId)?.n} armed — tap a slot to add it</span>
           <button
             type="button"
             onClick={() => setArmedId(null)}
-            className="ml-auto rounded-md border border-emerald-500/60 px-2.5 py-1 text-xs font-semibold"
+            className="ml-auto rounded-md border border-primary/50 px-2.5 py-1 text-xs font-semibold"
           >
             Cancel
           </button>
@@ -125,10 +125,10 @@ export default function CalendarPage() {
       <button
         type="button"
         onClick={() => setTrayOpen((o) => !o)}
-        className="mt-4 flex w-full items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm font-semibold text-zinc-200 lg:hidden"
+        className="mt-4 flex w-full items-center justify-between rounded-xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-ink lg:hidden"
       >
         <span>🧳 {trayOpen ? "Hide trip list" : "Browse trips to add"}</span>
-        <span className="text-zinc-500">{trayOpen ? "▲" : "▼"}</span>
+        <span className="text-muted">{trayOpen ? "▲" : "▼"}</span>
       </button>
 
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[280px_1fr]">
@@ -138,14 +138,14 @@ export default function CalendarPage() {
 
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <div className="inline-flex overflow-hidden rounded-lg border border-zinc-800">
+            <div className="inline-flex overflow-hidden rounded-lg border border-border">
               {(["weekend", "month"] as const).map((v) => (
                 <button
                   key={v}
                   type="button"
                   onClick={() => setView(v)}
                   className={`px-4 py-2 text-xs font-semibold ${
-                    view === v ? "bg-emerald-500 text-zinc-950" : "bg-zinc-900 text-zinc-400"
+                    view === v ? "bg-primary text-white" : "bg-surface text-muted"
                   }`}
                 >
                   {v === "weekend" ? "Weekend list" : "Month calendar"}
@@ -155,7 +155,7 @@ export default function CalendarPage() {
             <button
               type="button"
               onClick={() => filledCount && confirm("Clear all placed trips?") && clearAll()}
-              className="rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-zinc-400 hover:border-rose-500/50 hover:text-rose-300"
+              className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-muted hover:border-danger/50 hover:text-danger"
             >
               Clear all
             </button>
@@ -164,13 +164,13 @@ export default function CalendarPage() {
               onClick={() => setEditSlotsMode((m) => !m)}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
                 editSlotsMode
-                  ? "border-emerald-500 bg-emerald-500/10 text-emerald-300"
-                  : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-emerald-500/50"
+                  ? "border-primary bg-primary-soft text-primary"
+                  : "border-border bg-surface text-muted hover:border-primary/50"
               }`}
             >
               {editSlotsMode ? "Done editing" : "✏️ Edit slots"}
             </button>
-            <span className="text-xs text-zinc-500">
+            <span className="text-xs text-muted">
               {filledCount ? `${filledCount} of ${slots.length} slots filled` : "all slots empty — tap or drag to begin"}
               {filledCount > 0 && studyingInEurope && (
                 <>
@@ -178,9 +178,9 @@ export default function CalendarPage() {
                   <span
                     className={
                       schStatus === "red"
-                        ? "font-bold text-rose-400"
+                        ? "font-bold text-danger"
                         : schStatus === "amber"
-                          ? "font-semibold text-amber-400"
+                          ? "font-semibold text-warning"
                           : ""
                     }
                   >
@@ -214,7 +214,7 @@ export default function CalendarPage() {
                   />
                 ))}
                 {editSlotsMode && (
-                  <div className="rounded-xl border-2 border-dashed border-zinc-800 bg-zinc-900/40 p-3.5">
+                  <div className="rounded-card border-2 border-dashed border-border bg-surface p-3.5">
                     {addingSlot ? (
                       <div className="space-y-2">
                         <input
@@ -222,21 +222,21 @@ export default function CalendarPage() {
                           value={newSlotLabel}
                           onChange={(e) => setNewSlotLabel(e.target.value)}
                           placeholder="Slot label…"
-                          className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-sm text-zinc-100 placeholder:text-zinc-600"
+                          className="w-full rounded-md border border-border bg-surface-muted px-2 py-1 text-sm text-ink placeholder:text-muted"
                         />
-                        <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                        <div className="flex items-center gap-1.5 text-[11px] text-muted">
                           <input
                             type="date"
                             value={newSlotStart}
                             onChange={(e) => setNewSlotStart(e.target.value)}
-                            className="rounded-md border border-zinc-800 bg-zinc-950 px-1.5 py-1 text-zinc-100"
+                            className="rounded-md border border-border bg-surface-muted px-1.5 py-1 text-ink"
                           />
                           <span>–</span>
                           <input
                             type="date"
                             value={newSlotEnd}
                             onChange={(e) => setNewSlotEnd(e.target.value)}
-                            className="rounded-md border border-zinc-800 bg-zinc-950 px-1.5 py-1 text-zinc-100"
+                            className="rounded-md border border-border bg-surface-muted px-1.5 py-1 text-ink"
                           />
                         </div>
                         <div className="flex gap-2">
@@ -249,14 +249,14 @@ export default function CalendarPage() {
                               setNewSlotLabel("");
                               setAddingSlot(false);
                             }}
-                            className="rounded-md bg-emerald-500 px-3 py-1.5 text-xs font-bold text-zinc-950"
+                            className="rounded-md bg-primary px-3 py-1.5 text-xs font-bold text-white"
                           >
                             Add
                           </button>
                           <button
                             type="button"
                             onClick={() => setAddingSlot(false)}
-                            className="rounded-md border border-zinc-700 px-3 py-1.5 text-xs font-semibold text-zinc-300"
+                            className="rounded-md border border-border px-3 py-1.5 text-xs font-semibold text-muted"
                           >
                             Cancel
                           </button>
@@ -266,7 +266,7 @@ export default function CalendarPage() {
                       <button
                         type="button"
                         onClick={() => setAddingSlot(true)}
-                        className="flex h-full w-full items-center justify-center rounded-lg border border-dashed border-zinc-700 py-6 text-sm font-semibold text-zinc-400 hover:border-emerald-500/50 hover:text-emerald-300"
+                        className="flex h-full w-full items-center justify-center rounded-lg border border-dashed border-border py-6 text-sm font-semibold text-muted hover:border-primary/50 hover:text-primary"
                       >
                         + Add slot
                       </button>

@@ -41,11 +41,11 @@ export default function MonthGrid({
         ];
 
         return (
-          <div key={m} className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3.5">
-            <h3 className="text-center text-sm font-semibold text-zinc-100">{MONTH_NAMES[m]}</h3>
+          <div key={m} className="rounded-card border border-border bg-surface p-3.5">
+            <h3 className="text-center font-heading text-sm font-semibold text-ink">{MONTH_NAMES[m]}</h3>
             <div className="mt-2 grid grid-cols-7 gap-1">
               {DOW.map((d) => (
-                <div key={d} className="pb-1 text-center text-[9.5px] font-bold text-zinc-600">
+                <div key={d} className="pb-1 text-center text-[9.5px] font-bold text-muted">
                   {d}
                 </div>
               ))}
@@ -71,11 +71,11 @@ export default function MonthGrid({
                     className={`flex aspect-square items-center justify-center rounded-md text-[10.5px] ${
                       slot
                         ? filled
-                          ? "cursor-pointer bg-emerald-500 font-bold text-zinc-950"
+                          ? "cursor-pointer bg-primary font-bold text-white"
                           : armed
-                            ? "cursor-pointer border border-dashed border-emerald-500 text-emerald-400"
-                            : "cursor-pointer border border-dashed border-zinc-700 text-zinc-300 hover:border-emerald-500/50"
-                        : "bg-zinc-950/40 text-zinc-600"
+                            ? "cursor-pointer border border-dashed border-primary text-primary"
+                            : "cursor-pointer border border-dashed border-border text-ink hover:border-primary/50"
+                        : "bg-surface-muted/60 text-muted"
                     }`}
                   >
                     {d}
