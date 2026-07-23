@@ -1,6 +1,7 @@
 // Shared mark for every generated app icon (apple-icon, manifest icons):
-// a rounded emerald-on-dark square with the app's initials, matching the
-// site's existing dark theme + emerald accent. No external image assets or
+// a rounded emerald-on-dark square with the app's mark, matching the site's
+// existing dark theme + emerald accent (updated in the visual restyle pass
+// that follows the rename -- see CLAUDE.md). No external image assets or
 // dependencies needed -- next/og renders this to a real PNG at build time.
 import { ImageResponse } from "next/og";
 
@@ -38,7 +39,7 @@ export function renderIcon(size: number, { maskable = false }: { maskable?: bool
             fontFamily: "sans-serif",
           }}
         >
-          TP
+          S
         </div>
       </div>
     ),

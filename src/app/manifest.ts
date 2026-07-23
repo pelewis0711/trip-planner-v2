@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Trip Planner — Spring 2027",
-    short_name: "Trip Planner",
-    description: "Study-abroad semester travel planner",
+    name: "Semesterly",
+    short_name: "Semesterly",
+    description: "Plan your study-abroad semester of travel",
     start_url: "/",
     display: "standalone",
     background_color: "#09090b",

@@ -20,12 +20,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Trip Planner v2",
-  description: "Study-abroad semester travel planner — Spring 2027, Prague.",
+  title: "Semesterly",
+  description: "Plan your study-abroad semester of travel — budgets, calendar, and bookings in one place.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Trip Planner",
+    title: "Semesterly",
   },
 };
 

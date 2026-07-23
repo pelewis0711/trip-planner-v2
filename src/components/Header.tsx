@@ -120,7 +120,7 @@ export default function Header() {
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-3 sm:px-6">
         <div className="flex w-full items-center justify-between sm:w-auto sm:justify-start">
           <div>
-            <div className="text-base font-semibold text-zinc-50">Trip Planner v2</div>
+            <div className="text-base font-semibold text-zinc-50">Semesterly</div>
             <div className="text-[11px] font-medium tracking-wide text-zinc-500">
               {term ? `${term.season.toUpperCase()} ${term.year} · ` : ""}PER PERSON {currency}
               {currency !== "USD" && (
