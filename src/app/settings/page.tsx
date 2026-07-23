@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useAuthStore } from "@/lib/store/auth";
 import { usePlanStore } from "@/lib/store/plan";
 import { useCustomHomesStore } from "@/lib/store/customHomes";
-import { HOMES } from "@/data/homes";
+import { isKnownCity } from "@/lib/resolveHome";
 import { fetchUserSettings, saveUserSettings, rowToOnboardingValues } from "@/lib/supabase/settings";
 import OnboardingFlow, { AAU_PRAGUE_DEFAULTS, type OnboardingResult, type OnboardingValues } from "@/components/onboarding/OnboardingFlow";
 
@@ -35,7 +35,7 @@ export default function SettingsPage() {
 
   async function handleSave(result: OnboardingResult) {
     if (!user) return;
-    if (!HOMES[result.host.city]) {
+    if (!isKnownCity(result.host.city)) {
       addHome(result.host.city, { lat: result.host.lat, lon: result.host.lon, country: result.host.country });
     }
     setOnboardingDefaults(result.host.city, result.semester, result.studyingInEurope, result.currency);

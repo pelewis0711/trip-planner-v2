@@ -6,7 +6,8 @@
 // and /settings (edit anytime, single page) via the `layout` prop.
 import { useMemo, useState } from "react";
 import { HOMES } from "@/data/homes";
-import { HOME_COUNTRY } from "@/lib/calc/schengen";
+import { EUROPEAN_CITIES } from "@/data/europeanCities";
+import { lookupCity, resolveHome } from "@/lib/resolveHome";
 import { universityNames, findUniversitySemester } from "@/data/universitySemesters";
 import { smartDefaultSemester, postFinalsBreak, type Term } from "@/lib/calc/onboarding";
 import type { SemesterConfig } from "@/lib/calc/semester";
@@ -98,6 +99,13 @@ export default function OnboardingFlow({
   const [cityInput, setCityInput] = useState("");
   const [geocoding, setGeocoding] = useState(false);
   const [geocodeError, setGeocodeError] = useState<string | null>(null);
+  // requirement 3's fallback, for when neither the bundled city list nor a
+  // live geocode lookup can resolve what was typed -- never silently
+  // guesses a city, always asks.
+  const [manualEntry, setManualEntry] = useState(false);
+  const [manualCountry, setManualCountry] = useState("");
+  const [manualLat, setManualLat] = useState("");
+  const [manualLon, setManualLon] = useState("");
 
   const [hostUniversity, setHostUniversity] = useState(initial.hostUniversity);
   const [homeUniversity, setHomeUniversity] = useState(initial.homeUniversity);
@@ -131,24 +139,33 @@ export default function OnboardingFlow({
     if (!q) return;
     setGeocoding(true);
     setGeocodeError(null);
-    try {
-      const res = await fetch(`/api/geocode?q=${encodeURIComponent(q)}`);
-      const data = await res.json();
-      if (!res.ok) {
-        setGeocodeError(data.error || "Couldn't find that city");
-        return;
-      }
-      setHostCity(data.city);
-      setHostCountry(data.country);
-      setHostLat(data.lat);
-      setHostLon(data.lon);
-      setAddingCity(false);
-      setCityInput("");
-    } catch {
-      setGeocodeError("Couldn't reach the geocoding service");
-    } finally {
-      setGeocoding(false);
+    setManualEntry(false);
+    const result = await lookupCity(q);
+    setGeocoding(false);
+    if ("error" in result) {
+      setGeocodeError(result.error);
+      return;
     }
+    setHostCity(result.city);
+    setHostCountry(result.country);
+    setHostLat(result.lat);
+    setHostLon(result.lon);
+    setAddingCity(false);
+    setCityInput("");
+  }
+
+  function confirmManualEntry() {
+    const lat = Number(manualLat);
+    const lon = Number(manualLon);
+    if (!cityInput.trim() || Number.isNaN(lat) || Number.isNaN(lon)) return;
+    setHostCity(cityInput.trim());
+    setHostCountry(manualCountry.trim());
+    setHostLat(lat);
+    setHostLon(lon);
+    setAddingCity(false);
+    setManualEntry(false);
+    setGeocodeError(null);
+    setCityInput("");
   }
 
   function finish() {
@@ -169,32 +186,107 @@ export default function OnboardingFlow({
         <section className="space-y-2">
           <h3 className="text-sm font-semibold text-zinc-200">1. Host city</h3>
           {addingCity ? (
-            <div className="flex flex-wrap items-center gap-2">
-              <input
-                autoFocus
-                type="text"
-                value={cityInput}
-                onChange={(e) => setCityInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleAddCity()}
-                placeholder="Type any city…"
-                className="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1.5 text-sm text-zinc-100 placeholder:text-zinc-600"
-              />
-              <button
-                type="button"
-                onClick={handleAddCity}
-                disabled={geocoding}
-                className="rounded-md bg-emerald-500 px-3 py-1.5 text-xs font-bold text-zinc-950 disabled:opacity-50"
-              >
-                {geocoding ? "Looking up…" : "Confirm"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setAddingCity(false)}
-                className="text-xs text-zinc-500 hover:text-zinc-300"
-              >
-                Cancel
-              </button>
-              {geocodeError && <span className="text-xs text-red-400">{geocodeError}</span>}
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  autoFocus
+                  type="text"
+                  list="city-options"
+                  value={cityInput}
+                  onChange={(e) => setCityInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddCity()}
+                  placeholder="Type any European city…"
+                  className="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1.5 text-sm text-zinc-100 placeholder:text-zinc-600"
+                />
+                <datalist id="city-options">
+                  {[...Object.keys(HOMES), ...Object.keys(EUROPEAN_CITIES)].map((c) => (
+                    <option key={c} value={c} />
+                  ))}
+                </datalist>
+                <button
+                  type="button"
+                  onClick={handleAddCity}
+                  disabled={geocoding}
+                  className="rounded-md bg-emerald-500 px-3 py-1.5 text-xs font-bold text-zinc-950 disabled:opacity-50"
+                >
+                  {geocoding ? "Looking up…" : "Confirm"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddingCity(false);
+                    setGeocodeError(null);
+                    setManualEntry(false);
+                  }}
+                  className="text-xs text-zinc-500 hover:text-zinc-300"
+                >
+                  Cancel
+                </button>
+              </div>
+              {geocodeError && !manualEntry && (
+                <div className="space-y-1.5 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+                  <p>{geocodeError} — we couldn&apos;t find that city.</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAddingCity(false);
+                        setGeocodeError(null);
+                      }}
+                      className="rounded-md border border-amber-500/40 px-2 py-1 font-semibold text-amber-100"
+                    >
+                      Pick the nearest city from the list instead
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setManualEntry(true)}
+                      className="rounded-md border border-amber-500/40 px-2 py-1 font-semibold text-amber-100"
+                    >
+                      Enter coordinates manually
+                    </button>
+                  </div>
+                </div>
+              )}
+              {manualEntry && (
+                <div className="space-y-1.5 rounded-md border border-zinc-800 bg-zinc-950 p-2.5">
+                  <p className="text-[11px] text-zinc-500">
+                    &ldquo;{cityInput}&rdquo; — enter its coordinates and (optionally) country so trip distances
+                    and your Schengen tracker still work.
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    <input
+                      type="text"
+                      value={manualCountry}
+                      onChange={(e) => setManualCountry(e.target.value)}
+                      placeholder="Country (optional)"
+                      className="rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1 text-xs text-zinc-100 placeholder:text-zinc-600"
+                    />
+                    <input
+                      type="number"
+                      step="any"
+                      value={manualLat}
+                      onChange={(e) => setManualLat(e.target.value)}
+                      placeholder="Latitude"
+                      className="w-28 rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1 text-xs text-zinc-100 placeholder:text-zinc-600"
+                    />
+                    <input
+                      type="number"
+                      step="any"
+                      value={manualLon}
+                      onChange={(e) => setManualLon(e.target.value)}
+                      placeholder="Longitude"
+                      className="w-28 rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1 text-xs text-zinc-100 placeholder:text-zinc-600"
+                    />
+                    <button
+                      type="button"
+                      onClick={confirmManualEntry}
+                      className="rounded-md bg-emerald-500 px-3 py-1 text-xs font-bold text-zinc-950"
+                    >
+                      Use these coordinates
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <select
@@ -203,10 +295,11 @@ export default function OnboardingFlow({
                 if (e.target.value === OTHER_CITY) {
                   setAddingCity(true);
                 } else {
+                  const resolved = resolveHome(e.target.value);
                   setHostCity(e.target.value);
-                  setHostCountry(HOME_COUNTRY[e.target.value]);
-                  setHostLat(HOMES[e.target.value][0]);
-                  setHostLon(HOMES[e.target.value][1]);
+                  setHostCountry(resolved?.country ?? "");
+                  setHostLat(resolved?.lat ?? 0);
+                  setHostLon(resolved?.lon ?? 0);
                 }
               }}
               className="rounded-md border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-sm text-zinc-100"

@@ -19,8 +19,8 @@ import { liveSlotCosts, liveAdjustedGrandTotals } from "@/lib/calc/livePricing";
 import type { LivePrice } from "@/lib/store/livePrices";
 import { hotelKey, type LiveHotelPrice } from "@/lib/store/liveHotelPrices";
 import { daysOf, foodTiers, lodgingTiers } from "@/lib/calc/cost";
-import { HOME_COUNTRY, SCHENGEN, schengenDays } from "@/lib/calc/schengen";
-import { useCustomHomesStore } from "@/lib/store/customHomes";
+import { SCHENGEN, schengenDays } from "@/lib/calc/schengen";
+import { resolveHome } from "@/lib/resolveHome";
 import { slotWarnings } from "@/lib/calc/warnings";
 import { iso, nice, stopDates, legDateFor } from "@/lib/calc/dates";
 import { BAGS } from "@/lib/calc/pricing";
@@ -95,7 +95,7 @@ export function buildXlsxSheets(
 
   /* ---- Sheet 1: Budget ---- */
   const bt = blendedTotals(plan.placements, ctx, defaultTravelers);
-  const homeC = HOME_COUNTRY[plan.home] || useCustomHomesStore.getState().homes[plan.home]?.country || plan.home;
+  const homeC = resolveHome(plan.home)?.country || plan.home;
   const schD = schengenDays(plan.placements, plan.home, ctx.tripOf);
 
   const bud: Row[] = [

@@ -7,7 +7,9 @@ import { useActivePlan, usePlanStore } from "@/lib/store/plan";
 import { useAuthStore } from "@/lib/store/auth";
 import { createClient } from "@/lib/supabase/client";
 import { HOMES } from "@/data/homes";
+import { EUROPEAN_CITIES } from "@/data/europeanCities";
 import { useCustomHomesStore } from "@/lib/store/customHomes";
+import { lookupCity } from "@/lib/resolveHome";
 import { makeCtx } from "@/lib/calc/context";
 import { grandTotals } from "@/lib/calc/costs";
 import OfflineIndicator from "./OfflineIndicator";
@@ -40,28 +42,40 @@ export default function Header() {
   const [cityInput, setCityInput] = useState("");
   const [geocoding, setGeocoding] = useState(false);
   const [geocodeError, setGeocodeError] = useState<string | null>(null);
+  const [manualEntry, setManualEntry] = useState(false);
+  const [manualCountry, setManualCountry] = useState("");
+  const [manualLat, setManualLat] = useState("");
+  const [manualLon, setManualLon] = useState("");
 
   async function handleAddCity() {
     const q = cityInput.trim();
     if (!q) return;
     setGeocoding(true);
     setGeocodeError(null);
-    try {
-      const res = await fetch(`/api/geocode?q=${encodeURIComponent(q)}`);
-      const data = await res.json();
-      if (!res.ok) {
-        setGeocodeError(data.error || "Couldn't find that city");
-        return;
-      }
-      addHome(data.city, { lat: data.lat, lon: data.lon, country: data.country });
-      setHome(data.city);
-      setAddingCity(false);
-      setCityInput("");
-    } catch {
-      setGeocodeError("Couldn't reach the geocoding service");
-    } finally {
-      setGeocoding(false);
+    setManualEntry(false);
+    const result = await lookupCity(q);
+    setGeocoding(false);
+    if ("error" in result) {
+      setGeocodeError(result.error);
+      return;
     }
+    addHome(result.city, { lat: result.lat, lon: result.lon, country: result.country });
+    setHome(result.city);
+    setAddingCity(false);
+    setCityInput("");
+  }
+
+  function confirmManualEntry() {
+    const lat = Number(manualLat);
+    const lon = Number(manualLon);
+    if (!cityInput.trim() || Number.isNaN(lat) || Number.isNaN(lon)) return;
+    const city = cityInput.trim();
+    addHome(city, { lat, lon, country: manualCountry.trim() });
+    setHome(city);
+    setAddingCity(false);
+    setManualEntry(false);
+    setGeocodeError(null);
+    setCityInput("");
   }
 
   async function handleSignOut() {
@@ -111,16 +125,22 @@ export default function Header() {
         </div>
 
         {addingCity ? (
-          <div className="flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-xs">
+          <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-xs">
             <input
               autoFocus
               type="text"
+              list="header-city-options"
               value={cityInput}
               onChange={(e) => setCityInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAddCity()}
               placeholder="Type a city…"
               className="w-28 rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-sm text-zinc-100 placeholder:text-zinc-600"
             />
+            <datalist id="header-city-options">
+              {[...Object.keys(HOMES), ...Object.keys(EUROPEAN_CITIES)].map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
             <button
               type="button"
               onClick={handleAddCity}
@@ -134,12 +154,58 @@ export default function Header() {
               onClick={() => {
                 setAddingCity(false);
                 setGeocodeError(null);
+                setManualEntry(false);
               }}
               className="text-zinc-500 hover:text-zinc-300"
             >
               ✕
             </button>
-            {geocodeError && <span className="text-red-400">{geocodeError}</span>}
+            {geocodeError && !manualEntry && (
+              <div className="flex w-full flex-wrap items-center gap-1.5 pt-1">
+                <span className="text-red-400">{geocodeError}</span>
+                <button
+                  type="button"
+                  onClick={() => setManualEntry(true)}
+                  className="rounded-md border border-zinc-700 px-1.5 py-0.5 font-semibold text-zinc-300"
+                >
+                  Enter coordinates manually
+                </button>
+              </div>
+            )}
+            {manualEntry && (
+              <div className="flex w-full flex-wrap items-center gap-1.5 pt-1">
+                <input
+                  type="text"
+                  value={manualCountry}
+                  onChange={(e) => setManualCountry(e.target.value)}
+                  placeholder="Country"
+                  className="w-20 rounded-md border border-zinc-800 bg-zinc-950 px-1.5 py-1 text-zinc-100 placeholder:text-zinc-600"
+                />
+                <input
+                  type="number"
+                  step="any"
+                  value={manualLat}
+                  onChange={(e) => setManualLat(e.target.value)}
+                  placeholder="Lat"
+                  className="w-16 rounded-md border border-zinc-800 bg-zinc-950 px-1.5 py-1 text-zinc-100 placeholder:text-zinc-600"
+                />
+                <input
+                  type="number"
+                  step="any"
+                  value={manualLon}
+                  onChange={(e) => setManualLon(e.target.value)}
+                  placeholder="Lon"
+                  className="w-16 rounded-md border border-zinc-800 bg-zinc-950 px-1.5 py-1 text-zinc-100 placeholder:text-zinc-600"
+                />
+                <button
+                  type="button"
+                  onClick={confirmManualEntry}
+                  className="rounded-md bg-emerald-500 px-2 py-1 font-bold text-zinc-950"
+                >
+                  Use
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <label className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-xs font-medium text-zinc-400">

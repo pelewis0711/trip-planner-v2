@@ -4,7 +4,7 @@
 // conservative: it over-counts on purpose.
 import type { Placements } from "./types";
 import type { Trip } from "@/data/trips";
-import { useCustomHomesStore } from "@/lib/store/customHomes";
+import { resolveHome } from "@/lib/resolveHome";
 
 export const SCHENGEN = new Set([
   "Andorra", "Austria", "Belgium", "Bulgaria", "Croatia", "Czechia", "Denmark",
@@ -14,21 +14,15 @@ export const SCHENGEN = new Set([
   "Slovenia", "Spain", "Sweden", "Switzerland",
 ]);
 
-export const HOME_COUNTRY: Record<string, string> = {
-  Prague: "Czechia", Rome: "Italy", Florence: "Italy", Milan: "Italy",
-  Barcelona: "Spain", Madrid: "Spain", Seville: "Spain", Paris: "France",
-  London: "England", Dublin: "Ireland", Berlin: "Germany", Vienna: "Austria",
-  Budapest: "Hungary", Amsterdam: "Netherlands", Brussels: "Belgium",
-  Copenhagen: "Denmark", Stockholm: "Sweden", Lisbon: "Portugal",
-  Porto: "Portugal", Athens: "Greece",
-};
-
 export function schengenDays(
   placements: Placements,
   home: string,
   tripOf: (tripId: string) => Trip | undefined
 ): number {
-  const homeC = HOME_COUNTRY[home] ?? useCustomHomesStore.getState().homes[home]?.country;
+  // profile-driven: works for any resolvable home city (the original 20,
+  // the bundled ~130-city dataset, or a live-geocoded custom home), not
+  // just the fixed 20 this used to be limited to -- same formula either way.
+  const homeC = resolveHome(home)?.country;
   let d = 0;
   for (const sid in placements) {
     for (const st of placements[sid].stops || []) {

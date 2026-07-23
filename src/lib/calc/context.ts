@@ -1,9 +1,8 @@
 // Bundles the trip catalog + home base into the lookups the rest of the
 // calc engine needs, so functions don't have to thread five params each.
 import { TRIPS, type Trip } from "@/data/trips";
-import { HOMES } from "@/data/homes";
 import { useCustomTripsStore } from "@/lib/store/customTrips";
-import { useCustomHomesStore } from "@/lib/store/customHomes";
+import { resolveHome } from "@/lib/resolveHome";
 import type { BagOption } from "./pricing";
 
 export interface PlannerCtx {
@@ -28,8 +27,13 @@ export function makeCtx(home: string, bag: BagOption = "cabin"): PlannerCtx {
   const trips = hasCustom ? [...TRIPS, ...Object.values(custom)] : TRIPS;
   const byId = hasCustom ? new Map(trips.map((t) => [t.id, t])) : TRIP_BY_ID;
 
-  const customHome = useCustomHomesStore.getState().homes[home];
-  const homeCoord: [number, number] = HOMES[home] || (customHome ? [customHome.lat, customHome.lon] : HOMES.Prague);
+  // [0, 0] (null island) is an honest, obviously-a-placeholder fallback for
+  // an unresolved home -- never Prague's real coordinates. Every page that
+  // can reach here with no home configured already shows an "unconfigured"
+  // prompt instead of real numbers, so this is a safety net, not the normal
+  // path (see Calendar/Itinerary/Catalog's isUnconfigured checks).
+  const resolved = resolveHome(home);
+  const homeCoord: [number, number] = resolved ? [resolved.lat, resolved.lon] : [0, 0];
 
   return {
     trips,

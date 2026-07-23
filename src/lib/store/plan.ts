@@ -6,17 +6,14 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { TRIPS, type Trip } from "@/data/trips";
-import { HOMES } from "@/data/homes";
-import { useCustomHomesStore } from "@/lib/store/customHomes";
+import { isKnownCity } from "@/lib/resolveHome";
 import type { BagOption } from "@/lib/calc/pricing";
 import type { Placement, Placements, SlotActuals, Stop } from "@/lib/calc/types";
 import { generateSlots, DEFAULT_SEMESTER, fmtMonthDay, type SemesterConfig } from "@/lib/calc/semester";
 import type { Currency } from "@/components/onboarding/OnboardingFlow";
 import { LEGACY_SLOTS, type Slot, type SlotKind } from "@/data/slots";
 
-function isKnownHome(home: string): boolean {
-  return !!HOMES[home] || !!useCustomHomesStore.getState().homes[home];
-}
+const isKnownHome = isKnownCity;
 
 const TRIP_BY_ID = new Map(TRIPS.map((t) => [t.id, t]));
 
