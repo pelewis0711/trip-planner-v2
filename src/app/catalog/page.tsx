@@ -2,10 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { TRIPS } from "@/data/trips";
-import { HOMES } from "@/data/homes";
 import { useActivePlan } from "@/lib/store/plan";
 import { useCustomTripsStore } from "@/lib/store/customTrips";
-import { useCustomHomesStore } from "@/lib/store/customHomes";
+import { resolveHome } from "@/lib/resolveHome";
 import {
   activeFilterCount,
   buildFilterGroups,
@@ -18,17 +17,30 @@ import { makeCtx } from "@/lib/calc/context";
 import FilterPanel from "@/components/FilterPanel";
 import TripCard from "@/components/TripCard";
 import DiscoverPanel from "@/components/discover/DiscoverPanel";
+import SetupWizardModal from "@/components/onboarding/SetupWizardModal";
 
 export default function CatalogPage() {
-  const { home } = useActivePlan();
+  const activePlan = useActivePlan();
+  const { home } = activePlan;
   const customTrips = useCustomTripsStore((s) => s.trips);
-  const customHome = useCustomHomesStore((s) => s.homes[home]);
   const [filters, setFilters] = useState(emptyFilters());
   const [query, setQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [showDiscover, setShowDiscover] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
 
-  const homeCoord: [number, number] = HOMES[home] || (customHome ? [customHome.lat, customHome.lon] : HOMES.Prague);
+  // same "never configured at all" signal Calendar/Itinerary already use --
+  // catalog never got this gate, so an unconfigured visitor's filters/prices
+  // were silently computed as if their home were Prague (the actual bug
+  // this task's requirement 3 flagged). Fixed here alongside the general
+  // city-resolution work since it's the same root cause.
+  const isUnconfigured = !home && !activePlan.semester;
+
+  // [0, 0] (null island) for an unresolved home -- never Prague. Only
+  // matters if isUnconfigured is somehow false with an unresolvable home
+  // (e.g. a data inconsistency), since the gate below covers the normal case.
+  const resolved = resolveHome(home);
+  const homeCoord: [number, number] = resolved ? [resolved.lat, resolved.lon] : [0, 0];
   // makeCtx reads custom trips from the store internally (not as an arg),
   // so this dep is what tells the memo to recompute when they change
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -62,6 +74,28 @@ export default function CatalogPage() {
   );
 
   const activeCount = activeFilterCount(filters, query);
+
+  if (isUnconfigured) {
+    return (
+      <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
+        <div className="rounded-2xl border border-dashed border-zinc-800 p-14 text-center">
+          <h2 className="text-xl font-semibold text-zinc-50">Let&apos;s set up your trip first</h2>
+          <p className="mt-2 text-sm text-zinc-500">
+            Pick your host city so trip distances and prices are calculated from your own program,
+            not someone else&apos;s.
+          </p>
+          <button
+            type="button"
+            onClick={() => setWizardOpen(true)}
+            className="mt-5 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-bold text-zinc-950"
+          >
+            Set up now
+          </button>
+        </div>
+        {wizardOpen && <SetupWizardModal onClose={() => setWizardOpen(false)} />}
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">

@@ -8,6 +8,7 @@ import type { Placements, Stop } from "../types";
 import type { Plan } from "@/lib/store/plan";
 import { usePlanStore, presetActivityChecks, migratePlanToSlots, slotsToBeLost } from "@/lib/store/plan";
 import { useCustomHomesStore } from "@/lib/store/customHomes";
+import { resolveHome, isKnownCity } from "@/lib/resolveHome";
 import { HOMES } from "@/data/homes";
 import { LEGACY_SLOTS } from "@/data/slots";
 import { TRIPS } from "@/data/trips";
@@ -65,19 +66,56 @@ describe("Schengen tracker", () => {
     expect(schengenDays(placements, "Prague", tripOf)).toBe(0);
   });
 
-  it("exempts a geocoded (non-HOMES) host country via useCustomHomesStore (Phase 6)", () => {
-    useCustomHomesStore.getState().addHome("Valencia", { lat: 39.47, lon: -0.38, country: "Spain" });
+  it("exempts a geocoded (fully custom, not in any bundled dataset) host country via useCustomHomesStore (Phase 6)", () => {
+    // Alicante is deliberately NOT in EUROPEAN_CITIES -- this test is
+    // specifically about the useCustomHomesStore tier of resolution.
+    useCustomHomesStore.getState().addHome("Alicante", { lat: 38.35, lon: -0.48, country: "Spain" });
     // Rome (Italy) is Schengen and != Spain -> counts
     const romeStop: Stop = { tripId: "rome", nights: 2, act: [], sig: [], l: 0, fd: 0 };
     const tripOf = (id: string) => TRIPS.find((t) => t.id === id);
-    expect(schengenDays({ s06: { stops: [romeStop] } }, "Valencia", tripOf)).toBe(3);
+    expect(schengenDays({ s06: { stops: [romeStop] } }, "Alicante", tripOf)).toBe(3);
 
-    // a Spain trip, with Valencia as home, should be exempt (home country match)
+    // a Spain trip, with Alicante as home, should be exempt (home country match)
     const spainTrip = TRIPS.find((t) => t.c === "Spain");
     if (spainTrip) {
       const spainStop: Stop = { tripId: spainTrip.id, nights: 2, act: [], sig: [], l: 0, fd: 0 };
-      expect(schengenDays({ s06: { stops: [spainStop] } }, "Valencia", tripOf)).toBe(0);
+      expect(schengenDays({ s06: { stops: [spainStop] } }, "Alicante", tripOf)).toBe(0);
     }
+  });
+});
+
+describe("Phase 9 step 6: generalized home cities (bundled ~150-city dataset)", () => {
+  it("Schengen home country now derives from the bundled dataset too, not just the original 20 or a custom-geocoded home", () => {
+    // Krakow is in EUROPEAN_CITIES (Poland), not the original 20 HOMES and
+    // not custom-geocoded -- this is the actual bug fix: previously this
+    // would have resolved to `undefined`, over-counting even a Poland trip.
+    const tripOf = (id: string) => TRIPS.find((t) => t.id === id);
+    const polandTrip = TRIPS.find((t) => t.c === "Poland");
+    const romeStop: Stop = { tripId: "rome", nights: 2, act: [], sig: [], l: 0, fd: 0 };
+    // Rome (Italy) is Schengen and != Poland -> counts, same formula as ever
+    expect(schengenDays({ s06: { stops: [romeStop] } }, "Krakow", tripOf)).toBe(3);
+    if (polandTrip) {
+      const polandStop: Stop = { tripId: polandTrip.id, nights: 2, act: [], sig: [], l: 0, fd: 0 };
+      expect(schengenDays({ s06: { stops: [polandStop] } }, "Krakow", tripOf)).toBe(0);
+    }
+  });
+
+  it("resolveHome checks the original 20, then the bundled dataset, then a custom home, in that order", () => {
+    expect(resolveHome("Prague")).toEqual({ lat: 50.08, lon: 14.44, country: "Czechia" });
+    expect(resolveHome("Krakow")).toEqual({ lat: 50.06, lon: 19.94, country: "Poland" });
+    useCustomHomesStore.getState().addHome("Nowheresville", { lat: 1, lon: 2, country: "Testland" });
+    expect(resolveHome("Nowheresville")).toEqual({ lat: 1, lon: 2, country: "Testland" });
+  });
+
+  it("resolveHome returns null (never a Prague guess) for a city that isn't resolvable at all", () => {
+    expect(resolveHome("")).toBeNull();
+    expect(resolveHome("Definitely Not A Real City XYZ")).toBeNull();
+  });
+
+  it("isKnownCity is true for all three resolution tiers and false for an unresolvable city", () => {
+    expect(isKnownCity("Prague")).toBe(true);
+    expect(isKnownCity("Krakow")).toBe(true);
+    expect(isKnownCity("Definitely Not A Real City XYZ")).toBe(false);
   });
 });
 

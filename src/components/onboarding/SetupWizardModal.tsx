@@ -5,7 +5,7 @@
 // "set up your trip" empty state -- one modal, two entry points.
 import { useCustomHomesStore } from "@/lib/store/customHomes";
 import { usePlanStore } from "@/lib/store/plan";
-import { HOMES } from "@/data/homes";
+import { isKnownCity } from "@/lib/resolveHome";
 import OnboardingFlow, {
   EMPTY_ONBOARDING_DEFAULTS,
   type OnboardingResult,
@@ -16,7 +16,7 @@ export default function SetupWizardModal({ onClose }: { onClose: () => void }) {
   const addHome = useCustomHomesStore((s) => s.addHome);
 
   function handleComplete(result: OnboardingResult) {
-    if (!HOMES[result.host.city]) {
+    if (!isKnownCity(result.host.city)) {
       addHome(result.host.city, { lat: result.host.lat, lon: result.host.lon, country: result.host.country });
     }
     setOnboardingDefaults(result.host.city, result.semester, result.studyingInEurope, result.currency);

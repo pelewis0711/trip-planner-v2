@@ -7,8 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useAuthStore } from "@/lib/store/auth";
 import { usePlanStore, type Plan } from "@/lib/store/plan";
 import { useCustomHomesStore } from "@/lib/store/customHomes";
-import { HOMES } from "@/data/homes";
-import { HOME_COUNTRY } from "@/lib/calc/schengen";
+import { resolveHome, isKnownCity } from "@/lib/resolveHome";
 import { fetchProfileEmails } from "@/lib/supabase/profiles";
 import { planToInsertRow, rowToPlan, savePlanData, type PlanRow } from "@/lib/supabase/sharing";
 import { fetchUserSettings, saveUserSettings, rowToOnboardingValues } from "@/lib/supabase/settings";
@@ -136,12 +135,8 @@ export default function AuthSync() {
       if (!row) {
         const { defaultHome, defaultSemester, defaultStudyingInEurope, defaultCurrency } = usePlanStore.getState();
         if (defaultHome) {
-          const custom = useCustomHomesStore.getState().homes[defaultHome];
-          const host = HOMES[defaultHome]
-            ? { city: defaultHome, country: HOME_COUNTRY[defaultHome], lat: HOMES[defaultHome][0], lon: HOMES[defaultHome][1] }
-            : custom
-              ? { city: defaultHome, country: custom.country, lat: custom.lat, lon: custom.lon }
-              : null;
+          const resolved = resolveHome(defaultHome);
+          const host = resolved ? { city: defaultHome, country: resolved.country ?? "", lat: resolved.lat, lon: resolved.lon } : null;
           if (host && defaultSemester) {
             await saveUserSettings(
               supabase,
@@ -164,7 +159,7 @@ export default function AuthSync() {
         return;
       }
       const values = rowToOnboardingValues(row);
-      if (!HOMES[values.host.city]) {
+      if (!isKnownCity(values.host.city)) {
         useCustomHomesStore.getState().addHome(values.host.city, {
           lat: values.host.lat,
           lon: values.host.lon,

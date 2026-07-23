@@ -2,9 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { TRIPS } from "@/data/trips";
-import { HOMES } from "@/data/homes";
 import { useCustomTripsStore } from "@/lib/store/customTrips";
-import { useCustomHomesStore } from "@/lib/store/customHomes";
+import { resolveHome } from "@/lib/resolveHome";
 import {
   activeFilterCount,
   buildFilterGroups,
@@ -26,12 +25,15 @@ export default function TripTray({
   onDragStart: (tripId: string) => void;
 }) {
   const customTrips = useCustomTripsStore((s) => s.trips);
-  const customHome = useCustomHomesStore((s) => s.homes[home]);
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState(emptyFilters());
   const [showFilters, setShowFilters] = useState(false);
 
-  const homeCoord: [number, number] = HOMES[home] || (customHome ? [customHome.lat, customHome.lon] : HOMES.Prague);
+  // [0, 0] (null island) for an unresolved home -- never Prague. Calendar's
+  // own isUnconfigured check already keeps this page from being shown at
+  // all when there's no real home set, so this is a safety net only.
+  const resolved = resolveHome(home);
+  const homeCoord: [number, number] = resolved ? [resolved.lat, resolved.lon] : [0, 0];
   const allTrips = useMemo(
     () => (Object.keys(customTrips).length ? [...TRIPS, ...Object.values(customTrips)] : TRIPS),
     [customTrips]
