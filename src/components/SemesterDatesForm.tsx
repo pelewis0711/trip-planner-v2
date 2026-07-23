@@ -28,13 +28,22 @@ export default function SemesterDatesForm({
   const updateBreak = (id: string, patch: Partial<CustomBreak>) =>
     onChange({ ...value, breaks: value.breaks.map((b) => (b.id === id ? { ...b, ...patch } : b)) });
 
-  const addBreak = () =>
+  const addBreak = (label = "New break", kind: CustomBreak["kind"] = "break") =>
     onChange({
       ...value,
-      breaks: [...value.breaks, { id: uid(), label: "New break", start: value.start, end: value.start, kind: "break" }],
+      breaks: [...value.breaks, { id: uid(), label, start: value.start, end: value.start, kind }],
     });
 
   const removeBreak = (id: string) => onChange({ ...value, breaks: value.breaks.filter((b) => b.id !== id) });
+
+  // One-tap common presets -- still lands as a plain, fully-editable break
+  // (dates default to the term start, same as "+ Add break"), just saves
+  // typing out a label you'd type anyway.
+  const PRESETS: { label: string; emoji: string; kind: CustomBreak["kind"] }[] = [
+    { label: "Spring break", emoji: "🌴", kind: "break" },
+    { label: "Reading week", emoji: "📖", kind: "break" },
+    { label: "Fall break", emoji: "🍂", kind: "break" },
+  ];
 
   return (
     <div className="space-y-3 text-[12px]">
@@ -64,11 +73,23 @@ export default function SemesterDatesForm({
           <span className="font-semibold text-zinc-300">Breaks / special windows</span>
           <button
             type="button"
-            onClick={addBreak}
+            onClick={() => addBreak()}
             className="rounded-md border border-zinc-700 px-2 py-0.5 text-[11px] font-semibold text-zinc-300 hover:border-zinc-500"
           >
             ＋ Add break
           </button>
+        </div>
+        <div className="mb-2 flex flex-wrap gap-1.5">
+          {PRESETS.map((p) => (
+            <button
+              key={p.label}
+              type="button"
+              onClick={() => addBreak(p.label, p.kind)}
+              className="rounded-full border border-zinc-800 bg-zinc-900 px-2.5 py-1 text-[11px] font-medium text-zinc-400 hover:border-emerald-500/50 hover:text-emerald-300"
+            >
+              {p.emoji} {p.label}
+            </button>
+          ))}
         </div>
         <div className="space-y-2">
           {value.breaks.map((b) => (
