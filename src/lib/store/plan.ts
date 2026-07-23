@@ -80,10 +80,15 @@ export function presetActivityChecks(count: number, preset: ActivityPreset): boo
 }
 
 const DEFAULT_ID = "p_default";
+// "" means "no home city chosen yet" -- deliberately NOT a real city, so a
+// brand-new visitor doesn't silently look like whoever built this app.
+// Every consumer of Plan.home already treats an unrecognized string as
+// "not set" (see isKnownHome below), so this needs no other type change.
+const NO_HOME = "";
 const DEFAULT_PLAN: Plan = {
   id: DEFAULT_ID,
   name: "My semester plan",
-  home: "Prague",
+  home: NO_HOME,
   bag: "cabin",
   budget: null,
   placements: {},
@@ -202,7 +207,7 @@ export const usePlanStore = create<PlanStoreState>()(
       compareIds: [],
       userId: null,
       pendingSyncIds: [],
-      defaultHome: "Prague",
+      defaultHome: NO_HOME,
       defaultSemester: undefined,
       foodFixNoticeSeen: false,
 
@@ -312,7 +317,7 @@ export const usePlanStore = create<PlanStoreState>()(
 
       setBag: (bag) => set((state) => withActive(state, () => ({ bag }))),
       setBudget: (budget) => set((state) => withActive(state, () => ({ budget }))),
-      setHome: (home) => set((state) => withActive(state, () => ({ home: isKnownHome(home) ? home : "Prague" }))),
+      setHome: (home) => set((state) => withActive(state, () => ({ home: isKnownHome(home) ? home : NO_HOME }))),
       setUseLivePrices: (useLivePrices) => set((state) => withActive(state, () => ({ useLivePrices }))),
       setDefaultTravelers: (travelers) =>
         set((state) => withActive(state, () => ({ defaultTravelers: Math.max(1, Math.round(travelers)) }))),
@@ -430,7 +435,7 @@ export const usePlanStore = create<PlanStoreState>()(
             plans[id] = {
               id,
               name: `${pl.name || "Imported"} (imported)`,
-              home: pl.home && isKnownHome(pl.home) ? pl.home : "Prague",
+              home: pl.home && isKnownHome(pl.home) ? pl.home : NO_HOME,
               bag: pl.bag === "none" || pl.bag === "checked" ? pl.bag : "cabin",
               budget: typeof pl.budget === "number" ? pl.budget : null,
               placements: pl.placements ?? {},
@@ -526,13 +531,16 @@ export const usePlanStore = create<PlanStoreState>()(
         if (version >= 1 && state.plans) return state as unknown as PlanStoreState;
 
         // pre-Stage-6 shape: a single flat {placements, bag, budget}. Carry it
-        // forward as a real plan instead of silently dropping it.
-        let home = "Prague";
+        // forward as a real plan instead of silently dropping it. This branch
+        // only runs for truly ancient (version 0, no `plans`) localStorage --
+        // anyone already on version 1+ (everyone by now) hits the early
+        // return above untouched, so this never touches real saved plans.
+        let home = NO_HOME;
         try {
           const raw = window.localStorage.getItem("homeBase");
-          if (raw) home = JSON.parse(raw)?.state?.home || "Prague";
+          if (raw) home = JSON.parse(raw)?.state?.home || NO_HOME;
         } catch {
-          // ignore — fall back to Prague
+          // ignore — leave home unset
         }
         const id = uid();
         const now = Date.now();

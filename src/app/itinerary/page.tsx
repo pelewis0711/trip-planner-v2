@@ -219,7 +219,7 @@ export default function ItineraryPage() {
         <div className="mt-3 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-2.5 text-[12.5px] text-amber-200">
           ➕ Eurail Global Pass (Youth, 10 days/2 mo) ≈ <b>$296</b> if you&apos;re doing the rail-heavy
           trips · +12% contingency buffer ≈ <b>{money(contingency)}</b> → <b>estimated grand total ≈{" "}
-          {money(g.total + 296 + contingency)}</b>. Excludes normal {home} weekday living/housing.
+          {money(g.total + 296 + contingency)}</b>. Excludes normal {home || "home-city"} weekday living/housing.
         </div>
       </div>
 
