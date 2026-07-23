@@ -80,31 +80,31 @@ export default function SlotItinerary({
   ];
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 sm:p-5">
+    <div className="rounded-card border border-border bg-surface p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <span className="text-base font-semibold text-zinc-50">{title}</span>{" "}
-          <span className="text-xs text-zinc-500">
+          <span className="text-base font-semibold text-ink">{title}</span>{" "}
+          <span className="text-xs text-muted">
             {slot.label} · {slot.date}
             {multi ? ` · ${stops.length} places` : ""}
             {travelers > 1 ? ` · 👥 ${travelers} travelers` : ""}
           </span>
         </div>
         <span className="text-right">
-          <span className="text-lg font-extrabold text-emerald-400">
+          <span className="text-lg font-extrabold text-accent">
             {money(costs.total)}
             {costs.liveLegIndexes.size > 0 && (
-              <span className="ml-1.5 align-middle text-[10px] font-bold text-sky-400">LIVE</span>
+              <span className="ml-1.5 align-middle text-[10px] font-bold text-sky-600">LIVE</span>
             )}
           </span>
           {travelers > 1 && (
-            <span className="block text-[11px] text-zinc-500">{money(costs.total * travelers)} for {travelers}</span>
+            <span className="block text-[11px] text-muted">{money(costs.total * travelers)} for {travelers}</span>
           )}
         </span>
       </div>
 
-      <div className="mt-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-[12.5px] text-zinc-400">
-        🧭 {routeStr} <span className="text-zinc-600">— auto travel {money(costs.travel)}</span>
+      <div className="mt-2 rounded-lg border border-border bg-surface-muted px-3 py-1.5 text-[12.5px] text-muted">
+        🧭 {routeStr} <span className="text-muted">— auto travel {money(costs.travel)}</span>
       </div>
 
       {warnings.length > 0 && (
@@ -112,7 +112,7 @@ export default function SlotItinerary({
           {warnings.map((w, i) => (
             <div
               key={i}
-              className={`text-xs leading-snug ${w.lv === "red" ? "text-rose-400" : "text-amber-400"}`}
+              className={`text-xs leading-snug ${w.lv === "red" ? "text-danger" : "text-warning"}`}
             >
               {w.lv === "red" ? "⚠" : "◔"} {w.msg}
             </div>
@@ -122,25 +122,25 @@ export default function SlotItinerary({
 
       <div className="mt-3 grid grid-cols-1 gap-4 text-[12.5px] sm:grid-cols-3">
         <div>
-          <b className="mb-1 block text-[10.5px] font-semibold uppercase tracking-wide text-zinc-500">
+          <b className="mb-1 block text-[10.5px] font-semibold uppercase tracking-wide text-muted">
             ✈️ Travel legs ({money(costs.travel)})
           </b>
           {costs.legs.map((l, i) => (
             <div key={i} className="py-0.5">
-              <div className="flex justify-between text-zinc-300">
+              <div className="flex justify-between text-ink">
                 <span>
                   {l.from} → {l.to}
                 </span>
-                <span className="text-zinc-500">
+                <span className="text-muted">
                   {l.mode} · {money(l.cost)}
                 </span>
               </div>
-              {l.note && <div className="text-[10.5px] text-zinc-600">↳ {l.note}</div>}
+              {l.note && <div className="text-[10.5px] text-muted">↳ {l.note}</div>}
             </div>
           ))}
         </div>
         <div>
-          <b className="mb-1 block text-[10.5px] font-semibold uppercase tracking-wide text-zinc-500">
+          <b className="mb-1 block text-[10.5px] font-semibold uppercase tracking-wide text-muted">
             🛏️ Lodging ({money(costs.lodg)} per person{travelers > 1 ? `, ${money(costs.lodg * travelers)} for ${travelers}` : ""})
           </b>
           {stops.map((st, i) => {
@@ -148,21 +148,21 @@ export default function SlotItinerary({
             if (!t) return null;
             if (st.nights === 0)
               return (
-                <div key={i} className="flex justify-between py-0.5 text-zinc-300">
+                <div key={i} className="flex justify-between py-0.5 text-ink">
                   <span>{multi ? `${t.n}: ` : ""}day trip</span>
-                  <span className="text-zinc-500">$0</span>
+                  <span className="text-muted">$0</span>
                 </div>
               );
             const lt = lodgingTiers(t.ci, travelers)[st.l];
             const perPerson = lt[1] * st.nights;
             return (
               <div key={i} className="py-0.5">
-                <div className="flex justify-between text-zinc-300">
+                <div className="flex justify-between text-ink">
                   <span>
                     {multi ? `${t.n}: ` : ""}
                     {lt[0]} × {st.nights}n
                   </span>
-                  <span className="text-zinc-500">
+                  <span className="text-muted">
                     {money(perPerson)}
                     {travelers > 1 && ` (${money(perPerson * travelers)} for ${travelers})`}
                   </span>
@@ -176,37 +176,37 @@ export default function SlotItinerary({
                     tier={st.l === 2 ? "private" : "boutique"}
                   />
                 ) : (
-                  <span className="text-[10px] text-zinc-600">estimate only — no free live-price API for this tier</span>
+                  <span className="text-[10px] text-muted">estimate only — no free live-price API for this tier</span>
                 )}
               </div>
             );
           })}
         </div>
         <div>
-          <b className="mb-1 block text-[10.5px] font-semibold uppercase tracking-wide text-zinc-500">
+          <b className="mb-1 block text-[10.5px] font-semibold uppercase tracking-wide text-muted">
             💶 Category totals
           </b>
-          <div className="flex justify-between py-0.5 text-zinc-300">
+          <div className="flex justify-between py-0.5 text-ink">
             <span>Food</span>
-            <span className="text-zinc-500">{money(costs.food)}</span>
+            <span className="text-muted">{money(costs.food)}</span>
           </div>
-          <div className="flex justify-between py-0.5 text-zinc-300">
+          <div className="flex justify-between py-0.5 text-ink">
             <span>Activities</span>
-            <span className="text-zinc-500">{money(costs.act)}</span>
+            <span className="text-muted">{money(costs.act)}</span>
           </div>
-          <div className="mt-1 flex justify-between border-t border-zinc-800 pt-1 font-bold text-zinc-100">
+          <div className="mt-1 flex justify-between border-t border-border pt-1 font-bold text-ink">
             <span>Slot total</span>
-            <span className="text-emerald-400">
+            <span className="text-accent">
               {money(costs.total)}
               {travelers > 1 && (
-                <span className="ml-1 font-normal text-zinc-500">({money(costs.total * travelers)} for {travelers})</span>
+                <span className="ml-1 font-normal text-muted">({money(costs.total * travelers)} for {travelers})</span>
               )}
             </span>
           </div>
         </div>
       </div>
 
-      <div className="mt-3 space-y-2 border-t border-dashed border-zinc-800 pt-3">
+      <div className="mt-3 space-y-2 border-t border-dashed border-border pt-3">
         {stops.map((st, i) => {
           const t = ctx.tripOf(st.tripId);
           if (!t) return null;
@@ -219,41 +219,41 @@ export default function SlotItinerary({
           return (
             <div key={i} className="text-[12.5px]">
               <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                <div className="font-semibold text-zinc-200">
+                <div className="font-semibold text-ink">
                   {multi ? `${i + 1}. ` : ""}
-                  {t.n} <span className="font-normal text-zinc-500">· {t.c} · {st.nights === 0 ? "day trip" : `${st.nights}n`}</span>
+                  {t.n} <span className="font-normal text-muted">· {t.c} · {st.nights === 0 ? "day trip" : `${st.nights}n`}</span>
                 </div>
                 <div className="text-[11px]">
-                  <span className="text-zinc-500">${Math.round(range.floor)}–${Math.round(range.ceiling)} </span>
-                  <span className="font-semibold text-emerald-400">· Current ${Math.round(current)}</span>
+                  <span className="text-muted">{money(range.floor)}–{money(range.ceiling)} </span>
+                  <span className="font-semibold text-accent">· Current {money(current)}</span>
                 </div>
               </div>
               <div className="mt-1 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
-                  <b className="text-[10.5px] font-semibold uppercase tracking-wide text-zinc-500">
+                  <b className="text-[10.5px] font-semibold uppercase tracking-wide text-muted">
                     🎟️ Activities
                   </b>
                   {checkedActs.length ? (
                     checkedActs.map(([name, price]) => (
-                      <div key={name} className="flex justify-between text-zinc-400">
+                      <div key={name} className="flex justify-between text-muted">
                         <span>{name}</span>
                         <span>{price ? money(price) : "free"}</span>
                       </div>
                     ))
                   ) : (
-                    <div className="text-zinc-600">none selected</div>
+                    <div className="text-muted">none selected</div>
                   )}
                 </div>
                 <div>
-                  <b className="text-[10.5px] font-semibold uppercase tracking-wide text-zinc-500">
+                  <b className="text-[10.5px] font-semibold uppercase tracking-wide text-muted">
                     🍽️ Food
                   </b>
-                  <div className="flex justify-between text-zinc-400">
+                  <div className="flex justify-between text-muted">
                     <span>{ft[0]} × {dys}d</span>
                     <span>{money(ft[1] * dys)}</span>
                   </div>
                   {checkedSig.length > 0 && (
-                    <div className="mt-1.5 text-zinc-600">
+                    <div className="mt-1.5 text-muted">
                       <span className="text-[10px] font-semibold uppercase tracking-wide">Bucket list (free)</span>
                       {checkedSig.map(([name, price]) => (
                         <div key={name} className="flex justify-between">
@@ -270,13 +270,13 @@ export default function SlotItinerary({
         })}
       </div>
 
-      <div className="mt-3 rounded-xl border border-dashed border-zinc-800 p-3">
-        <b className="text-xs text-zinc-300">💳 Booked actuals</b>{" "}
-        <span className="text-[11px] text-zinc-500">— type the real price once you book; blank = still an estimate</span>
+      <div className="mt-3 rounded-xl border border-dashed border-border p-3">
+        <b className="text-xs text-ink">💳 Booked actuals</b>{" "}
+        <span className="text-[11px] text-muted">— type the real price once you book; blank = still an estimate</span>
         <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
           {ACTUAL_FIELDS.map(([key, label, est]) => (
-            <label key={key} className="flex items-center gap-1.5 text-zinc-400">
-              {label} <span className="text-[10.5px] text-zinc-600">est {money(est)}</span>
+            <label key={key} className="flex items-center gap-1.5 text-muted">
+              {label} <span className="text-[10.5px] text-muted">est {money(est)}</span>
               <input
                 type="number"
                 min={0}
@@ -285,12 +285,12 @@ export default function SlotItinerary({
                   setActual(slot.id, key, e.target.value === "" ? null : Math.max(0, +e.target.value || 0))
                 }
                 placeholder="$"
-                className="w-[70px] rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-zinc-100"
+                className="w-[70px] rounded-md border border-border bg-surface-muted px-2 py-1 text-ink"
               />
             </label>
           ))}
           {booked && (
-            <span className={`font-bold ${blend - costs.total > 0 ? "text-rose-400" : "text-emerald-400"}`}>
+            <span className={`font-bold ${blend - costs.total > 0 ? "text-danger" : "text-success"}`}>
               {blend - costs.total >= 0 ? "+" : ""}
               {money(blend - costs.total)} vs estimate
             </span>
@@ -298,9 +298,9 @@ export default function SlotItinerary({
         </div>
       </div>
 
-      <div className="mt-3 border-t border-zinc-800 pt-3">
-        <div className="text-sm font-semibold text-zinc-100">📅 Book this trip</div>
-        <div className="mt-1.5 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-[12px] text-emerald-200">
+      <div className="mt-3 border-t border-border pt-3">
+        <div className="font-heading text-sm font-semibold text-ink">📅 Book this trip</div>
+        <div className="mt-1.5 rounded-lg border border-primary/30 bg-primary-soft px-3 py-2 text-[12px] text-ink">
           {timingTip(slot)}
         </div>
         <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -316,16 +316,16 @@ export default function SlotItinerary({
                 </div>
               ))}
               <div className="mt-1 flex flex-wrap gap-1.5 text-[10.5px]">
-                <a href={STATIC_LINKS.skyscanner} target="_blank" rel="noopener" className="text-blue-400">
+                <a href={STATIC_LINKS.skyscanner} target="_blank" rel="noopener" className="text-primary">
                   Skyscanner
                 </a>
-                <a href={STATIC_LINKS.kiwi} target="_blank" rel="noopener" className="text-blue-400">
+                <a href={STATIC_LINKS.kiwi} target="_blank" rel="noopener" className="text-primary">
                   Kiwi
                 </a>
-                <a href={STATIC_LINKS.ryanair} target="_blank" rel="noopener" className="text-blue-400">
+                <a href={STATIC_LINKS.ryanair} target="_blank" rel="noopener" className="text-primary">
                   Ryanair
                 </a>
-                <a href={STATIC_LINKS.wizzair} target="_blank" rel="noopener" className="text-blue-400">
+                <a href={STATIC_LINKS.wizzair} target="_blank" rel="noopener" className="text-primary">
                   Wizz Air
                 </a>
               </div>
@@ -334,18 +334,18 @@ export default function SlotItinerary({
           {railLegs.length > 0 && (
             <BookCol title="🚆 Trains & buses">
               {railLegs.map((l, i) => (
-                <div key={i} className="text-[11.5px] text-zinc-400">
-                  {l.from} → {l.to} <span className="text-zinc-600">{l.km ? `~${l.km} km` : ""}</span>
+                <div key={i} className="text-[11.5px] text-muted">
+                  {l.from} → {l.to} <span className="text-muted">{l.km ? `~${l.km} km` : ""}</span>
                 </div>
               ))}
               <div className="mt-1 flex flex-wrap gap-1.5 text-[10.5px]">
-                <a href={STATIC_LINKS.omio} target="_blank" rel="noopener" className="text-blue-400">
+                <a href={STATIC_LINKS.omio} target="_blank" rel="noopener" className="text-primary">
                   Omio
                 </a>
-                <a href={STATIC_LINKS.trainline} target="_blank" rel="noopener" className="text-blue-400">
+                <a href={STATIC_LINKS.trainline} target="_blank" rel="noopener" className="text-primary">
                   Trainline
                 </a>
-                <a href={STATIC_LINKS.flixbus} target="_blank" rel="noopener" className="text-blue-400">
+                <a href={STATIC_LINKS.flixbus} target="_blank" rel="noopener" className="text-primary">
                   FlixBus
                 </a>
               </div>
@@ -359,17 +359,17 @@ export default function SlotItinerary({
                 const co = iso(d.out);
                 return (
                   <div key={i} className="mb-1.5">
-                    <div className="text-[11px] font-semibold text-zinc-300">
-                      {t.n} <span className="font-normal text-zinc-600">{nice(d.in)} → {nice(d.out)}</span>
+                    <div className="text-[11px] font-semibold text-ink">
+                      {t.n} <span className="font-normal text-muted">{nice(d.in)} → {nice(d.out)}</span>
                     </div>
                     <div className="flex flex-wrap gap-1.5 text-[10.5px]">
-                      <a href={hostelworldUrl(t.n, ci, co, travelers)} target="_blank" rel="noopener" className="text-blue-400">
+                      <a href={hostelworldUrl(t.n, ci, co, travelers)} target="_blank" rel="noopener" className="text-primary">
                         Hostelworld
                       </a>
-                      <a href={bookingComUrl(t.n, ci, co, travelers)} target="_blank" rel="noopener" className="text-blue-400">
+                      <a href={bookingComUrl(t.n, ci, co, travelers)} target="_blank" rel="noopener" className="text-primary">
                         Booking
                       </a>
-                      <a href={airbnbUrl(t.n, ci, co, travelers)} target="_blank" rel="noopener" className="text-blue-400">
+                      <a href={airbnbUrl(t.n, ci, co, travelers)} target="_blank" rel="noopener" className="text-primary">
                         Airbnb
                       </a>
                     </div>
@@ -384,15 +384,15 @@ export default function SlotItinerary({
               if (!t) return null;
               return (
                 <div key={i} className="mb-1">
-                  <div className="text-[11px] font-semibold text-zinc-300">{t.n}</div>
+                  <div className="text-[11px] font-semibold text-ink">{t.n}</div>
                   <div className="flex flex-wrap gap-1.5 text-[10.5px]">
-                    <a href={getYourGuideUrl(t.n)} target="_blank" rel="noopener" className="text-blue-400">
+                    <a href={getYourGuideUrl(t.n)} target="_blank" rel="noopener" className="text-primary">
                       GetYourGuide
                     </a>
-                    <a href={viatorUrl(t.n)} target="_blank" rel="noopener" className="text-blue-400">
+                    <a href={viatorUrl(t.n)} target="_blank" rel="noopener" className="text-primary">
                       Viator
                     </a>
-                    <a href={tiqetsUrl(t.n)} target="_blank" rel="noopener" className="text-blue-400">
+                    <a href={tiqetsUrl(t.n)} target="_blank" rel="noopener" className="text-primary">
                       Tiqets
                     </a>
                   </div>
@@ -403,7 +403,7 @@ export default function SlotItinerary({
         </div>
         {stops.some((st) => stopHasSigFood(ctx, st)) && (
           <div className="mt-2">
-            <b className="text-[10.5px] font-semibold uppercase tracking-wide text-zinc-500">
+            <b className="text-[10.5px] font-semibold uppercase tracking-wide text-muted">
               🍜 Find your bucket-list dishes
             </b>
             <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
@@ -418,7 +418,7 @@ export default function SlotItinerary({
                       href={mapsBestDishUrl(name, t.n)}
                       target="_blank"
                       rel="noopener"
-                      className="text-blue-400"
+                      className="text-primary"
                     >
                       {name} in {t.n}
                     </a>
@@ -439,8 +439,8 @@ function stopHasSigFood(ctx: PlannerCtx, st: Placement["stops"][number]) {
 
 function BookCol({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-3">
-      <b className="mb-1.5 block text-xs text-zinc-200">{title}</b>
+    <div className="rounded-lg border border-border bg-surface-muted p-3">
+      <b className="mb-1.5 block text-xs text-ink">{title}</b>
       {children}
     </div>
   );
@@ -448,9 +448,9 @@ function BookCol({ title, children }: { title: string; children: React.ReactNode
 
 function BookLink({ label, href }: { label: string; href: string }) {
   return (
-    <div className="text-[11.5px] text-zinc-400">
+    <div className="text-[11.5px] text-muted">
       {label}:{" "}
-      <a href={href} target="_blank" rel="noopener" className="font-medium text-blue-400">
+      <a href={href} target="_blank" rel="noopener" className="font-medium text-primary">
         Google Flights ↗
       </a>
     </div>

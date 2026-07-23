@@ -28,7 +28,7 @@ export default function SummaryBar({
   if (total <= 0) return null;
 
   return (
-    <div className="mt-4 flex h-7 overflow-hidden rounded-lg bg-zinc-900">
+    <div className="mt-4 flex h-7 overflow-hidden rounded-lg bg-surface-muted">
       {SEGMENTS.map((s) => {
         const v = values[s.key];
         if (v <= 0) return null;
@@ -37,7 +37,7 @@ export default function SummaryBar({
           <div
             key={s.key}
             style={{ width: `${pct.toFixed(2)}%`, backgroundColor: s.color }}
-            className="flex items-center justify-center overflow-hidden text-[11px] font-bold whitespace-nowrap text-zinc-950"
+            className="flex items-center justify-center overflow-hidden text-[11px] font-bold whitespace-nowrap text-ink"
             title={`${s.label}: ${formatMoney(v, currency)}`}
           >
             {pct > 7 ? s.label : ""}

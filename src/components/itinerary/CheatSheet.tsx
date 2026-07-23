@@ -24,17 +24,17 @@ function cards(studyingInEurope: boolean) {
 export default function CheatSheet({ studyingInEurope = true }: { studyingInEurope?: boolean }) {
   const CARDS = cards(studyingInEurope);
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5">
-      <h3 className="text-base font-semibold text-zinc-100">🗓️ When to book — cheat sheet</h3>
-      <p className="mt-1 text-xs text-zinc-500">
+    <div className="rounded-card border border-border bg-surface p-5">
+      <h3 className="font-heading text-base font-semibold text-ink">🗓️ When to book — cheat sheet</h3>
+      <p className="mt-1 text-xs text-muted">
         Rules of thumb for student travel. Every trip below also has its own booking links and a
         tailored timing tip.
       </p>
       <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {CARDS.map((c) => (
-          <div key={c.title} className="rounded-xl border border-zinc-800 bg-zinc-950 p-3.5">
-            <b className="block text-sm text-zinc-100">{c.title}</b>
-            <p className="mt-1.5 text-[11.5px] leading-relaxed text-zinc-500">{c.body}</p>
+          <div key={c.title} className="rounded-xl border border-border bg-surface-muted p-3.5">
+            <b className="block text-sm text-ink">{c.title}</b>
+            <p className="mt-1.5 text-[11.5px] leading-relaxed text-muted">{c.body}</p>
           </div>
         ))}
       </div>
