@@ -19,12 +19,20 @@ export interface HostCity {
   lon: number;
 }
 
+export type Currency = "USD" | "EUR" | "GBP";
+
 export interface OnboardingResult {
   host: HostCity;
   hostUniversity: string;
   homeUniversity: string;
   term: Term;
   semester: SemesterConfig;
+  // Phase 9: stored but not yet wired to any behavior -- no currency
+  // conversion happens anywhere yet (every price in the app is still
+  // computed in USD), and nothing changes based on studyingInEurope. Both
+  // are here so the data flows end-to-end; real behavior is a later step.
+  studyingInEurope: boolean;
+  currency: Currency;
 }
 
 export interface OnboardingValues {
@@ -33,6 +41,8 @@ export interface OnboardingValues {
   homeUniversity: string;
   term: Term;
   semester: SemesterConfig;
+  studyingInEurope: boolean;
+  currency: Currency;
 }
 
 export const AAU_PRAGUE_DEFAULTS: OnboardingValues = {
@@ -45,6 +55,8 @@ export const AAU_PRAGUE_DEFAULTS: OnboardingValues = {
     { id: "brk", label: "SPRING BREAK", start: "2027-03-26", end: "2027-04-04", kind: "break" },
     { id: "post", label: "POST-FINALS", start: "2027-05-15", end: "2027-05-24", kind: "post" },
   ] },
+  studyingInEurope: true,
+  currency: "USD",
 };
 
 const OTHER_CITY = "__other__";
@@ -77,6 +89,8 @@ export default function OnboardingFlow({
 
   const [semester, setSemester] = useState<SemesterConfig>(initial.semester);
   const [datesTouched, setDatesTouched] = useState(false);
+  const [studyingInEurope, setStudyingInEurope] = useState(initial.studyingInEurope);
+  const [currency, setCurrency] = useState<Currency>(initial.currency);
 
   const uniNames = useMemo(() => universityNames(), []);
 
@@ -128,6 +142,8 @@ export default function OnboardingFlow({
       homeUniversity: homeUniversity.trim(),
       term,
       semester,
+      studyingInEurope,
+      currency,
     });
   }
 
@@ -274,6 +290,34 @@ export default function OnboardingFlow({
               setSemester(next);
             }}
           />
+
+          <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-zinc-800 pt-4">
+            <label className="flex items-center gap-2 text-xs text-zinc-300">
+              <input
+                type="checkbox"
+                checked={studyingInEurope}
+                onChange={(e) => setStudyingInEurope(e.target.checked)}
+                className="accent-emerald-500"
+              />
+              Studying in Europe
+            </label>
+            <label className="flex items-center gap-2 text-xs text-zinc-300">
+              Currency
+              <select
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value as Currency)}
+                className="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-zinc-100"
+              >
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="GBP">GBP (£)</option>
+              </select>
+            </label>
+          </div>
+          <p className="text-[11px] text-zinc-600">
+            Just saved for now — doesn&apos;t change any prices yet (everything in the app is still
+            shown in USD).
+          </p>
         </section>
       )}
     </>

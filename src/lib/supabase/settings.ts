@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { SemesterConfig } from "@/lib/calc/semester";
-import type { OnboardingResult, OnboardingValues } from "@/components/onboarding/OnboardingFlow";
+import type { Currency, OnboardingResult, OnboardingValues } from "@/components/onboarding/OnboardingFlow";
 
 export interface UserSettingsRow {
   id: string;
@@ -12,6 +12,8 @@ export interface UserSettingsRow {
   home_university: string | null;
   term: "fall" | "spring" | "winter";
   default_semester: SemesterConfig;
+  studying_in_europe: boolean;
+  currency: Currency;
   onboarded_at: string | null;
   updated_at: string;
 }
@@ -23,6 +25,8 @@ export function rowToOnboardingValues(row: UserSettingsRow): OnboardingValues {
     homeUniversity: row.home_university ?? "",
     term: row.term,
     semester: row.default_semester,
+    studyingInEurope: row.studying_in_europe,
+    currency: row.currency,
   };
 }
 
@@ -58,6 +62,8 @@ export async function saveUserSettings(
     home_university: result.homeUniversity || null,
     term: result.term,
     default_semester: result.semester,
+    studying_in_europe: result.studyingInEurope,
+    currency: result.currency,
     onboarded_at: alreadyOnboarded ? undefined : new Date().toISOString(),
     updated_at: new Date().toISOString(),
   });
