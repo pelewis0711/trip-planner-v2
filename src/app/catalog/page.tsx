@@ -78,16 +78,16 @@ export default function CatalogPage() {
   if (isUnconfigured) {
     return (
       <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
-        <div className="rounded-2xl border border-dashed border-zinc-800 p-14 text-center">
-          <h2 className="text-xl font-semibold text-zinc-50">Let&apos;s set up your trip first</h2>
-          <p className="mt-2 text-sm text-zinc-500">
+        <div className="rounded-card border-2 border-dashed border-border p-14 text-center">
+          <h2 className="font-heading text-xl font-semibold text-ink">Let&apos;s set up your trip first</h2>
+          <p className="mt-2 text-sm text-muted">
             Pick your host city so trip distances and prices are calculated from your own program,
             not someone else&apos;s.
           </p>
           <button
             type="button"
             onClick={() => setWizardOpen(true)}
-            className="mt-5 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-bold text-zinc-950"
+            className="mt-5 rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-hover"
           >
             Set up now
           </button>
@@ -99,14 +99,14 @@ export default function CatalogPage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5">
-        <h2 className="text-xl font-semibold text-zinc-50">
-          Trip Catalog <span className="text-sm font-normal text-zinc-500">— {visible.length} of {allTrips.length} options</span>
+      <div className="rounded-card border border-border bg-surface p-5">
+        <h2 className="font-heading text-xl font-semibold text-ink">
+          Trip Catalog <span className="font-sans text-sm font-normal text-muted">— {visible.length} of {allTrips.length} options</span>
         </h2>
-        <p className="mt-1 text-sm text-zinc-400">
+        <p className="mt-1 text-sm text-muted">
           Prices are per person, round-trip from {home || "your home city (not set yet)"}, mid-range
           estimates. Head to{" "}
-          <b className="text-zinc-200">My Calendar</b> to drop a trip onto a slot.
+          <b className="text-ink">My Calendar</b> to drop a trip onto a slot.
         </p>
       </div>
 
@@ -116,12 +116,12 @@ export default function CatalogPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="🔎 Search city, country, or region…"
-          className="w-full min-w-[220px] flex-1 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 sm:w-auto"
+          className="w-full min-w-[220px] flex-1 rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-muted sm:w-auto"
         />
         <button
           type="button"
           onClick={() => setShowFilters((s) => !s)}
-          className="rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:border-emerald-500/50"
+          className="rounded-full border border-border bg-surface px-3.5 py-2 text-xs font-semibold text-muted hover:border-primary/50 hover:text-primary"
         >
           ⚙ Filters {activeCount ? `(${activeCount})` : ""} {showFilters ? "▲" : "▼"}
         </button>
@@ -129,7 +129,7 @@ export default function CatalogPage() {
           <button
             type="button"
             onClick={clearAll}
-            className="rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-zinc-400 hover:border-emerald-500/50 hover:text-zinc-100"
+            className="rounded-full border border-border bg-surface px-3.5 py-2 text-xs font-semibold text-muted hover:border-primary/50 hover:text-primary"
           >
             Clear all
           </button>
@@ -137,7 +137,7 @@ export default function CatalogPage() {
         <button
           type="button"
           onClick={() => setShowDiscover((s) => !s)}
-          className="ml-auto rounded-full border border-emerald-500/50 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/20"
+          className="ml-auto rounded-full border border-accent/40 bg-accent-soft px-3.5 py-2 text-xs font-semibold text-accent-hover hover:bg-accent/20"
         >
           ✨ Discover more trips {showDiscover ? "▲" : "▼"}
         </button>
@@ -156,7 +156,7 @@ export default function CatalogPage() {
       )}
 
       {visible.length === 0 ? (
-        <div className="mt-8 rounded-xl border border-dashed border-zinc-800 p-10 text-center text-zinc-500">
+        <div className="mt-8 rounded-card border-2 border-dashed border-border p-10 text-center text-muted">
           No trips match those filters. Try clearing a few.
         </div>
       ) : (
