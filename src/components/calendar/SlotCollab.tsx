@@ -96,8 +96,8 @@ export default function SlotCollab({
   };
 
   return (
-    <div className="mt-3 rounded-xl border border-zinc-800 bg-zinc-900/60 p-3.5">
-      <h5 className="mb-2 text-[10.5px] font-semibold tracking-wide text-zinc-500 uppercase">
+    <div className="mt-3 rounded-xl border border-border bg-surface-muted p-3.5">
+      <h5 className="mb-2 text-[10.5px] font-semibold tracking-wide text-muted uppercase">
         👥 Votes &amp; comments
       </h5>
 
@@ -111,10 +111,10 @@ export default function SlotCollab({
               type="button"
               onClick={() => handleVote(e)}
               className={`rounded-full border px-2.5 py-1 text-sm transition-colors ${
-                mine ? "border-emerald-500 bg-emerald-500/10" : "border-zinc-800 bg-zinc-950 hover:border-zinc-600"
+                mine ? "border-primary bg-primary-soft" : "border-border bg-surface hover:border-primary/40"
               }`}
             >
-              {e} {n > 0 && <span className="text-[11px] text-zinc-400">{n}</span>}
+              {e} {n > 0 && <span className="text-[11px] text-muted">{n}</span>}
             </button>
           );
         })}
@@ -124,15 +124,15 @@ export default function SlotCollab({
         {comments.map((c) => (
           <div key={c.id} className="flex items-start justify-between gap-2 text-[12px]">
             <div>
-              <span className="font-semibold text-zinc-300">{emails.get(c.user_id) ?? "someone"}</span>{" "}
-              <span className="text-zinc-600">{timeAgo(c.created_at)}</span>
-              <div className="text-zinc-200">{c.body}</div>
+              <span className="font-semibold text-ink">{emails.get(c.user_id) ?? "someone"}</span>{" "}
+              <span className="text-muted">{timeAgo(c.created_at)}</span>
+              <div className="text-ink">{c.body}</div>
             </div>
             {c.user_id === userId && (
               <button
                 type="button"
                 onClick={() => handleDelete(c.id)}
-                className="shrink-0 text-zinc-600 hover:text-rose-400"
+                className="shrink-0 text-muted hover:text-danger"
                 aria-label="Delete comment"
               >
                 ✕
@@ -149,13 +149,13 @@ export default function SlotCollab({
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handlePost()}
           placeholder="Add a comment…"
-          className="min-w-0 flex-1 rounded-md border border-zinc-800 bg-zinc-950 px-2.5 py-1.5 text-[12px] text-zinc-100 placeholder:text-zinc-600"
+          className="min-w-0 flex-1 rounded-md border border-border bg-surface px-2.5 py-1.5 text-[12px] text-ink placeholder:text-muted"
         />
         <button
           type="button"
           onClick={handlePost}
           disabled={posting || !draft.trim()}
-          className="shrink-0 rounded-md border border-zinc-700 px-2.5 py-1.5 text-[12px] font-semibold text-zinc-300 hover:border-emerald-500/50 disabled:opacity-50"
+          className="shrink-0 rounded-md border border-border px-2.5 py-1.5 text-[12px] font-semibold text-ink hover:border-primary/50 disabled:opacity-50"
         >
           Post
         </button>

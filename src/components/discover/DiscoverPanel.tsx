@@ -110,17 +110,17 @@ export default function DiscoverPanel({
   };
 
   return (
-    <div className="rounded-2xl border border-emerald-500/30 bg-zinc-900/60 p-4">
+    <div className="rounded-card border border-primary/30 bg-primary-soft p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-sm font-semibold text-zinc-100">✨ Discover more trips</h3>
-          <p className="mt-1 text-xs text-zinc-500">
+          <h3 className="font-heading text-sm font-semibold text-ink">✨ Discover more trips</h3>
+          <p className="mt-1 text-xs text-muted">
             Uses your active filters, open slots, remaining budget, and Schengen days to propose real
             places not already in the catalog. Costs a few cents per run — you approve each one before
             it&apos;s added to your own catalog.
           </p>
         </div>
-        <button type="button" onClick={onClose} className="shrink-0 text-zinc-500 hover:text-zinc-300">
+        <button type="button" onClick={onClose} className="shrink-0 text-muted hover:text-ink">
           ✕
         </button>
       </div>
@@ -129,15 +129,15 @@ export default function DiscoverPanel({
         type="button"
         onClick={runDiscovery}
         disabled={loading}
-        className="mt-3 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-bold text-zinc-950 disabled:opacity-50"
+        className="mt-3 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary-hover disabled:opacity-50"
       >
         {loading ? "Thinking… (can take 15–30s)" : "Find new trips"}
       </button>
 
-      {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
+      {error && <p className="mt-3 text-sm text-danger">{error}</p>}
 
       {usage && (
-        <p className="mt-3 text-[11px] text-zinc-500">
+        <p className="mt-3 text-[11px] text-muted">
           This run: {usage.inputTokens.toLocaleString()} in / {usage.outputTokens.toLocaleString()} out
           tokens · ≈${usage.costUsd < 0.01 ? "<0.01" : usage.costUsd.toFixed(2)}
           {rejected.length > 0 && ` · ${rejected.length} suggestion${rejected.length > 1 ? "s" : ""} rejected (malformed or duplicate)`}

@@ -65,14 +65,14 @@ function LoginForm() {
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-12 sm:px-6">
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-8">
-        <h1 className="text-xl font-semibold text-zinc-50">Sign in</h1>
-        <p className="mt-1 text-sm text-zinc-500">
+      <div className="rounded-card border border-border bg-surface p-8">
+        <h1 className="font-heading text-xl font-semibold text-ink">Sign in</h1>
+        <p className="mt-1 text-sm text-muted">
           Keep your plans synced across devices.
         </p>
 
         {sent ? (
-          <div className="mt-6 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
+          <div className="mt-6 rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-sm text-success">
             Check <span className="font-semibold">{email}</span> for a sign-in link.
           </div>
         ) : (
@@ -81,7 +81,7 @@ function LoginForm() {
               type="button"
               onClick={handleGoogle}
               disabled={loading !== null}
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-700 bg-zinc-950 px-4 py-2.5 text-sm font-medium text-zinc-100 transition-colors hover:border-zinc-500 disabled:opacity-50"
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:border-primary/50 disabled:opacity-50"
             >
               <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden>
                 <path
@@ -104,10 +104,10 @@ function LoginForm() {
               Continue with Google
             </button>
 
-            <div className="my-5 flex items-center gap-3 text-xs text-zinc-600">
-              <div className="h-px flex-1 bg-zinc-800" />
+            <div className="my-5 flex items-center gap-3 text-xs text-muted">
+              <div className="h-px flex-1 bg-border" />
               or
-              <div className="h-px flex-1 bg-zinc-800" />
+              <div className="h-px flex-1 bg-border" />
             </div>
 
             <form onSubmit={handleMagicLink} className="space-y-3">
@@ -117,12 +117,12 @@ function LoginForm() {
                 placeholder="you@school.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3.5 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-emerald-500 focus:outline-none"
+                className="w-full rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-muted focus:border-primary focus:outline-none"
               />
               <button
                 type="submit"
                 disabled={loading !== null}
-                className="w-full rounded-lg bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-zinc-950 transition-colors hover:bg-emerald-400 disabled:opacity-50"
+                className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
               >
                 {loading === "email" ? "Sending…" : "Send me a sign-in link"}
               </button>
@@ -130,9 +130,9 @@ function LoginForm() {
           </>
         )}
 
-        {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
+        {error && <p className="mt-4 text-sm text-danger">{error}</p>}
 
-        <p className="mt-6 text-xs text-zinc-600">
+        <p className="mt-6 text-xs text-muted">
           No password needed — we&apos;ll email you a link. Your plans on this
           device carry over automatically once you&apos;re signed in.
         </p>

@@ -6,6 +6,7 @@ import { TRIPS } from "@/data/trips";
 import { describeTerm } from "@/lib/calc/semester";
 import { resolveHome } from "@/lib/resolveHome";
 import { haversine } from "@/lib/calc/routing";
+import ImagePlaceholder from "@/components/ImagePlaceholder";
 
 const REGIONS = new Set(TRIPS.map((t) => t.reg)).size;
 const COUNTRIES = new Set(TRIPS.map((t) => t.c)).size;
@@ -53,70 +54,74 @@ export default function OverviewPage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
-      <div className="rounded-2xl border border-zinc-800 bg-gradient-to-br from-zinc-900 to-zinc-900/60 p-6 sm:p-8">
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
-          {home ? `Plan your semester of travel from ${home} ✈️` : "Plan your semester of travel ✈️"}
-        </h1>
-        <p className="mt-3 max-w-2xl text-zinc-400">
-          {!home ? (
-            <>
-              <b className="text-zinc-200">Pick your home city</b> up in the header to get flight/train
-              prices routed from where you actually are. Until then, prices below are just illustrative.
-            </>
-          ) : (
-            <>
-              You&apos;re based in <b className="text-zinc-200">{home}</b>
-              {term ? (
-                <>
-                  {" "}
-                  for <b className="text-zinc-200">{term.season} {term.year}</b>
-                </>
-              ) : null}
-              . That leaves{" "}
-              <b className="text-zinc-200">
-                {weekendCount} free weekend{weekendCount === 1 ? "" : "s"}
-              </b>
-              {otherSlots.length > 0 && (
-                <>
-                  , plus {otherSlots.map((s) => s.label).join(", ")}
-                </>
-              )}{" "}
-              to travel. Every trip below reprices with flights/trains routed from {home}.
-            </>
-          )}{" "}
-          Browse <b className="text-zinc-200">{TRIPS.length} trip options</b>, then fine-tune every
-          activity, meal, flight and bed.
-        </p>
+      <div className="grid grid-cols-1 gap-6 rounded-card border border-border bg-surface p-6 sm:p-8 lg:grid-cols-[1fr_280px] lg:items-center">
+        <div>
+          <h1 className="font-heading text-2xl font-bold tracking-tight text-ink sm:text-3xl">
+            {home ? `Plan your semester of travel from ${home} ✈️` : "Plan your semester of travel ✈️"}
+          </h1>
+          <p className="mt-3 max-w-2xl text-muted">
+            {!home ? (
+              <>
+                <b className="text-ink">Pick your home city</b> up in the header to get flight/train
+                prices routed from where you actually are. Until then, prices below are just illustrative.
+              </>
+            ) : (
+              <>
+                You&apos;re based in <b className="text-ink">{home}</b>
+                {term ? (
+                  <>
+                    {" "}
+                    for <b className="text-ink">{term.season} {term.year}</b>
+                  </>
+                ) : null}
+                . That leaves{" "}
+                <b className="text-ink">
+                  {weekendCount} free weekend{weekendCount === 1 ? "" : "s"}
+                </b>
+                {otherSlots.length > 0 && (
+                  <>
+                    , plus {otherSlots.map((s) => s.label).join(", ")}
+                  </>
+                )}{" "}
+                to travel. Every trip below reprices with flights/trains routed from {home}.
+              </>
+            )}{" "}
+            Browse <b className="text-ink">{TRIPS.length} trip options</b>, then fine-tune every
+            activity, meal, flight and bed.
+          </p>
 
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            [TRIPS.length, "trip options"],
-            [REGIONS, "regions"],
-            [COUNTRIES, "countries"],
-            [slots.length, "open travel slots"],
-          ].map(([n, label]) => (
-            <div key={label as string} className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
-              <b className="block text-2xl font-bold text-emerald-400">{n}</b>
-              <span className="text-xs text-zinc-500">{label}</span>
-            </div>
-          ))}
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {[
+              [TRIPS.length, "trip options"],
+              [REGIONS, "regions"],
+              [COUNTRIES, "countries"],
+              [slots.length, "open travel slots"],
+            ].map(([n, label]) => (
+              <div key={label as string} className="rounded-xl border border-border bg-surface-muted p-4">
+                <b className="block text-2xl font-bold text-accent">{n}</b>
+                <span className="text-xs text-muted">{label}</span>
+              </div>
+            ))}
+          </div>
         </div>
+
+        <ImagePlaceholder ratio="aspect-[4/3]" className="hidden lg:flex" />
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-5">
-          <h4 className="text-sm font-semibold text-zinc-100">🗓️ Recommended by time of year</h4>
-          <ul className="mt-3 space-y-2.5 text-sm text-zinc-400">
+        <div className="rounded-card border border-border bg-surface p-5">
+          <h4 className="font-heading text-sm font-semibold text-ink">🗓️ Recommended by time of year</h4>
+          <ul className="mt-3 space-y-2.5 text-sm text-muted">
             {SEASON_TIPS.map(([lead, rest]) => (
               <li key={lead}>
-                <b className="text-zinc-200">{lead}</b> {rest}
+                <b className="text-ink">{lead}</b> {rest}
               </li>
             ))}
             {otherSlots
               .filter((s) => s.kind === "break" || s.kind === "special")
               .map((s) => (
                 <li key={s.id}>
-                  <b className="text-zinc-200">
+                  <b className="text-ink">
                     Your {s.label} ({s.date}):
                   </b>{" "}
                   go far &amp; multi-city if it&apos;s long enough — a rail pass often pays off on a
@@ -126,59 +131,59 @@ export default function OverviewPage() {
           </ul>
         </div>
 
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-5">
-          <h4 className="text-sm font-semibold text-zinc-100">
+        <div className="rounded-card border border-border bg-surface p-5">
+          <h4 className="font-heading text-sm font-semibold text-ink">
             📍 {home ? `Near ${home}` : "Near your home city"}
           </h4>
           {nearHome.length ? (
-            <ul className="mt-3 space-y-2.5 text-sm text-zinc-400">
+            <ul className="mt-3 space-y-2.5 text-sm text-muted">
               {nearHome.map(({ t, km }) => (
                 <li key={t.id}>
-                  <b className="text-zinc-200">{t.n}, {t.c}</b> — ~{Math.round(km)}km, good for a quick
+                  <b className="text-ink">{t.n}, {t.c}</b> — ~{Math.round(km)}km, good for a quick
                   weekend or day trip.
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-3 text-sm text-zinc-500">
+            <p className="mt-3 text-sm text-muted">
               Pick your home city to see the closest catalog trips — usually the cheapest, fastest ones
               to reach.
             </p>
           )}
         </div>
 
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-5">
-          <h4 className="text-sm font-semibold text-zinc-100">💰 Recommended for affordability</h4>
-          <ul className="mt-3 space-y-2.5 text-sm text-zinc-400">
+        <div className="rounded-card border border-border bg-surface p-5">
+          <h4 className="font-heading text-sm font-semibold text-ink">💰 Recommended for affordability</h4>
+          <ul className="mt-3 space-y-2.5 text-sm text-muted">
             {AFFORDABILITY_TIPS.map(([lead, rest]) => (
               <li key={lead}>
-                <b className="text-zinc-200">{lead}</b> {rest}
+                <b className="text-ink">{lead}</b> {rest}
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-5">
-          <h4 className="text-sm font-semibold text-zinc-100">⏱️ Recommended trip length</h4>
-          <ul className="mt-3 space-y-2.5 text-sm text-zinc-400">
+        <div className="rounded-card border border-border bg-surface p-5">
+          <h4 className="font-heading text-sm font-semibold text-ink">⏱️ Recommended trip length</h4>
+          <ul className="mt-3 space-y-2.5 text-sm text-muted">
             {LENGTH_TIPS.map(([lead, rest]) => (
               <li key={lead}>
-                <b className="text-zinc-200">{lead}</b> {rest}
+                <b className="text-ink">{lead}</b> {rest}
               </li>
             ))}
           </ul>
         </div>
       </div>
 
-      <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/60 p-5">
-        <h3 className="text-sm font-semibold text-zinc-100">How to use this planner</h3>
-        <p className="mt-2 text-sm text-zinc-400">
-          <b className="text-zinc-200">1.</b> Open <b className="text-zinc-200">Trip Catalog</b>{" "}
-          and browse or filter trips. &nbsp; <b className="text-zinc-200">2.</b> Drop them onto{" "}
-          <b className="text-zinc-200">My Calendar</b>{" "}
+      <div className="mt-4 rounded-card border border-border bg-surface p-5">
+        <h3 className="font-heading text-sm font-semibold text-ink">How to use this planner</h3>
+        <p className="mt-2 text-sm text-muted">
+          <b className="text-ink">1.</b> Open <b className="text-ink">Trip Catalog</b>{" "}
+          and browse or filter trips. &nbsp; <b className="text-ink">2.</b> Drop them onto{" "}
+          <b className="text-ink">My Calendar</b>{" "}
           and pick your flight vs. train, hostel vs. Airbnb, and which activities you want. &nbsp;{" "}
-          <b className="text-zinc-200">3.</b> Watch{" "}
-          <b className="text-zinc-200">Itinerary &amp; Totals</b>{" "}
+          <b className="text-ink">3.</b> Watch{" "}
+          <b className="text-ink">Itinerary &amp; Totals</b>{" "}
           update live with per-category costs and your full schedule.
         </p>
       </div>

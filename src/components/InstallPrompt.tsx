@@ -31,7 +31,7 @@ export default function InstallPrompt() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pt-3 sm:px-6">
-      <div className="flex items-center justify-between gap-3 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-2.5 text-[12.5px] text-emerald-200">
+      <div className="flex items-center justify-between gap-3 rounded-xl border border-primary/40 bg-primary-soft px-4 py-2.5 text-[12.5px] text-primary">
         <span>
           📲 Install this app: tap the <b>Share</b> button in Safari, then{" "}
           <b>Add to Home Screen</b>. It&apos;ll work offline once installed.
@@ -39,7 +39,7 @@ export default function InstallPrompt() {
         <button
           type="button"
           onClick={dismiss}
-          className="shrink-0 rounded-md border border-emerald-500/40 px-2 py-1 font-semibold text-emerald-300"
+          className="shrink-0 rounded-md border border-primary/40 px-2 py-1 font-semibold text-primary"
           aria-label="Dismiss"
         >
           ✕

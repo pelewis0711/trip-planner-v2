@@ -35,11 +35,11 @@ export default function LiveFlightPrice({ from, to, date }: { from: string; to: 
   }, [origin, destination, dateStr, fetchPrice]);
 
   if (!origin || !destination || !dateStr) {
-    return <span className="text-[10.5px] text-zinc-600">no live price — city not mapped to an airport</span>;
+    return <span className="text-[10.5px] text-muted">no live price — city not mapped to an airport</span>;
   }
 
   if (loading && !live) {
-    return <span className="text-[10.5px] text-zinc-600">checking live price…</span>;
+    return <span className="text-[10.5px] text-muted">checking live price…</span>;
   }
 
   if (!live) return null;
@@ -47,16 +47,16 @@ export default function LiveFlightPrice({ from, to, date }: { from: string; to: 
   return (
     <span className="flex flex-wrap items-center gap-1 text-[10.5px]">
       {live.price !== null ? (
-        <span className="font-semibold text-emerald-400">Live: {money(live.price)}</span>
+        <span className="font-semibold text-success">Live: {money(live.price)}</span>
       ) : (
-        <span className="text-zinc-600">no live fares found for this route</span>
+        <span className="text-muted">no live fares found for this route</span>
       )}
-      <span className="text-zinc-600">· checked {timeAgo(live.checkedAt)}</span>
+      <span className="text-muted">· checked {timeAgo(live.checkedAt)}</span>
       <button
         type="button"
         onClick={() => fetchPrice(origin, destination, dateStr, { refresh: true })}
         disabled={loading}
-        className="text-zinc-500 hover:text-emerald-400 disabled:opacity-50"
+        className="text-muted hover:text-success disabled:opacity-50"
         aria-label="Refresh live price"
         title="Refresh live price"
       >

@@ -42,32 +42,32 @@ export default function LiveHotelPrice({
   }, [city, checkIn, checkOut, guests, tier, fetchPrice]);
 
   if (!checkIn || !checkOut) {
-    return <span className="text-[10.5px] text-zinc-600">estimate only — no dates yet</span>;
+    return <span className="text-[10.5px] text-muted">estimate only — no dates yet</span>;
   }
 
   if (loading && !live) {
-    return <span className="text-[10.5px] text-zinc-600">checking live price…</span>;
+    return <span className="text-[10.5px] text-muted">checking live price…</span>;
   }
 
   if (!live) return null;
 
   if (live.unavailable) {
-    return <span className="text-[10.5px] text-zinc-600">live pricing unavailable right now — estimate only</span>;
+    return <span className="text-[10.5px] text-muted">live pricing unavailable right now — estimate only</span>;
   }
 
   return (
     <span className="flex flex-wrap items-center gap-1 text-[10.5px]">
       {live.price !== null ? (
-        <span className="font-semibold text-emerald-400">Live: {money(live.price)}{live.hotelName ? ` (${live.hotelName})` : ""}</span>
+        <span className="font-semibold text-success">Live: {money(live.price)}{live.hotelName ? ` (${live.hotelName})` : ""}</span>
       ) : (
-        <span className="text-zinc-600">no live prices found — estimate only</span>
+        <span className="text-muted">no live prices found — estimate only</span>
       )}
-      <span className="text-zinc-600">· checked {timeAgo(live.checkedAt)}</span>
+      <span className="text-muted">· checked {timeAgo(live.checkedAt)}</span>
       <button
         type="button"
         onClick={() => fetchPrice(city, checkIn, checkOut, guests, tier, { refresh: true })}
         disabled={loading}
-        className="text-zinc-500 hover:text-emerald-400 disabled:opacity-50"
+        className="text-muted hover:text-success disabled:opacity-50"
         aria-label="Refresh live hotel price"
         title="Refresh live hotel price"
       >
