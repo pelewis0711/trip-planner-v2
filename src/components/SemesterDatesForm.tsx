@@ -48,33 +48,33 @@ export default function SemesterDatesForm({
   return (
     <div className="space-y-3 text-[12px]">
       <div className="flex flex-wrap gap-3">
-        <label className="flex flex-col gap-1 text-zinc-400">
+        <label className="flex flex-col gap-1 text-muted">
           Start
           <input
             type="date"
             value={value.start}
             onChange={(e) => onChange({ ...value, start: e.target.value })}
-            className="rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1 text-zinc-100"
+            className="rounded-md border border-border bg-surface px-2 py-1 text-ink"
           />
         </label>
-        <label className="flex flex-col gap-1 text-zinc-400">
+        <label className="flex flex-col gap-1 text-muted">
           End
           <input
             type="date"
             value={value.end}
             onChange={(e) => onChange({ ...value, end: e.target.value })}
-            className="rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1 text-zinc-100"
+            className="rounded-md border border-border bg-surface px-2 py-1 text-ink"
           />
         </label>
       </div>
 
       <div>
         <div className="mb-1.5 flex items-center justify-between">
-          <span className="font-semibold text-zinc-300">Breaks / special windows</span>
+          <span className="font-semibold text-ink">Breaks / special windows</span>
           <button
             type="button"
             onClick={() => addBreak()}
-            className="rounded-md border border-zinc-700 px-2 py-0.5 text-[11px] font-semibold text-zinc-300 hover:border-zinc-500"
+            className="rounded-md border border-border px-2 py-0.5 text-[11px] font-semibold text-muted hover:border-primary/40"
           >
             ＋ Add break
           </button>
@@ -85,7 +85,7 @@ export default function SemesterDatesForm({
               key={p.label}
               type="button"
               onClick={() => addBreak(p.label, p.kind)}
-              className="rounded-full border border-zinc-800 bg-zinc-900 px-2.5 py-1 text-[11px] font-medium text-zinc-400 hover:border-emerald-500/50 hover:text-emerald-300"
+              className="rounded-full border border-border bg-surface px-2.5 py-1 text-[11px] font-medium text-muted hover:border-primary/50 hover:text-primary"
             >
               {p.emoji} {p.label}
             </button>
@@ -93,29 +93,29 @@ export default function SemesterDatesForm({
         </div>
         <div className="space-y-2">
           {value.breaks.map((b) => (
-            <div key={b.id} className="flex flex-wrap items-center gap-1.5 rounded-md border border-zinc-800 bg-zinc-900 p-2">
+            <div key={b.id} className="flex flex-wrap items-center gap-1.5 rounded-md border border-border bg-surface p-2">
               <input
                 type="text"
                 value={b.label}
                 onChange={(e) => updateBreak(b.id, { label: e.target.value })}
-                className="min-w-0 flex-1 rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-zinc-100"
+                className="min-w-0 flex-1 rounded-md border border-border bg-surface-muted px-2 py-1 text-ink"
               />
               <input
                 type="date"
                 value={b.start}
                 onChange={(e) => updateBreak(b.id, { start: e.target.value })}
-                className="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-zinc-100"
+                className="rounded-md border border-border bg-surface-muted px-2 py-1 text-ink"
               />
               <input
                 type="date"
                 value={b.end}
                 onChange={(e) => updateBreak(b.id, { end: e.target.value })}
-                className="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-zinc-100"
+                className="rounded-md border border-border bg-surface-muted px-2 py-1 text-ink"
               />
               <select
                 value={b.kind}
                 onChange={(e) => updateBreak(b.id, { kind: e.target.value as CustomBreak["kind"] })}
-                className="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-zinc-100"
+                className="rounded-md border border-border bg-surface-muted px-2 py-1 text-ink"
               >
                 {(Object.entries(KIND_LABEL) as [CustomBreak["kind"], string][]).map(([k, l]) => (
                   <option key={k} value={k}>
@@ -126,13 +126,13 @@ export default function SemesterDatesForm({
               <button
                 type="button"
                 onClick={() => removeBreak(b.id)}
-                className="shrink-0 rounded-md bg-rose-500/20 px-2 py-1 font-bold text-rose-300 hover:bg-rose-500/30"
+                className="shrink-0 rounded-md bg-danger/10 px-2 py-1 font-bold text-danger hover:bg-danger/20"
               >
                 ✕
               </button>
             </div>
           ))}
-          {!value.breaks.length && <div className="text-zinc-600">No breaks added — just weekends.</div>}
+          {!value.breaks.length && <div className="text-muted">No breaks added — just weekends.</div>}
         </div>
       </div>
     </div>

@@ -59,11 +59,11 @@ export default function PlansPage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5">
-        <h2 className="text-xl font-semibold text-zinc-50">Plans &amp; Compare</h2>
-        <p className="mt-1 text-sm text-zinc-400">
+      <div className="rounded-card border border-border bg-surface p-5">
+        <h2 className="font-heading text-xl font-semibold text-ink">Plans &amp; Compare</h2>
+        <p className="mt-1 text-sm text-muted">
           Every change you make is saved automatically to this browser. Build multiple versions of
-          your semester — a budget one, a bucket-list one — then tick <b className="text-zinc-200">compare</b>{" "}
+          your semester — a budget one, a bucket-list one — then tick <b className="text-ink">compare</b>{" "}
           on two or more and see them side by side below. Share a plan as a .json to send it to a
           friend (import theirs to compare against yours).
         </p>
@@ -71,14 +71,14 @@ export default function PlansPage() {
           <button
             type="button"
             onClick={() => newPlan(prompt("Name this plan:", `Plan ${ids.length + 1}`) || undefined)}
-            className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-bold text-zinc-950"
+            className="rounded-lg bg-primary px-3.5 py-2 text-xs font-bold text-white hover:bg-primary-hover"
           >
             ＋ New plan
           </button>
           <button
             type="button"
             onClick={() => fileInput.current?.click()}
-            className="rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:border-emerald-500/50"
+            className="rounded-full border border-border bg-surface px-3.5 py-2 text-xs font-semibold text-muted hover:border-primary/50 hover:text-primary"
           >
             ⤒ Import plan file
           </button>
@@ -96,33 +96,33 @@ export default function PlansPage() {
           <button
             type="button"
             onClick={compareAll}
-            className="rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:border-emerald-500/50"
+            className="rounded-full border border-border bg-surface px-3.5 py-2 text-xs font-semibold text-muted hover:border-primary/50 hover:text-primary"
           >
             Compare all
           </button>
           <button
             type="button"
             onClick={clearCompare}
-            className="rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:border-emerald-500/50"
+            className="rounded-full border border-border bg-surface px-3.5 py-2 text-xs font-semibold text-muted hover:border-primary/50 hover:text-primary"
           >
             Clear comparison
           </button>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-zinc-800 pt-3">
-          <span className="text-xs font-semibold text-zinc-400">🔗 Have a friend&apos;s share link?</span>
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border pt-3">
+          <span className="text-xs font-semibold text-muted">🔗 Have a friend&apos;s share link?</span>
           <input
             type="text"
             value={friendLink}
             onChange={(e) => setFriendLink(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleOpenFriendLink()}
             placeholder="Paste the link they sent you"
-            className="min-w-0 flex-1 rounded-md border border-zinc-800 bg-zinc-950 px-2.5 py-1.5 text-xs text-zinc-100 placeholder:text-zinc-600"
+            className="min-w-0 flex-1 rounded-md border border-border bg-surface-muted px-2.5 py-1.5 text-xs text-ink placeholder:text-muted"
           />
           <button
             type="button"
             onClick={handleOpenFriendLink}
-            className="rounded-md border border-zinc-700 bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:border-emerald-500/50"
+            className="rounded-md border border-border bg-surface px-3.5 py-2 text-xs font-semibold text-muted hover:border-primary/50 hover:text-primary"
           >
             Open
           </button>
