@@ -60,21 +60,21 @@ export default function TripTray({
   const activeCount = activeFilterCount(filters, query);
 
   return (
-    <aside className="flex max-h-[calc(100vh-6rem)] flex-col rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 lg:sticky lg:top-20">
-      <h3 className="mb-2 text-sm font-semibold text-zinc-100">
-        Trips <span className="font-normal text-zinc-500">— tap or drag ({visible.length})</span>
+    <aside className="flex max-h-[calc(100vh-6rem)] flex-col rounded-card border border-border bg-surface p-3 lg:sticky lg:top-24">
+      <h3 className="mb-2 font-heading text-sm font-semibold text-ink">
+        Trips <span className="font-sans font-normal text-muted">— tap or drag ({visible.length})</span>
       </h3>
       <input
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="🔎 Search…"
-        className="rounded-lg border border-zinc-800 bg-zinc-950 px-2.5 py-1.5 text-xs text-zinc-100 placeholder:text-zinc-600"
+        className="rounded-lg border border-border bg-surface-muted px-2.5 py-2 text-xs text-ink placeholder:text-muted"
       />
       <button
         type="button"
         onClick={() => setShowFilters((s) => !s)}
-        className="mt-2 self-start text-xs font-semibold text-zinc-500 hover:text-zinc-200"
+        className="mt-2 self-start text-xs font-semibold text-muted hover:text-primary"
       >
         ⚙ Filters {activeCount ? `(${activeCount})` : ""} {showFilters ? "▲" : "▼"}
       </button>
@@ -97,21 +97,21 @@ export default function TripTray({
             onClick={() => onArm(t.id)}
             className={`flex w-full items-center justify-between gap-2 rounded-lg border px-2.5 py-2 text-left text-xs transition-colors ${
               armedId === t.id
-                ? "border-emerald-500 bg-emerald-500/10"
-                : "border-zinc-800 bg-zinc-950 hover:border-emerald-500/40"
+                ? "border-primary bg-primary-soft"
+                : "border-border bg-surface-muted hover:border-primary/40"
             }`}
           >
             <span className="min-w-0">
-              <span className="block truncate font-semibold text-zinc-100">{t.n}</span>
-              <span className="block truncate text-[10.5px] text-zinc-500">{t.c}</span>
+              <span className="block truncate font-semibold text-ink">{t.n}</span>
+              <span className="block truncate text-[10.5px] text-muted">{t.c}</span>
             </span>
-            <span className="shrink-0 text-[11px] font-bold text-emerald-400">
+            <span className="shrink-0 text-[11px] font-bold text-accent">
               {t.g === 0 ? "day" : `${t.g}n`}
             </span>
           </button>
         ))}
         {!visible.length && (
-          <p className="p-3 text-center text-xs text-zinc-500">No trips match those filters.</p>
+          <p className="p-3 text-center text-xs text-muted">No trips match those filters.</p>
         )}
       </div>
     </aside>

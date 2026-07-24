@@ -3,6 +3,7 @@
 import type { Trip } from "@/data/trips";
 import { usePlanStore } from "@/lib/store/plan";
 import { formatMoney } from "@/lib/calc/currency";
+import ImagePlaceholder from "./ImagePlaceholder";
 
 const TYPE_LABEL: Record<string, string> = {
   history: "History & Culture",
@@ -12,17 +13,19 @@ const TYPE_LABEL: Record<string, string> = {
 };
 
 const TYPE_STYLE: Record<string, string> = {
-  history: "bg-violet-500/15 text-violet-300",
-  scenic: "bg-emerald-500/15 text-emerald-300",
-  beach: "bg-sky-500/15 text-sky-300",
-  nightlife: "bg-pink-500/15 text-pink-300",
+  history: "bg-violet-100 text-violet-700",
+  scenic: "bg-teal-100 text-teal-700",
+  beach: "bg-sky-100 text-sky-700",
+  nightlife: "bg-pink-100 text-pink-700",
 };
 
 const TIER_LABEL: Record<string, string> = { b: "Budget", m: "Mid", s: "Splurge" };
+// Semantic status colors (not the primary/accent brand pair) -- these
+// communicate a fact about the trip's cost tier, not a brand decoration.
 const TIER_STYLE: Record<string, string> = {
-  b: "text-emerald-400",
-  m: "text-amber-400",
-  s: "text-rose-400",
+  b: "bg-success/10 text-success",
+  m: "bg-warning/10 text-warning",
+  s: "bg-danger/10 text-danger",
 };
 
 function tierOf(ci: number): "b" | "m" | "s" {
@@ -46,15 +49,17 @@ export default function TripCard({
   const tier = tierOf(trip.ci);
   const currency = usePlanStore((s) => s.defaultCurrency);
   return (
-    <div className="flex flex-col rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 transition-colors hover:border-emerald-500/40">
-      <div className="flex items-start justify-between gap-2">
+    <div className="flex flex-col rounded-card border border-border bg-surface p-3 shadow-sm transition-shadow hover:shadow-md">
+      <ImagePlaceholder />
+
+      <div className="mt-3 flex items-start justify-between gap-2">
         <div>
-          <div className="text-base font-semibold text-zinc-50">{trip.n}</div>
-          <div className="text-xs text-zinc-500">
+          <div className="font-heading text-base font-semibold text-ink">{trip.n}</div>
+          <div className="text-xs text-muted">
             {trip.c === trip.reg ? trip.c : `${trip.c} · ${trip.reg}`}
           </div>
         </div>
-        <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold ${TIER_STYLE[tier]}`}>
+        <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold ${TIER_STYLE[tier]}`}>
           {TIER_LABEL[tier]}
         </span>
       </div>
@@ -63,21 +68,21 @@ export default function TripCard({
         {trip.t.map((ty) => (
           <span
             key={ty}
-            className={`rounded-full px-2 py-0.5 text-[10.5px] font-semibold ${TYPE_STYLE[ty] ?? "bg-zinc-800 text-zinc-300"}`}
+            className={`rounded-full px-2 py-0.5 text-[10.5px] font-semibold ${TYPE_STYLE[ty] ?? "bg-surface-muted text-muted"}`}
           >
             {TYPE_LABEL[ty] ?? ty}
           </span>
         ))}
       </div>
 
-      <p className="mt-2 flex-1 text-[12.5px] text-zinc-400">{trip.w}</p>
+      <p className="mt-2 flex-1 text-[12.5px] text-muted">{trip.w}</p>
 
-      <div className="mt-3 flex items-center justify-between border-t border-zinc-800 pt-2.5 text-xs text-zinc-500">
+      <div className="mt-3 flex items-center justify-between border-t border-border pt-2.5 text-xs text-muted">
         <span>
           {trip.g === 0 ? "Day trip" : `${trip.g} night${trip.g > 1 ? "s" : ""}`} &middot;{" "}
           {trip.m.map((m) => MO_SHORT[m]).join("/")}
         </span>
-        <span className="text-[15px] font-extrabold text-emerald-400">
+        <span className="font-heading text-[15px] font-bold text-accent">
           {formatMoney(floor, currency)}–{formatMoney(ceiling, currency)}
         </span>
       </div>

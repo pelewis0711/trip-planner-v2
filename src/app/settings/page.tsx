@@ -49,23 +49,23 @@ export default function SettingsPage() {
   }
 
   if (!initial) {
-    return <div className="mx-auto max-w-2xl px-4 py-16 text-center text-sm text-zinc-500">Loading…</div>;
+    return <div className="mx-auto max-w-2xl px-4 py-16 text-center text-sm text-muted">Loading…</div>;
   }
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5">
-        <h2 className="text-xl font-semibold text-zinc-50">Settings</h2>
-        <p className="mt-1 text-sm text-zinc-400">
+      <div className="rounded-card border border-border bg-surface p-5">
+        <h2 className="font-heading text-xl font-semibold text-ink">Settings</h2>
+        <p className="mt-1 text-sm text-muted">
           Your host city, university, and semester dates — used as the default for any new plan you
           create. Doesn&apos;t change plans you&apos;ve already made; edit an individual plan&apos;s dates from its
           card on the Plans tab instead.
         </p>
       </div>
 
-      <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5">
+      <div className="mt-4 rounded-card border border-border bg-surface p-5">
         <OnboardingFlow initial={initial} onComplete={handleSave} layout="single-page" submitLabel="Save" />
-        {saved && <p className="mt-3 text-sm text-emerald-400">Saved.</p>}
+        {saved && <p className="mt-3 text-sm text-success">Saved.</p>}
       </div>
     </div>
   );

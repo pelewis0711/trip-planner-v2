@@ -24,19 +24,19 @@ export default function SetupWizardModal({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 px-4 py-10">
-      <div className="w-full max-w-lg rounded-2xl border border-zinc-800 bg-zinc-950 p-5 sm:p-6">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink/50 px-4 py-10">
+      <div className="w-full max-w-lg rounded-card border border-border bg-surface p-5 shadow-lg sm:p-6">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-zinc-50">Set up your trip</h2>
-            <p className="mt-1 text-xs text-zinc-500">
+            <h2 className="font-heading text-lg font-semibold text-ink">Set up your trip</h2>
+            <p className="mt-1 text-xs text-muted">
               Saved on this device — sign in anytime to keep it with your account.
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 rounded-md border border-zinc-800 px-2 py-1 text-xs font-semibold text-zinc-400"
+            className="shrink-0 rounded-md border border-border px-2 py-1 text-xs font-semibold text-muted"
             aria-label="Close"
           >
             ✕

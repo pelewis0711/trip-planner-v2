@@ -81,27 +81,27 @@ export default function SharedPlanPage({ params }: { params: Promise<{ token: st
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6">
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5">
-        <div className="text-xs font-semibold tracking-wide text-emerald-400 uppercase">
+      <div className="rounded-card border border-border bg-surface p-5">
+        <div className="text-xs font-semibold tracking-wide text-primary uppercase">
           {isCollabLink ? "Shared to collaborate" : "Shared to view"}
         </div>
-        <h2 className="mt-1 text-xl font-semibold text-zinc-50">{plan.name}</h2>
-        <p className="mt-1 text-sm text-zinc-400">
+        <h2 className="mt-1 font-heading text-xl font-semibold text-ink">{plan.name}</h2>
+        <p className="mt-1 text-sm text-muted">
           {ownerEmail ? `Shared by ${ownerEmail} · ` : ""}Home base: {plan.home}
         </p>
 
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {(
             [
-              ["Trips", String(g.count), "text-zinc-100"],
-              ["Nights away", String(g.nights), "text-zinc-100"],
-              ["Subtotal", money(g.total), "text-emerald-400"],
-              ["Per night", g.nights ? money(g.total / g.nights) : "—", "text-zinc-100"],
+              ["Trips", String(g.count), "text-ink"],
+              ["Nights away", String(g.nights), "text-ink"],
+              ["Subtotal", money(g.total), "text-accent"],
+              ["Per night", g.nights ? money(g.total / g.nights) : "—", "text-ink"],
             ] as const
           ).map(([label, val, cls]) => (
-            <div key={label} className="rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-center">
+            <div key={label} className="rounded-xl border border-border bg-surface-muted p-3 text-center">
               <b className={`block text-lg font-extrabold ${cls}`}>{val}</b>
-              <span className="text-[11px] text-zinc-500">{label}</span>
+              <span className="text-[11px] text-muted">{label}</span>
             </div>
           ))}
         </div>
@@ -112,7 +112,7 @@ export default function SharedPlanPage({ params }: { params: Promise<{ token: st
               type="button"
               onClick={handleJoin}
               disabled={joining || authLoading}
-              className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-bold text-zinc-950 disabled:opacity-50"
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary-hover disabled:opacity-50"
             >
               {joining
                 ? "Joining…"
@@ -126,26 +126,26 @@ export default function SharedPlanPage({ params }: { params: Promise<{ token: st
           <button
             type="button"
             onClick={handleAddToCompare}
-            className="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-300 hover:border-zinc-500"
+            className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-ink hover:border-primary/50"
           >
             Add to my Compare (view only)
           </button>
         </div>
       </div>
 
-      <h3 className="mt-6 mb-3 text-sm font-semibold text-zinc-300">Schedule</h3>
+      <h3 className="mt-6 mb-3 font-heading text-sm font-semibold text-ink">Schedule</h3>
       <div className="space-y-2">
         {slots.length ? (
           slots.map((s) => (
-            <div key={s.id} className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 text-sm">
-              <div className="text-xs text-zinc-500">
+            <div key={s.id} className="rounded-xl border border-border bg-surface p-3 text-sm">
+              <div className="text-xs text-muted">
                 {s.label} · {s.date}
               </div>
-              <div className="text-zinc-100">{planSlotSummary(plan, s.id)}</div>
+              <div className="text-ink">{planSlotSummary(plan, s.id)}</div>
             </div>
           ))
         ) : (
-          <div className="text-sm text-zinc-500">No trips scheduled yet.</div>
+          <div className="text-sm text-muted">No trips scheduled yet.</div>
         )}
       </div>
     </div>
@@ -154,7 +154,7 @@ export default function SharedPlanPage({ params }: { params: Promise<{ token: st
 
 function Centered({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto flex w-full max-w-md flex-1 items-center justify-center px-4 py-12 text-center text-sm text-zinc-400">
+    <div className="mx-auto flex w-full max-w-md flex-1 items-center justify-center px-4 py-12 text-center text-sm text-muted">
       {children}
     </div>
   );

@@ -52,18 +52,18 @@ export default function OnboardingPage() {
 
   if (!initial) {
     return (
-      <div className="mx-auto max-w-lg px-4 py-16 text-center text-sm text-zinc-500">Loading…</div>
+      <div className="mx-auto max-w-lg px-4 py-16 text-center text-sm text-muted">Loading…</div>
     );
   }
 
   return (
     <div className="mx-auto max-w-lg px-4 py-10 sm:py-16">
-      <h1 className="text-xl font-semibold text-zinc-50">Set up your semester</h1>
-      <p className="mt-2 text-sm text-zinc-400">
+      <h1 className="font-heading text-xl font-semibold text-ink">Set up your semester</h1>
+      <p className="mt-2 text-sm text-muted">
         A few quick questions so the calendar and Schengen tracker match your actual program — not just
         AAU Prague. Everything here is editable later from Settings.
       </p>
-      <div className="mt-8 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5">
+      <div className="mt-8 rounded-card border border-border bg-surface p-5">
         <OnboardingFlow initial={initial} onComplete={handleComplete} layout="wizard" />
       </div>
     </div>

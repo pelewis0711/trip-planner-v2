@@ -54,11 +54,11 @@ export default function ItineraryPage() {
   if (g.count === 0) {
     return (
       <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
-        <div className="rounded-2xl border border-dashed border-zinc-800 p-14 text-center">
-          <h2 className="text-xl font-semibold text-zinc-50">
+        <div className="rounded-card border-2 border-dashed border-border p-14 text-center">
+          <h2 className="font-heading text-xl font-semibold text-ink">
             {isUnconfigured ? "Let's set up your trip first" : "No trips scheduled yet"}
           </h2>
-          <p className="mt-2 text-sm text-zinc-500">
+          <p className="mt-2 text-sm text-muted">
             {isUnconfigured
               ? "Pick your host city and semester dates so your calendar and totals match your own program."
               : "Head to the Trip Catalog and drag options onto your Calendar. Your live itinerary and category totals will build here."}
@@ -67,7 +67,7 @@ export default function ItineraryPage() {
             <button
               type="button"
               onClick={() => setWizardOpen(true)}
-              className="mt-5 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-bold text-zinc-950"
+              className="mt-5 rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-hover"
             >
               Set up now
             </button>
@@ -80,19 +80,19 @@ export default function ItineraryPage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 print:border-0">
+      <div className="rounded-card border border-border bg-surface p-5 print:border-0">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-xl font-semibold text-zinc-50">Itinerary &amp; Live Totals</h2>
-            <p className="mt-1 text-sm text-zinc-400">
-              {g.count} trip{g.count > 1 ? "s" : ""} scheduled · per person, USD. Everything
+            <h2 className="font-heading text-xl font-semibold text-ink">Itinerary &amp; Live Totals</h2>
+            <p className="mt-1 text-sm text-muted">
+              {g.count} trip{g.count > 1 ? "s" : ""} scheduled · per person, {currency}. Everything
               recomputes as you edit trips on the Calendar.
             </p>
           </div>
           <button
             type="button"
             onClick={() => window.print()}
-            className="print:hidden rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:border-emerald-500/50"
+            className="print:hidden rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-muted hover:border-primary/50 hover:text-primary"
           >
             🖨️ Print / Save as PDF
           </button>
@@ -100,18 +100,18 @@ export default function ItineraryPage() {
 
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
           {[
-            ["Travel", g.travel, "text-sky-400", null],
-            ["Lodging", g.lodg, "text-violet-400", g.lodgGroup],
-            ["Food", g.food, "text-amber-400", null],
-            ["Activities", g.act, "text-emerald-400", null],
-            ["Trips subtotal (per person)", g.total, "text-zinc-100", g.totalGroup],
+            ["Travel", g.travel, "text-sky-600", null],
+            ["Lodging", g.lodg, "text-primary", g.lodgGroup],
+            ["Food", g.food, "text-amber-600", null],
+            ["Activities", g.act, "text-success", null],
+            ["Trips subtotal (per person)", g.total, "text-accent", g.totalGroup],
           ].map(([label, val, cls, group]) => (
-            <div key={label as string} className="rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-center">
+            <div key={label as string} className="rounded-xl border border-border bg-surface-muted p-3 text-center">
               <b className={`block text-xl font-extrabold ${cls}`}>{money(val as number)}</b>
               {group !== null && (group as number) !== (val as number) && (
-                <span className="block text-[11px] text-zinc-400">{money(group as number)} group total</span>
+                <span className="block text-[11px] text-muted">{money(group as number)} group total</span>
               )}
-              <span className="text-[11px] text-zinc-500">{label}</span>
+              <span className="text-[11px] text-muted">{label}</span>
             </div>
           ))}
         </div>
@@ -123,10 +123,10 @@ export default function ItineraryPage() {
             <span
               className={
                 schStatus === "red"
-                  ? "font-bold text-rose-400"
+                  ? "font-bold text-danger"
                   : schStatus === "amber"
-                    ? "font-semibold text-amber-400"
-                    : "text-zinc-300"
+                    ? "font-semibold text-warning"
+                    : "text-ink"
               }
             >
               🛂 Schengen days: <b>{schD}</b> / 90 per 180
@@ -137,12 +137,12 @@ export default function ItineraryPage() {
         )}
 
         <div className="mt-2.5 flex flex-wrap items-center gap-3 text-xs">
-          <label className="flex items-center gap-1.5 text-zinc-400">
+          <label className="flex items-center gap-1.5 text-muted">
             🧳 Flight extras:
             <select
               value={bag}
               onChange={(e) => setBag(e.target.value as BagOption)}
-              className="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-zinc-100"
+              className="rounded-md border border-border bg-surface-muted px-2 py-1 text-ink"
             >
               {(Object.entries(BAGS) as [BagOption, [string, number]][]).map(([k, v]) => (
                 <option key={k} value={k}>
@@ -153,20 +153,20 @@ export default function ItineraryPage() {
             </select>
           </label>
 
-          <label className="flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 font-semibold text-zinc-300">
+          <label className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 font-semibold text-muted">
             👥 Default travelers
             <button
               type="button"
               onClick={() => setDefaultTravelers(Math.max(1, (defaultTravelers ?? 1) - 1))}
-              className="rounded-md border border-zinc-700 px-1.5 font-bold"
+              className="rounded-md border border-border px-1.5 font-bold text-ink"
             >
               −
             </button>
-            <span className="w-4 text-center text-emerald-400">{defaultTravelers ?? 1}</span>
+            <span className="w-4 text-center text-primary">{defaultTravelers ?? 1}</span>
             <button
               type="button"
               onClick={() => setDefaultTravelers(Math.min(20, (defaultTravelers ?? 1) + 1))}
-              className="rounded-md border border-zinc-700 px-1.5 font-bold"
+              className="rounded-md border border-border px-1.5 font-bold text-ink"
             >
               +
             </button>
@@ -187,8 +187,8 @@ export default function ItineraryPage() {
                   }
                   if (e.key === "Escape") setEditingBudget(false);
                 }}
-                placeholder="USD"
-                className="w-24 rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-zinc-100"
+                placeholder={currency}
+                className="w-24 rounded-md border border-border bg-surface-muted px-2 py-1 text-ink"
               />
               <button
                 type="button"
@@ -196,7 +196,7 @@ export default function ItineraryPage() {
                   setBudget(budgetInput === "" ? null : Math.max(0, +budgetInput || 0));
                   setEditingBudget(false);
                 }}
-                className="rounded-md bg-emerald-500 px-2 py-1 font-bold text-zinc-950"
+                className="rounded-md bg-primary px-2 py-1 font-bold text-white"
               >
                 Save
               </button>
@@ -208,17 +208,17 @@ export default function ItineraryPage() {
                 setBudgetInput(budget !== null ? String(budget) : "");
                 setEditingBudget(true);
               }}
-              className="rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 font-semibold text-zinc-300 hover:border-emerald-500/50"
+              className="rounded-full border border-border bg-surface px-3 py-1.5 font-semibold text-muted hover:border-primary/50 hover:text-primary"
             >
               💰 {budget !== null ? `Budget: ${money(budget)}` : "Set travel budget"}
             </button>
           )}
 
           {bt.booked > 0 && (
-            <span className="text-zinc-400">
+            <span className="text-muted">
               📌 {bt.booked} slot{bt.booked > 1 ? "s" : ""} with booked actuals → projected{" "}
-              <b className="text-zinc-100">{money(bt.blend)}</b>{" "}
-              <span className={bt.blend > bt.est ? "text-rose-400" : "text-emerald-400"}>
+              <b className="text-ink">{money(bt.blend)}</b>{" "}
+              <span className={bt.blend > bt.est ? "text-danger" : "text-success"}>
                 ({bt.blend >= bt.est ? "+" : ""}
                 {money(bt.blend - bt.est)} vs estimate)
               </span>
@@ -226,23 +226,23 @@ export default function ItineraryPage() {
           )}
 
           {budget !== null && remaining !== null && (
-            <span className={`font-bold ${remaining < 0 ? "text-rose-400" : "text-emerald-400"}`}>
+            <span className={`font-bold ${remaining < 0 ? "text-danger" : "text-success"}`}>
               {remaining < 0 ? `OVER budget by ${money(-remaining)}` : `${money(remaining)} remaining`}
             </span>
           )}
 
-          <label className="flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 font-semibold text-zinc-300">
+          <label className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 font-semibold text-muted">
             <input
               type="checkbox"
               checked={!!useLivePrices}
               onChange={(e) => setUseLivePrices(e.target.checked)}
-              className="accent-sky-500"
+              className="accent-primary"
             />
             ✈️ Use live flight prices
           </label>
         </div>
 
-        <div className="mt-3 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-2.5 text-[12.5px] text-amber-200">
+        <div className="mt-3 rounded-xl border border-warning/40 bg-warning/10 px-4 py-2.5 text-[12.5px] text-warning">
           {studyingInEurope && (
             <>➕ Eurail Global Pass (Youth, 10 days/2 mo) ≈ <b>{money(296)}</b> if you&apos;re doing the rail-heavy trips · </>
           )}
@@ -257,7 +257,7 @@ export default function ItineraryPage() {
         </div>
       </div>
 
-      <h3 className="mt-6 mb-3 text-sm font-semibold text-zinc-300">
+      <h3 className="mt-6 mb-3 font-heading text-sm font-semibold text-ink">
         Your schedule &amp; booking links (chronological)
       </h3>
       <div className="space-y-4">

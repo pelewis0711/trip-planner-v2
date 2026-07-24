@@ -54,45 +54,45 @@ export default function EditModal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-black/70 px-4 py-10"
+      className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-ink/50 px-4 py-10"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-2xl rounded-2xl border border-zinc-800 bg-zinc-950 p-5"
+        className="w-full max-w-2xl rounded-card border border-border bg-surface p-5 shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-zinc-50">{slot.label}</h2>
-            <p className="text-xs text-zinc-500">{slot.date}</p>
+            <h2 className="font-heading text-lg font-semibold text-ink">{slot.label}</h2>
+            <p className="text-xs text-muted">{slot.date}</p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs font-semibold text-zinc-400 hover:text-zinc-100"
+            className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-muted hover:text-ink"
           >
             Close
           </button>
         </div>
 
-        <div className="mt-3 flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-xs">
-          <span className="text-zinc-500">👥 Travelers</span>
+        <div className="mt-3 flex items-center gap-2 rounded-lg border border-border bg-surface-muted px-3 py-1.5 text-xs">
+          <span className="text-muted">👥 Travelers</span>
           <button
             type="button"
             onClick={() => setTravelersFor(slot.id, Math.max(1, travelers - 1))}
-            className="rounded-md border border-zinc-800 px-2 py-0.5 font-bold text-zinc-300"
+            className="rounded-md border border-border px-2 py-0.5 font-bold text-ink"
           >
             −
           </button>
-          <span className="w-6 text-center font-bold text-emerald-400">{travelers}</span>
+          <span className="w-6 text-center font-bold text-primary">{travelers}</span>
           <button
             type="button"
             onClick={() => setTravelersFor(slot.id, Math.min(20, travelers + 1))}
-            className="rounded-md border border-zinc-800 px-2 py-0.5 font-bold text-zinc-300"
+            className="rounded-md border border-border px-2 py-0.5 font-bold text-ink"
           >
             +
           </button>
-          <span className="text-zinc-500">for this whole slot (all stops share the group)</span>
+          <span className="text-muted">for this whole slot (all stops share the group)</span>
         </div>
 
         <div className="mt-4 space-y-4">
@@ -106,22 +106,22 @@ export default function EditModal({
             const current = stopCurrentEstimate(t, st, ctx, travelers);
 
             return (
-              <div key={i} className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3.5">
+              <div key={i} className="rounded-card border border-border bg-surface-muted p-3.5">
                 <div className="flex items-center gap-2">
                   {stops.length > 1 && (
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-[11px] font-bold text-zinc-950">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-white">
                       {i + 1}
                     </span>
                   )}
-                  <span className="flex-1 text-sm font-semibold text-zinc-100">
-                    {t.n} <span className="font-normal text-zinc-500">· {t.c}</span>
+                  <span className="flex-1 text-sm font-semibold text-ink">
+                    {t.n} <span className="font-normal text-muted">· {t.c}</span>
                   </span>
                   <div className="flex shrink-0 gap-1">
                     <button
                       type="button"
                       disabled={i === 0}
                       onClick={() => moveStop(slot.id, i, i - 1)}
-                      className="rounded-md border border-zinc-800 px-1.5 py-0.5 text-xs text-zinc-400 disabled:opacity-30"
+                      className="rounded-md border border-border px-1.5 py-0.5 text-xs text-muted disabled:opacity-30"
                     >
                       ↑
                     </button>
@@ -129,14 +129,14 @@ export default function EditModal({
                       type="button"
                       disabled={i === stops.length - 1}
                       onClick={() => moveStop(slot.id, i, i + 1)}
-                      className="rounded-md border border-zinc-800 px-1.5 py-0.5 text-xs text-zinc-400 disabled:opacity-30"
+                      className="rounded-md border border-border px-1.5 py-0.5 text-xs text-muted disabled:opacity-30"
                     >
                       ↓
                     </button>
                     <button
                       type="button"
                       onClick={() => removeStop(slot.id, i)}
-                      className="rounded-md bg-rose-500/20 px-2 py-0.5 text-xs font-bold text-rose-300 hover:bg-rose-500/30"
+                      className="rounded-md bg-danger/10 px-2 py-0.5 text-xs font-bold text-danger hover:bg-danger/20"
                     >
                       Remove
                     </button>
@@ -144,38 +144,38 @@ export default function EditModal({
                 </div>
 
                 <div className="mt-1.5 text-[11.5px]">
-                  <span className="text-zinc-500">Range </span>
-                  <span className="font-semibold text-zinc-300">
+                  <span className="text-muted">Range </span>
+                  <span className="font-semibold text-ink">
                     {formatMoney(range.floor, currency)}–{formatMoney(range.ceiling, currency)}
                   </span>
                   <br />
-                  <span className="text-zinc-500">Current </span>
-                  <span className="font-semibold text-emerald-400">
+                  <span className="text-muted">Current </span>
+                  <span className="font-semibold text-accent">
                     {formatMoney(current, currency)}
                     {travelers > 1 && (
-                      <span className="font-normal text-zinc-500"> ({formatMoney(current * travelers, currency)} for {travelers})</span>
+                      <span className="font-normal text-muted"> ({formatMoney(current * travelers, currency)} for {travelers})</span>
                     )}
                   </span>
                 </div>
 
-                <div className="mt-3 flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-xs">
-                  <span className="text-zinc-500">Nights</span>
+                <div className="mt-3 flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs">
+                  <span className="text-muted">Nights</span>
                   <button
                     type="button"
                     onClick={() => updateStop(slot.id, i, { nights: Math.max(0, st.nights - 1) })}
-                    className="rounded-md border border-zinc-800 px-2 py-0.5 font-bold text-zinc-300"
+                    className="rounded-md border border-border px-2 py-0.5 font-bold text-ink"
                   >
                     −
                   </button>
-                  <span className="w-6 text-center font-bold text-emerald-400">{st.nights}</span>
+                  <span className="w-6 text-center font-bold text-primary">{st.nights}</span>
                   <button
                     type="button"
                     onClick={() => updateStop(slot.id, i, { nights: Math.min(14, st.nights + 1) })}
-                    className="rounded-md border border-zinc-800 px-2 py-0.5 font-bold text-zinc-300"
+                    className="rounded-md border border-border px-2 py-0.5 font-bold text-ink"
                   >
                     +
                   </button>
-                  <span className="text-zinc-500">
+                  <span className="text-muted">
                     {st.nights === 0 ? "day trip" : `${days} day${days > 1 ? "s" : ""} of food`}
                   </span>
                 </div>
@@ -202,7 +202,7 @@ export default function EditModal({
                           tier={st.l === 2 ? "private" : "boutique"}
                         />
                       ) : (
-                        <span className="text-[10.5px] text-zinc-600">
+                        <span className="text-[10.5px] text-muted">
                           estimate only — no free live-price API for hostels/Airbnb
                         </span>
                       )}
@@ -227,7 +227,7 @@ export default function EditModal({
                           key={preset}
                           type="button"
                           onClick={() => applyActivityPreset(slot.id, i, preset)}
-                          className="rounded-full border border-zinc-700 px-2.5 py-0.5 text-[11px] font-semibold text-zinc-300 hover:border-emerald-500/50 hover:text-emerald-300"
+                          className="rounded-full border border-border px-2.5 py-0.5 text-[11px] font-semibold text-muted hover:border-primary/50 hover:text-primary"
                         >
                           {label}
                         </button>
@@ -258,7 +258,7 @@ export default function EditModal({
         </div>
 
         {costs && (
-          <div className="mt-4 grid grid-cols-2 gap-2 border-t border-zinc-800 pt-3 sm:grid-cols-5">
+          <div className="mt-4 grid grid-cols-2 gap-2 border-t border-border pt-3 sm:grid-cols-5">
             {[
               ["Travel", costs.travel, null],
               ["Lodging", costs.lodg, costs.lodg * travelers],
@@ -266,12 +266,12 @@ export default function EditModal({
               ["Activities", costs.act, null],
               ["Total (per person)", costs.total, costs.total * travelers],
             ].map(([label, val, group]) => (
-              <div key={label as string} className="rounded-lg bg-zinc-900/60 p-2 text-center">
-                <b className="block text-sm text-emerald-400">{formatMoney(val as number, currency)}</b>
+              <div key={label as string} className="rounded-lg bg-surface-muted p-2 text-center">
+                <b className="block text-sm text-accent">{formatMoney(val as number, currency)}</b>
                 {group !== null && travelers > 1 && (
-                  <span className="block text-[10px] text-zinc-400">{formatMoney(group as number, currency)} for {travelers}</span>
+                  <span className="block text-[10px] text-muted">{formatMoney(group as number, currency)} for {travelers}</span>
                 )}
-                <span className="text-[10px] text-zinc-500">{label}</span>
+                <span className="text-[10px] text-muted">{label}</span>
               </div>
             ))}
           </div>
@@ -309,7 +309,7 @@ function TierGroup({
 }) {
   return (
     <div className="mt-3">
-      <h5 className="mb-1 text-[10.5px] font-semibold uppercase tracking-wide text-zinc-500">
+      <h5 className="mb-1 text-[10.5px] font-semibold uppercase tracking-wide text-muted">
         {label}
       </h5>
       <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
@@ -322,17 +322,17 @@ function TierGroup({
               onClick={() => onChange(idx)}
               className={`rounded-lg border px-2 py-1.5 text-left text-[11px] transition-colors ${
                 value === idx
-                  ? "border-emerald-500 bg-emerald-500/10 text-zinc-100"
-                  : "border-zinc-800 bg-zinc-950 text-zinc-400 hover:border-zinc-600"
+                  ? "border-primary bg-primary-soft text-ink"
+                  : "border-border bg-surface text-muted hover:border-primary/40"
               }`}
             >
               <span className="block truncate font-medium">{name}</span>
-              <span className="text-emerald-400">
+              <span className="text-accent">
                 {formatMoney(perPerson, currency)}
                 {perNight ? "" : " total"}
               </span>
               {!!travelers && travelers > 1 && (
-                <span className="block text-[10px] text-zinc-500">{formatMoney(perPerson * travelers, currency)} for {travelers}</span>
+                <span className="block text-[10px] text-muted">{formatMoney(perPerson * travelers, currency)} for {travelers}</span>
               )}
             </button>
           );
@@ -362,23 +362,23 @@ function CheckList({
 }) {
   return (
     <div className="mt-3">
-      <h5 className="mb-1 text-[10.5px] font-semibold uppercase tracking-wide text-zinc-500">
+      <h5 className="mb-1 text-[10.5px] font-semibold uppercase tracking-wide text-muted">
         {label}
       </h5>
       <div className="space-y-1">
         {items.map(([name, price], idx) => (
           <label
             key={name}
-            className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1 text-xs hover:bg-zinc-900"
+            className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1 text-xs hover:bg-surface"
           >
             <input
               type="checkbox"
               checked={checked[idx] ?? false}
               onChange={() => onToggle(idx)}
-              className="accent-emerald-500"
+              className="accent-primary"
             />
-            <span className="flex-1 text-zinc-300">{name}</span>
-            <span className={refOnly ? "text-zinc-500" : "text-emerald-400"}>
+            <span className="flex-1 text-ink">{name}</span>
+            <span className={refOnly ? "text-muted" : "text-accent"}>
               {refOnly ? (price ? `ref ${formatMoney(price, currency)}` : "free") : price ? formatMoney(price, currency) : "free"}
             </span>
           </label>

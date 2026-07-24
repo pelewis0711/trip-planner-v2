@@ -47,22 +47,22 @@ export default function SharePanel({ plan, onClose }: { plan: Plan; onClose: () 
   };
 
   return (
-    <div className="mt-3 space-y-3 rounded-lg border border-zinc-800 bg-zinc-950 p-3 text-[12px]">
+    <div className="mt-3 space-y-3 rounded-lg border border-border bg-surface-muted p-3 text-[12px]">
       <div className="flex items-center justify-between">
-        <b className="text-zinc-200">Share this plan</b>
-        <button type="button" onClick={onClose} className="text-zinc-500 hover:text-zinc-300">
+        <b className="text-ink">Share this plan</b>
+        <button type="button" onClick={onClose} className="text-muted hover:text-ink">
           ✕
         </button>
       </div>
 
       <div>
-        <label className="flex items-center gap-2 text-zinc-300">
+        <label className="flex items-center gap-2 text-ink">
           <input
             type="checkbox"
             checked={!!plan.shareViewToken}
             disabled={busy !== null}
             onChange={() => toggle("view")}
-            className="accent-emerald-500"
+            className="accent-primary"
           />
           Anyone with the link can view
         </label>
@@ -72,12 +72,12 @@ export default function SharePanel({ plan, onClose }: { plan: Plan; onClose: () 
               readOnly
               value={shareUrl(plan.shareViewToken)}
               onFocus={(e) => e.target.select()}
-              className="min-w-0 flex-1 rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1 text-zinc-400"
+              className="min-w-0 flex-1 rounded-md border border-border bg-surface px-2 py-1 text-muted"
             />
             <button
               type="button"
               onClick={() => copy("view", plan.shareViewToken!)}
-              className="shrink-0 rounded-md border border-zinc-700 px-2 py-1 font-semibold text-zinc-300"
+              className="shrink-0 rounded-md border border-border px-2 py-1 font-semibold text-muted"
             >
               {copied === "view" ? "Copied!" : "Copy"}
             </button>
@@ -86,13 +86,13 @@ export default function SharePanel({ plan, onClose }: { plan: Plan; onClose: () 
       </div>
 
       <div>
-        <label className="flex items-center gap-2 text-zinc-300">
+        <label className="flex items-center gap-2 text-ink">
           <input
             type="checkbox"
             checked={!!plan.shareCollabToken}
             disabled={busy !== null}
             onChange={() => toggle("collab")}
-            className="accent-emerald-500"
+            className="accent-primary"
           />
           Anyone with the link (signed in) can edit
         </label>
@@ -103,18 +103,18 @@ export default function SharePanel({ plan, onClose }: { plan: Plan; onClose: () 
                 readOnly
                 value={shareUrl(plan.shareCollabToken)}
                 onFocus={(e) => e.target.select()}
-                className="min-w-0 flex-1 rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1 text-zinc-400"
+                className="min-w-0 flex-1 rounded-md border border-border bg-surface px-2 py-1 text-muted"
               />
               <button
                 type="button"
                 onClick={() => copy("collab", plan.shareCollabToken!)}
-                className="shrink-0 rounded-md border border-zinc-700 px-2 py-1 font-semibold text-zinc-300"
+                className="shrink-0 rounded-md border border-border px-2 py-1 font-semibold text-muted"
               >
                 {copied === "collab" ? "Copied!" : "Copy"}
               </button>
             </div>
             {!!plan.collaboratorIds?.length && (
-              <div className="mt-1 text-zinc-500">
+              <div className="mt-1 text-muted">
                 {plan.collaboratorIds.length} collaborator{plan.collaboratorIds.length > 1 ? "s" : ""} joined
               </div>
             )}

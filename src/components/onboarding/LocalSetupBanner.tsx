@@ -26,7 +26,7 @@ export default function LocalSetupBanner() {
   return (
     <>
       <div className="mx-auto w-full max-w-6xl px-4 pt-3 sm:px-6">
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-2.5 text-[12.5px] text-emerald-200">
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-primary/40 bg-primary-soft px-4 py-2.5 text-[12.5px] text-primary">
           <span>
             🧭 Set up your trip — pick your host city and semester dates so your calendar matches your
             program, not someone else&apos;s.
@@ -35,14 +35,14 @@ export default function LocalSetupBanner() {
             <button
               type="button"
               onClick={() => setOpen(true)}
-              className="rounded-md border border-emerald-500/60 bg-emerald-500/20 px-2.5 py-1 font-semibold text-emerald-100"
+              className="rounded-md border border-primary/60 bg-primary/20 px-2.5 py-1 font-semibold text-primary"
             >
               Set up now
             </button>
             <button
               type="button"
               onClick={dismiss}
-              className="rounded-md border border-emerald-500/40 px-2 py-1 font-semibold text-emerald-300"
+              className="rounded-md border border-primary/40 px-2 py-1 font-semibold text-primary"
               aria-label="Dismiss"
             >
               ✕
