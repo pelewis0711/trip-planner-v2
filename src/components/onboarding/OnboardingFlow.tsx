@@ -184,7 +184,7 @@ export default function OnboardingFlow({
     <>
       {(layout === "single-page" || step === 1) && (
         <section className="space-y-2">
-          <h3 className="text-sm font-semibold text-zinc-200">1. Host city</h3>
+          <h3 className="font-heading text-sm font-semibold text-ink">1. Host city</h3>
           {addingCity ? (
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
@@ -196,7 +196,7 @@ export default function OnboardingFlow({
                   onChange={(e) => setCityInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleAddCity()}
                   placeholder="Type any European city…"
-                  className="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1.5 text-sm text-zinc-100 placeholder:text-zinc-600"
+                  className="rounded-md border border-border bg-surface-muted px-2 py-1.5 text-sm text-ink placeholder:text-muted"
                 />
                 <datalist id="city-options">
                   {[...Object.keys(HOMES), ...Object.keys(EUROPEAN_CITIES)].map((c) => (
@@ -207,7 +207,7 @@ export default function OnboardingFlow({
                   type="button"
                   onClick={handleAddCity}
                   disabled={geocoding}
-                  className="rounded-md bg-emerald-500 px-3 py-1.5 text-xs font-bold text-zinc-950 disabled:opacity-50"
+                  className="rounded-md bg-primary px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
                 >
                   {geocoding ? "Looking up…" : "Confirm"}
                 </button>
@@ -218,13 +218,13 @@ export default function OnboardingFlow({
                     setGeocodeError(null);
                     setManualEntry(false);
                   }}
-                  className="text-xs text-zinc-500 hover:text-zinc-300"
+                  className="text-xs text-muted hover:text-ink"
                 >
                   Cancel
                 </button>
               </div>
               {geocodeError && !manualEntry && (
-                <div className="space-y-1.5 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+                <div className="space-y-1.5 rounded-md border border-warning/40 bg-warning/10 px-3 py-2 text-xs text-warning">
                   <p>{geocodeError} — we couldn&apos;t find that city.</p>
                   <div className="flex flex-wrap gap-2">
                     <button
@@ -233,14 +233,14 @@ export default function OnboardingFlow({
                         setAddingCity(false);
                         setGeocodeError(null);
                       }}
-                      className="rounded-md border border-amber-500/40 px-2 py-1 font-semibold text-amber-100"
+                      className="rounded-md border border-warning/40 px-2 py-1 font-semibold text-warning"
                     >
                       Pick the nearest city from the list instead
                     </button>
                     <button
                       type="button"
                       onClick={() => setManualEntry(true)}
-                      className="rounded-md border border-amber-500/40 px-2 py-1 font-semibold text-amber-100"
+                      className="rounded-md border border-warning/40 px-2 py-1 font-semibold text-warning"
                     >
                       Enter coordinates manually
                     </button>
@@ -248,8 +248,8 @@ export default function OnboardingFlow({
                 </div>
               )}
               {manualEntry && (
-                <div className="space-y-1.5 rounded-md border border-zinc-800 bg-zinc-950 p-2.5">
-                  <p className="text-[11px] text-zinc-500">
+                <div className="space-y-1.5 rounded-md border border-border bg-surface-muted p-2.5">
+                  <p className="text-[11px] text-muted">
                     &ldquo;{cityInput}&rdquo; — enter its coordinates and (optionally) country so trip distances
                     and your Schengen tracker still work.
                   </p>
@@ -259,7 +259,7 @@ export default function OnboardingFlow({
                       value={manualCountry}
                       onChange={(e) => setManualCountry(e.target.value)}
                       placeholder="Country (optional)"
-                      className="rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1 text-xs text-zinc-100 placeholder:text-zinc-600"
+                      className="rounded-md border border-border bg-surface px-2 py-1 text-xs text-ink placeholder:text-muted"
                     />
                     <input
                       type="number"
@@ -267,7 +267,7 @@ export default function OnboardingFlow({
                       value={manualLat}
                       onChange={(e) => setManualLat(e.target.value)}
                       placeholder="Latitude"
-                      className="w-28 rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1 text-xs text-zinc-100 placeholder:text-zinc-600"
+                      className="w-28 rounded-md border border-border bg-surface px-2 py-1 text-xs text-ink placeholder:text-muted"
                     />
                     <input
                       type="number"
@@ -275,12 +275,12 @@ export default function OnboardingFlow({
                       value={manualLon}
                       onChange={(e) => setManualLon(e.target.value)}
                       placeholder="Longitude"
-                      className="w-28 rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1 text-xs text-zinc-100 placeholder:text-zinc-600"
+                      className="w-28 rounded-md border border-border bg-surface px-2 py-1 text-xs text-ink placeholder:text-muted"
                     />
                     <button
                       type="button"
                       onClick={confirmManualEntry}
-                      className="rounded-md bg-emerald-500 px-3 py-1 text-xs font-bold text-zinc-950"
+                      className="rounded-md bg-primary px-3 py-1 text-xs font-bold text-white"
                     >
                       Use these coordinates
                     </button>
@@ -302,7 +302,7 @@ export default function OnboardingFlow({
                   setHostLon(resolved?.lon ?? 0);
                 }
               }}
-              className="rounded-md border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-sm text-zinc-100"
+              className="rounded-md border border-border bg-surface-muted px-3 py-1.5 text-sm text-ink"
             >
               {Object.keys(HOMES).map((h) => (
                 <option key={h} value={h}>
@@ -313,7 +313,7 @@ export default function OnboardingFlow({
             </select>
           )}
           {!addingCity && hostCity && (
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-muted">
               {hostCity}, {hostCountry}
             </p>
           )}
@@ -322,8 +322,8 @@ export default function OnboardingFlow({
 
       {(layout === "single-page" || step === 2) && (
         <section className="space-y-2">
-          <h3 className="text-sm font-semibold text-zinc-200">
-            2. Host university <span className="font-normal text-zinc-500">(optional)</span>
+          <h3 className="font-heading text-sm font-semibold text-ink">
+            2. Host university <span className="font-sans font-normal text-muted">(optional)</span>
           </h3>
           <input
             type="text"
@@ -334,7 +334,7 @@ export default function OnboardingFlow({
               reseedDates(e.target.value, term);
             }}
             placeholder="Start typing…"
-            className="w-full max-w-sm rounded-md border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-sm text-zinc-100 placeholder:text-zinc-600"
+            className="w-full max-w-sm rounded-md border border-border bg-surface-muted px-3 py-1.5 text-sm text-ink placeholder:text-muted"
           />
           <datalist id="host-university-options">
             {uniNames.map((n) => (
@@ -346,22 +346,22 @@ export default function OnboardingFlow({
 
       {(layout === "single-page" || step === 3) && (
         <section className="space-y-2">
-          <h3 className="text-sm font-semibold text-zinc-200">
-            3. Home university <span className="font-normal text-zinc-500">(optional)</span>
+          <h3 className="font-heading text-sm font-semibold text-ink">
+            3. Home university <span className="font-sans font-normal text-muted">(optional)</span>
           </h3>
           <input
             type="text"
             value={homeUniversity}
             onChange={(e) => setHomeUniversity(e.target.value)}
             placeholder="Your home-campus school"
-            className="w-full max-w-sm rounded-md border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-sm text-zinc-100 placeholder:text-zinc-600"
+            className="w-full max-w-sm rounded-md border border-border bg-surface-muted px-3 py-1.5 text-sm text-ink placeholder:text-muted"
           />
         </section>
       )}
 
       {(layout === "single-page" || step === 4) && (
         <section className="space-y-2">
-          <h3 className="text-sm font-semibold text-zinc-200">4. Term</h3>
+          <h3 className="font-heading text-sm font-semibold text-ink">4. Term</h3>
           <div className="flex gap-2">
             {(["fall", "spring", "winter"] as Term[]).map((t) => (
               <button
@@ -373,8 +373,8 @@ export default function OnboardingFlow({
                 }}
                 className={`rounded-md border px-4 py-1.5 text-sm font-semibold capitalize ${
                   term === t
-                    ? "border-emerald-500 bg-emerald-500/10 text-emerald-300"
-                    : "border-zinc-800 text-zinc-400 hover:border-zinc-600"
+                    ? "border-primary bg-primary-soft text-primary"
+                    : "border-border text-muted hover:border-primary/40"
                 }`}
               >
                 {t}
@@ -386,8 +386,8 @@ export default function OnboardingFlow({
 
       {(layout === "single-page" || step === 5) && (
         <section className="space-y-2">
-          <h3 className="text-sm font-semibold text-zinc-200">5. Confirm semester dates</h3>
-          <p className="text-xs text-zinc-500">
+          <h3 className="font-heading text-sm font-semibold text-ink">5. Confirm semester dates</h3>
+          <p className="text-xs text-muted">
             {findUniversitySemester(hostUniversity, term)
               ? `Pre-filled from ${hostUniversity}'s published calendar — double-check it.`
               : "No match in our database — pre-filled with typical dates for this term. Edit anything below."}
@@ -400,22 +400,22 @@ export default function OnboardingFlow({
             }}
           />
 
-          <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-zinc-800 pt-4">
-            <label className="flex items-center gap-2 text-xs text-zinc-300">
+          <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-border pt-4">
+            <label className="flex items-center gap-2 text-xs text-ink">
               <input
                 type="checkbox"
                 checked={studyingInEurope}
                 onChange={(e) => setStudyingInEurope(e.target.checked)}
-                className="accent-emerald-500"
+                className="accent-primary"
               />
               Studying in Europe
             </label>
-            <label className="flex items-center gap-2 text-xs text-zinc-300">
+            <label className="flex items-center gap-2 text-xs text-ink">
               Currency
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value as Currency)}
-                className="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-zinc-100"
+                className="rounded-md border border-border bg-surface-muted px-2 py-1 text-ink"
               >
                 <option value="USD">USD ($)</option>
                 <option value="EUR">EUR (€)</option>
@@ -423,7 +423,7 @@ export default function OnboardingFlow({
               </select>
             </label>
           </div>
-          <p className="text-[11px] text-zinc-600">
+          <p className="text-[11px] text-muted">
             Just saved for now — doesn&apos;t change any prices yet (everything in the app is still
             shown in USD).
           </p>
@@ -439,7 +439,7 @@ export default function OnboardingFlow({
         <button
           type="button"
           onClick={finish}
-          className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-bold text-zinc-950"
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary-hover"
         >
           {submitLabel}
         </button>
@@ -453,7 +453,7 @@ export default function OnboardingFlow({
     <div className="space-y-6">
       <div className="flex gap-1.5">
         {[1, 2, 3, 4, 5].map((s) => (
-          <div key={s} className={`h-1 flex-1 rounded-full ${s <= step ? "bg-emerald-500" : "bg-zinc-800"}`} />
+          <div key={s} className={`h-1 flex-1 rounded-full ${s <= step ? "bg-primary" : "bg-surface-muted"}`} />
         ))}
       </div>
 
@@ -464,7 +464,7 @@ export default function OnboardingFlow({
           type="button"
           onClick={() => setStep((s) => Math.max(1, s - 1))}
           disabled={step === 1}
-          className="rounded-lg border border-zinc-800 px-4 py-2 text-sm font-semibold text-zinc-400 disabled:opacity-30"
+          className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-muted disabled:opacity-30"
         >
           Back
         </button>
@@ -474,7 +474,7 @@ export default function OnboardingFlow({
               <button
                 type="button"
                 onClick={() => setStep((s) => s + 1)}
-                className="rounded-lg border border-zinc-800 px-4 py-2 text-sm font-semibold text-zinc-400 hover:border-zinc-600"
+                className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-muted hover:border-primary/40"
               >
                 Skip
               </button>
@@ -483,7 +483,7 @@ export default function OnboardingFlow({
               type="button"
               onClick={() => setStep((s) => s + 1)}
               disabled={!canNext}
-              className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-bold text-zinc-950 disabled:opacity-40"
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white disabled:opacity-40"
             >
               Next
             </button>
@@ -492,7 +492,7 @@ export default function OnboardingFlow({
           <button
             type="button"
             onClick={finish}
-            className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-bold text-zinc-950"
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary-hover"
           >
             {submitLabel}
           </button>
