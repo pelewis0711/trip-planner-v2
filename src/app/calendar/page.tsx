@@ -279,6 +279,7 @@ export default function CalendarPage() {
                 slots={slots}
                 placements={placements}
                 armed={!!armedId}
+                year={semesterYear}
                 onActivate={activate}
                 onDropTrip={dropTrip}
               />

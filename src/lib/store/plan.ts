@@ -139,6 +139,11 @@ interface PlanStoreState {
   setupPromptDismissed: boolean;
   dismissSetupPrompt: () => void;
 
+  // Phase 11: one-time "Got it" ack for the wizard's brief privacy mention --
+  // global, not per-plan, same shape as foodFixNoticeSeen/setupPromptDismissed.
+  privacyNoticeSeen: boolean;
+  dismissPrivacyNotice: () => void;
+
   // mutate the ACTIVE plan
   addStop: (slotId: string, tripId: string) => void;
   removeStop: (slotId: string, stopIndex: number) => void;
@@ -321,6 +326,7 @@ export const usePlanStore = create<PlanStoreState>()(
       defaultCurrency: "USD",
       foodFixNoticeSeen: false,
       setupPromptDismissed: false,
+      privacyNoticeSeen: false,
 
       addStop: (slotId, tripId) =>
         set((state) =>
@@ -685,6 +691,7 @@ export const usePlanStore = create<PlanStoreState>()(
 
       dismissFoodFixNotice: () => set({ foodFixNoticeSeen: true }),
       dismissSetupPrompt: () => set({ setupPromptDismissed: true }),
+      dismissPrivacyNotice: () => set({ privacyNoticeSeen: true }),
     }),
     {
       name: "activePlan",
@@ -701,6 +708,7 @@ export const usePlanStore = create<PlanStoreState>()(
         defaultCurrency: state.defaultCurrency,
         foodFixNoticeSeen: state.foodFixNoticeSeen,
         setupPromptDismissed: state.setupPromptDismissed,
+        privacyNoticeSeen: state.privacyNoticeSeen,
       }),
       migrate: (persisted, version) => {
         const state = (persisted ?? {}) as Record<string, unknown>;
