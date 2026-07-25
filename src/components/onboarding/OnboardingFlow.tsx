@@ -5,6 +5,7 @@
 // picked explicitly. Reused by both /onboarding (first sign-in, step-by-step)
 // and /settings (edit anytime, single page) via the `layout` prop.
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { HOMES } from "@/data/homes";
 import { EUROPEAN_CITIES } from "@/data/europeanCities";
 import { lookupCity, resolveHome } from "@/lib/resolveHome";
@@ -12,6 +13,7 @@ import { universityNames, findUniversitySemester } from "@/data/universitySemest
 import { smartDefaultSemester, postFinalsBreak, type Term } from "@/lib/calc/onboarding";
 import type { SemesterConfig } from "@/lib/calc/semester";
 import SemesterDatesForm from "@/components/SemesterDatesForm";
+import { usePlanStore } from "@/lib/store/plan";
 
 export interface HostCity {
   city: string;
@@ -46,20 +48,6 @@ export interface OnboardingValues {
   currency: Currency;
 }
 
-export const AAU_PRAGUE_DEFAULTS: OnboardingValues = {
-  host: { city: "Prague", country: "Czechia", lat: HOMES.Prague[0], lon: HOMES.Prague[1] },
-  hostUniversity: "Anglo-American University",
-  homeUniversity: "",
-  term: "spring",
-  semester: { start: "2027-01-24", end: "2027-05-24", breaks: [
-    { id: "sp", label: "St. Patrick's ☘", start: "2027-03-16", end: "2027-03-18", kind: "special" },
-    { id: "brk", label: "SPRING BREAK", start: "2027-03-26", end: "2027-04-04", kind: "break" },
-    { id: "post", label: "POST-FINALS", start: "2027-05-15", end: "2027-05-24", kind: "post" },
-  ] },
-  studyingInEurope: true,
-  currency: "USD",
-};
-
 // Phase 9 step 3: the starting point for a brand-new, never-configured
 // visitor -- no city, so this doesn't quietly look like anyone in particular.
 // The host-city <select> below already falls through to "Other city..." for
@@ -90,6 +78,9 @@ export default function OnboardingFlow({
   submitLabel?: string;
 }) {
   const [step, setStep] = useState(1);
+
+  const privacyNoticeSeen = usePlanStore((s) => s.privacyNoticeSeen);
+  const dismissPrivacyNotice = usePlanStore((s) => s.dismissPrivacyNotice);
 
   const [hostCity, setHostCity] = useState(initial.host.city);
   const [hostCountry, setHostCountry] = useState(initial.host.country);
@@ -427,6 +418,25 @@ export default function OnboardingFlow({
             Just saved for now — doesn&apos;t change any prices yet (everything in the app is still
             shown in USD).
           </p>
+
+          {!privacyNoticeSeen && (
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-primary/30 bg-primary-soft px-3 py-2.5 text-xs text-ink">
+              <span>
+                🔒 By default, everything you enter here stays only in your own browser — no account
+                needed. Sign in and it syncs to your own private account instead.{" "}
+                <Link href="/privacy" className="font-semibold text-primary underline">
+                  Read more
+                </Link>
+              </span>
+              <button
+                type="button"
+                onClick={dismissPrivacyNotice}
+                className="shrink-0 rounded-md border border-primary/50 bg-primary/10 px-2.5 py-1 font-semibold text-primary"
+              >
+                Got it
+              </button>
+            </div>
+          )}
         </section>
       )}
     </>

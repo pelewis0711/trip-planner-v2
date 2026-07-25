@@ -3,13 +3,19 @@
 import { useState } from "react";
 import type { Plan } from "@/lib/store/plan";
 import { usePlanStore, slotsToBeLost } from "@/lib/store/plan";
-import { DEFAULT_SEMESTER, type SemesterConfig } from "@/lib/calc/semester";
+import type { SemesterConfig } from "@/lib/calc/semester";
+import { smartDefaultSemester } from "@/lib/calc/onboarding";
 import SemesterDatesForm from "@/components/SemesterDatesForm";
+
+// Neutral, computed-from-today starting point (same helper onboarding uses)
+// -- NOT a hardcoded date range, so this panel never surfaces one specific
+// student's program as if it were everyone's default.
+const BLANK_TEMPLATE = smartDefaultSemester("spring");
 
 export default function SemesterPanel({ plan, onClose }: { plan: Plan; onClose: () => void }) {
   const regenerateSlotsFor = usePlanStore((s) => s.regenerateSlotsFor);
   const isCustom = !!plan.semester;
-  const [form, setForm] = useState<SemesterConfig>(plan.semester ?? DEFAULT_SEMESTER);
+  const [form, setForm] = useState<SemesterConfig>(plan.semester ?? BLANK_TEMPLATE);
 
   // "warn me first instead of silently deleting" -- named here, confirmed
   // before regenerateSlotsFor actually touches anything. Custom (hand-added)
@@ -34,12 +40,12 @@ export default function SemesterPanel({ plan, onClose }: { plan: Plan; onClose: 
     applyIfConfirmed(form);
   };
 
-  const handleReset = () => applyIfConfirmed(DEFAULT_SEMESTER);
+  const handleReset = () => applyIfConfirmed(BLANK_TEMPLATE);
 
   return (
     <div className="mt-3 space-y-3 rounded-lg border border-border bg-surface-muted p-3 text-[12px]">
       <div className="flex items-center justify-between">
-        <b className="text-ink">Semester dates{isCustom ? "" : " (default: AAU Spring 2027)"}</b>
+        <b className="text-ink">Semester dates{isCustom ? "" : " (using a blank template — set your own below)"}</b>
         <button type="button" onClick={onClose} className="text-muted hover:text-ink">
           ✕
         </button>
@@ -66,7 +72,7 @@ export default function SemesterPanel({ plan, onClose }: { plan: Plan; onClose: 
           onClick={handleReset}
           className="rounded-md border border-border px-3 py-1.5 text-[12px] font-semibold text-muted hover:border-primary/40"
         >
-          Reset to AAU Spring 2027
+          Reset to blank template
         </button>
       </div>
     </div>

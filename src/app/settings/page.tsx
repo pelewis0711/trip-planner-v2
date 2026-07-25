@@ -8,7 +8,7 @@ import { usePlanStore } from "@/lib/store/plan";
 import { useCustomHomesStore } from "@/lib/store/customHomes";
 import { isKnownCity } from "@/lib/resolveHome";
 import { fetchUserSettings, saveUserSettings, rowToOnboardingValues } from "@/lib/supabase/settings";
-import OnboardingFlow, { AAU_PRAGUE_DEFAULTS, type OnboardingResult, type OnboardingValues } from "@/components/onboarding/OnboardingFlow";
+import OnboardingFlow, { EMPTY_ONBOARDING_DEFAULTS, type OnboardingResult, type OnboardingValues } from "@/components/onboarding/OnboardingFlow";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -29,7 +29,7 @@ export default function SettingsPage() {
     (async () => {
       const supabase = createClient();
       const row = await fetchUserSettings(supabase, user.id);
-      setInitial(row ? rowToOnboardingValues(row) : AAU_PRAGUE_DEFAULTS);
+      setInitial(row ? rowToOnboardingValues(row) : EMPTY_ONBOARDING_DEFAULTS);
     })();
   }, [authLoading, user, router]);
 

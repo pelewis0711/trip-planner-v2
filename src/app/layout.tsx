@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import AuthSync from "@/components/AuthSync";
 import CustomTripsSync from "@/components/CustomTripsSync";
 import RegisterServiceWorker from "@/components/RegisterServiceWorker";
@@ -61,6 +62,7 @@ export default function RootLayout({
         <FoodFixNotice />
         <LocalSetupBanner />
         <main className="flex flex-1 flex-col">{children}</main>
+        <Footer />
       </body>
     </html>
   );
