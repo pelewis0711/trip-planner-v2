@@ -410,6 +410,64 @@ export const UNIVERSITY_SEMESTERS: UniversitySemesterEntry[] = [
     start: "2027-02-01", end: "2027-06-13",
     breaks: [b("Easter Vacation", "2027-03-22", "2027-04-11", "easter")],
     sourceUrl: "https://documents.manchester.ac.uk/DocuInfo.aspx?DocID=78064" },
+
+  // UIUC exchange partners, batch 2. 5 of 8 requested universities sourced.
+  // Flags worth a second look:
+  // - WHU Otto Beisheim School of Management NOT attempted at all --
+  //   whu.edu's robots.txt explicitly disallows ClaudeBot while
+  //   whitelisting Googlebot/Bingbot, so this was treated as a policy
+  //   boundary to respect, not a technical failure to route around.
+  // - University of Bologna NOT included -- its academic calendars are
+  //   decentralized per-school/per-degree with no single working central
+  //   page found after checking the sitemap, international-mobility nav,
+  //   and internal search.
+  // - Tilburg University NOT included -- the live site 403s (Cloudflare
+  //   bot challenge) on every page. A real official PDF was found via the
+  //   Wayback Machine, but its own 2026-27 section is explicitly labeled
+  //   "DRAFT: THE START OF ACADEMIC YEAR 2026-2027 IS STILL IN DRAFT" with
+  //   only a preliminary start window and no end date or spring dates --
+  //   genuinely not ready to record, not a fetch failure.
+  // - TUM/TU Darmstadt/Bern: each publishes both a broader administrative
+  //   "semester" and a narrower actual-teaching "lecture period" inside
+  //   it -- the lecture period is what's recorded below (what actually
+  //   matters for when an exchange student is in class), not the wider
+  //   window that mostly pads exam/break time on both ends.
+  // - TUM/KTH/Karolinska show breaks: [] because their own pages say so
+  //   explicitly (Karolinska: "no official holidays such as Christmas or
+  //   Easter"; KTH: continuous study/exam periods, no gap) -- not a
+  //   search gap.
+  { university: "Technical University of Munich (TUM)", city: "Munich", country: "Germany", term: "fall",
+    start: "2026-10-12", end: "2027-02-05", breaks: [],
+    sourceUrl: "https://www.tum.de/en/studies/application/application-info-portal/dates-periods-and-deadlines/" },
+  { university: "Technical University of Munich (TUM)", city: "Munich", country: "Germany", term: "spring",
+    start: "2027-04-12", end: "2027-07-16", breaks: [],
+    sourceUrl: "https://www.tum.de/en/studies/application/application-info-portal/dates-periods-and-deadlines/" },
+  { university: "TU Darmstadt", city: "Darmstadt", country: "Germany", term: "fall",
+    start: "2026-10-12", end: "2027-02-12",
+    breaks: [b("Christmas Break (Weihnachtspause)", "2026-12-21", "2027-01-08", "christmas")],
+    sourceUrl: "https://www.tu-darmstadt.de/studieren/studierende_tu/semestermine/index.de.jsp" },
+  { university: "TU Darmstadt", city: "Darmstadt", country: "Germany", term: "spring",
+    start: "2027-04-12", end: "2027-07-16", breaks: [],
+    sourceUrl: "https://www.tu-darmstadt.de/studieren/studierende_tu/semestermine/index.de.jsp" },
+  { university: "KTH Royal Institute of Technology", city: "Stockholm", country: "Sweden", term: "fall",
+    start: "2026-08-24", end: "2027-01-11", breaks: [],
+    sourceUrl: "https://www.kth.se/en/student/studier/schema/lasarsindelning-1.912374" },
+  { university: "KTH Royal Institute of Technology", city: "Stockholm", country: "Sweden", term: "spring",
+    start: "2027-01-12", end: "2027-05-31", breaks: [],
+    sourceUrl: "https://www.kth.se/en/student/studier/schema/lasarsindelning-1.912374" },
+  { university: "Karolinska Institute", city: "Stockholm", country: "Sweden", term: "fall",
+    start: "2026-08-31", end: "2027-01-17", breaks: [],
+    sourceUrl: "https://education.ki.se/student-at-ki/academic-calendar" },
+  { university: "Karolinska Institute", city: "Stockholm", country: "Sweden", term: "spring",
+    start: "2027-01-18", end: "2027-06-06", breaks: [],
+    sourceUrl: "https://education.ki.se/student-at-ki/academic-calendar" },
+  { university: "University of Bern", city: "Bern", country: "Switzerland", term: "fall",
+    start: "2026-09-14", end: "2026-12-18", breaks: [],
+    sourceUrl: "https://www.unibe.ch/studies/dates/semesterdates/index_eng.html" },
+  { university: "University of Bern", city: "Bern", country: "Switzerland", term: "spring",
+    start: "2027-02-22", end: "2027-06-04",
+    breaks: [b("Spring vacation", "2027-03-26", "2027-04-04", "spring")],
+    sourceUrl: "https://www.unibe.ch/studies/dates/semesterdates/index_eng.html" },
 ];
 
 export function universityNames(): string[] {
