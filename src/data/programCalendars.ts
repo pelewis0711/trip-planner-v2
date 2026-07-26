@@ -137,6 +137,69 @@ const PROVIDER_ENTRIES: ProgramCalendar[] = [
     term: "Spring 2027", start: "2027-01-18", end: "2027-05-08", breaks: [],
     sourceUrl: "https://www.iesabroad.org/programs/vienna-business-economics-international-relations",
     verifyNote: VERIFY_NOTE },
+
+  // Batch 2 (CIEE + API), same discipline: each provider's own program
+  // page, dates read directly off the page, not a summary.
+  //
+  // Flags worth a second look:
+  // - CIEE (all 4 cities): none of the official pages publish specific
+  //   break/excursion dates -- they only mention excursions in general
+  //   prose (named destinations, no dates). breaks: [] reflects the real
+  //   page content, not a search gap.
+  // - API Florence: apiabroad.com's own program page is a JS-rendered app
+  //   that can't be scraped directly, and API's own program page (per a
+  //   university study-abroad-office mirror) explicitly tells students to
+  //   use the LdM (Lorenzo de' Medici, the host institute) academic
+  //   calendar for exact dates -- so this genuinely is the real source of
+  //   truth for API Florence, not a substitute, even though it's LdM's PDF
+  //   rather than apiabroad.com's own page.
+  // - API Barcelona: deliberately NOT included. Two university
+  //   study-abroad mirrors gave conflicting Spring 2027 dates (Jan 7-May
+  //   11 vs. Jan 10-Apr 28) and Fall 2026 wasn't found anywhere -- rather
+  //   than guess between two conflicting numbers, this is skipped entirely
+  //   until it can be confirmed against API's own page.
+  { id: "ciee-prague-fall-2026", type: "provider", name: "CIEE Prague", city: "Prague", country: "Czechia",
+    term: "Fall 2026", start: "2026-09-08", end: "2026-12-19", breaks: [],
+    sourceUrl: "https://www.ciee.org/go-abroad/college-study-abroad/programs/czech-republic/prague/semester-prague",
+    verifyNote: VERIFY_NOTE },
+  { id: "ciee-prague-spring-2027", type: "provider", name: "CIEE Prague", city: "Prague", country: "Czechia",
+    term: "Spring 2027", start: "2027-01-26", end: "2027-05-08", breaks: [],
+    sourceUrl: "https://www.ciee.org/go-abroad/college-study-abroad/programs/czech-republic/prague/semester-prague",
+    verifyNote: VERIFY_NOTE },
+  { id: "ciee-berlin-fall-2026", type: "provider", name: "CIEE Berlin", city: "Berlin", country: "Germany",
+    term: "Fall 2026", start: "2026-09-07", end: "2026-12-19", breaks: [],
+    sourceUrl: "https://www.ciee.org/go-abroad/college-study-abroad/programs/germany/berlin/semester-berlin",
+    verifyNote: VERIFY_NOTE },
+  { id: "ciee-berlin-spring-2027", type: "provider", name: "CIEE Berlin", city: "Berlin", country: "Germany",
+    term: "Spring 2027", start: "2027-01-04", end: "2027-05-15", breaks: [],
+    sourceUrl: "https://www.ciee.org/go-abroad/college-study-abroad/programs/germany/berlin/semester-berlin",
+    verifyNote: VERIFY_NOTE },
+  { id: "ciee-paris-fall-2026", type: "provider", name: "CIEE Paris", city: "Paris", country: "France",
+    term: "Fall 2026", start: "2026-08-17", end: "2026-12-19", breaks: [],
+    sourceUrl: "https://www.ciee.org/go-abroad/college-study-abroad/programs/france/paris/semester-paris",
+    verifyNote: VERIFY_NOTE },
+  { id: "ciee-paris-spring-2027", type: "provider", name: "CIEE Paris", city: "Paris", country: "France",
+    term: "Spring 2027", start: "2027-01-02", end: "2027-05-08", breaks: [],
+    sourceUrl: "https://www.ciee.org/go-abroad/college-study-abroad/programs/france/paris/semester-paris",
+    verifyNote: VERIFY_NOTE },
+  { id: "ciee-rome-fall-2026", type: "provider", name: "CIEE Rome", city: "Rome", country: "Italy",
+    term: "Fall 2026", start: "2026-08-17", end: "2026-12-05", breaks: [],
+    sourceUrl: "https://www.ciee.org/go-abroad/college-study-abroad/programs/italy/rome/semester-rome",
+    verifyNote: VERIFY_NOTE },
+  { id: "ciee-rome-spring-2027", type: "provider", name: "CIEE Rome", city: "Rome", country: "Italy",
+    term: "Spring 2027", start: "2027-01-25", end: "2027-05-08", breaks: [],
+    sourceUrl: "https://www.ciee.org/go-abroad/college-study-abroad/programs/italy/rome/semester-rome",
+    verifyNote: VERIFY_NOTE },
+  { id: "api-florence-fall-2026", type: "provider", name: "API Florence", city: "Florence", country: "Italy",
+    term: "Fall 2026", start: "2026-09-01", end: "2026-12-19",
+    breaks: [{ label: "Fall Break", start: "2026-10-26", end: "2026-10-30" }],
+    sourceUrl: "https://ldminstitute.com/wp-content/uploads/2025/12/LdM-Academic-Calendar-2026-2027_2025.12.10.pdf",
+    verifyNote: VERIFY_NOTE },
+  { id: "api-florence-spring-2027", type: "provider", name: "API Florence", city: "Florence", country: "Italy",
+    term: "Spring 2027", start: "2027-01-26", end: "2027-05-15",
+    breaks: [{ label: "Spring Break", start: "2027-03-22", end: "2027-03-26" }],
+    sourceUrl: "https://ldminstitute.com/wp-content/uploads/2025/12/LdM-Academic-Calendar-2026-2027_2025.12.10.pdf",
+    verifyNote: VERIFY_NOTE },
 ];
 
 export const PROGRAM_CALENDARS: ProgramCalendar[] = [...UNIVERSITY_ENTRIES, ...PROVIDER_ENTRIES];
