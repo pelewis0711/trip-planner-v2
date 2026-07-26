@@ -265,6 +265,58 @@ const PROVIDER_ENTRIES: ProgramCalendar[] = [
     term: "Spring 2027", start: "2027-01-13", end: "2027-05-08", breaks: [],
     sourceUrl: "https://www.saiprograms.com/rome/jcu/jcu-spring-semester-2027",
     verifyNote: VERIFY_NOTE },
+
+  // Batch 4 -- expanding city coverage for providers already in the
+  // dataset (CEA CAPA, IES Abroad, CIEE) rather than new provider names.
+  // - CEA CAPA Dublin and CEA CAPA Rome are NOT included: ceastudyabroad.com
+  //   returned a hard 403 Forbidden on every program-details URL tried
+  //   (5+ distinct pages, both cities, both terms) -- looks like systematic
+  //   bot-blocking, not a one-off. Partner-institution mirrors (Wake
+  //   Forest for Rome, a Memphis studioabroad mirror for Dublin) show the
+  //   real reason isn't just the fetch tool: Rome's own mirror lists Spring
+  //   2027 as "Forthcoming" and Dublin's lists all upcoming terms as "TBA"
+  //   -- CEA CAPA itself may not have finalized these specific dates yet.
+  // - CIEE's own program pages label these as "tentative dates" with a
+  //   note to confirm with an advisor before booking flights -- a real
+  //   caveat from the source itself, not a hedge added here.
+  // - IES Abroad Rome: IES splits each city into several discipline-
+  //   specific program pages rather than one city page. Dates were pulled
+  //   from "Rome - Language & Area Studies" and cross-checked identical
+  //   against "Rome - Business Studies" and "Rome - International
+  //   Relations," so this is treated as the Rome center's one shared
+  //   semester calendar, not something specific to a single track.
+  { id: "ciee-dublin-fall-2026", type: "provider", name: "CIEE Dublin", city: "Dublin", country: "Ireland",
+    term: "Fall 2026", start: "2026-08-31", end: "2026-12-20", breaks: [],
+    sourceUrl: "https://www.ciee.org/go-abroad/college-study-abroad/programs/ireland/dublin/semester-dublin",
+    verifyNote: VERIFY_NOTE },
+  { id: "ciee-dublin-spring-2027", type: "provider", name: "CIEE Dublin", city: "Dublin", country: "Ireland",
+    term: "Spring 2027", start: "2027-01-04", end: "2027-05-02", breaks: [],
+    sourceUrl: "https://www.ciee.org/go-abroad/college-study-abroad/programs/ireland/dublin/semester-dublin",
+    verifyNote: VERIFY_NOTE },
+  { id: "ciee-barcelona-fall-2026", type: "provider", name: "CIEE Barcelona", city: "Barcelona", country: "Spain",
+    term: "Fall 2026", start: "2026-09-02", end: "2026-12-19", breaks: [],
+    sourceUrl: "https://www.ciee.org/go-abroad/college-study-abroad/programs/spain/barcelona/semester-barcelona",
+    verifyNote: VERIFY_NOTE },
+  { id: "ciee-barcelona-spring-2027", type: "provider", name: "CIEE Barcelona", city: "Barcelona", country: "Spain",
+    term: "Spring 2027", start: "2027-01-04", end: "2027-04-24", breaks: [],
+    sourceUrl: "https://www.ciee.org/go-abroad/college-study-abroad/programs/spain/barcelona/semester-barcelona",
+    verifyNote: VERIFY_NOTE },
+  { id: "ies-abroad-london-fall-2026", type: "provider", name: "IES Abroad London", city: "London", country: "England",
+    term: "Fall 2026", start: "2026-09-01", end: "2026-12-12", breaks: [],
+    sourceUrl: "https://www.iesabroad.org/programs/london-study-london",
+    verifyNote: VERIFY_NOTE },
+  { id: "ies-abroad-london-spring-2027", type: "provider", name: "IES Abroad London", city: "London", country: "England",
+    term: "Spring 2027", start: "2027-01-12", end: "2027-04-24", breaks: [],
+    sourceUrl: "https://www.iesabroad.org/programs/london-study-london",
+    verifyNote: VERIFY_NOTE },
+  { id: "ies-abroad-rome-fall-2026", type: "provider", name: "IES Abroad Rome", city: "Rome", country: "Italy",
+    term: "Fall 2026", start: "2026-08-31", end: "2026-12-10", breaks: [],
+    sourceUrl: "https://www.iesabroad.org/programs/rome-language-area-studies",
+    verifyNote: VERIFY_NOTE },
+  { id: "ies-abroad-rome-spring-2027", type: "provider", name: "IES Abroad Rome", city: "Rome", country: "Italy",
+    term: "Spring 2027", start: "2027-01-25", end: "2027-05-06", breaks: [],
+    sourceUrl: "https://www.iesabroad.org/programs/rome-language-area-studies",
+    verifyNote: VERIFY_NOTE },
 ];
 
 export const PROGRAM_CALENDARS: ProgramCalendar[] = [...UNIVERSITY_ENTRIES, ...PROVIDER_ENTRIES];
