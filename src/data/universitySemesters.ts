@@ -468,6 +468,73 @@ export const UNIVERSITY_SEMESTERS: UniversitySemesterEntry[] = [
     start: "2027-02-22", end: "2027-06-04",
     breaks: [b("Spring vacation", "2027-03-26", "2027-04-04", "spring")],
     sourceUrl: "https://www.unibe.ch/studies/dates/semesterdates/index_eng.html" },
+
+  // UIUC exchange partners, batch 3. 5 of 8 requested universities sourced.
+  // Flags worth a second look:
+  // - EBS Universitat (Wiesbaden) NOT included -- no academic-calendar
+  //   page found anywhere on ebs.edu after checking the sitemap, student
+  //   services, and orientation pages; may be behind a student-only
+  //   portal or simply not published on a dedicated page.
+  // - University of Bergen NOT included -- its official page only
+  //   describes a generic recurring pattern ("autumn starts week 32...")
+  //   without confirming it's specifically the 2026/27 dates rather than
+  //   a template description. Not reported rather than treated as exact.
+  // - Universidade Catolica Portuguesa (Lisbon) NOT included as a
+  //   fall/spring entry -- its real, dated academic-calendar PDF exists
+  //   (year starts Sept 1 2026, ends July 31 2027, with dated Christmas
+  //   and Easter closures) but the document itself isn't organized into a
+  //   fall/spring split, so guessing where one ends and the other begins
+  //   was avoided rather than invented.
+  // - UC3M/UPV Valencia: "end" is each term's own exam-period end (both
+  //   universities' own documents frame it this way -- "fin de semestre"
+  //   = when all evaluation acts must be finished), not last day of
+  //   classes -- this is why Fall's end date lands in late January, after
+  //   Christmas break. A real structural feature of the Spanish academic
+  //   calendar, not an error.
+  // - BI Norwegian's Christmas-break end date (Jan 4) is an inference from
+  //   the source's own vaguer "23 December to early January" phrasing, not
+  //   a date literally printed on the page.
+  { university: "Friedrich-Schiller-Universitat Jena", city: "Jena", country: "Germany", term: "fall",
+    start: "2026-10-19", end: "2027-02-12",
+    breaks: [b("Christmas/New Year break", "2026-12-21", "2027-01-01", "christmas")],
+    sourceUrl: "https://www.uni-jena.de/unijenamedia/38740/zuletzt-vom-senat-zur-kenntnis-genommener-terminplan.pdf" },
+  { university: "Friedrich-Schiller-Universitat Jena", city: "Jena", country: "Germany", term: "spring",
+    start: "2027-04-12", end: "2027-07-16",
+    breaks: [b("Schillertag (Dies Academicus)", "2027-06-25", "2027-06-25", "special")],
+    sourceUrl: "https://www.uni-jena.de/unijenamedia/38740/zuletzt-vom-senat-zur-kenntnis-genommener-terminplan.pdf" },
+  { university: "University of Potsdam", city: "Potsdam", country: "Germany", term: "fall",
+    start: "2026-10-12", end: "2027-02-05",
+    breaks: [b("Christmas Break", "2026-12-21", "2027-01-01", "christmas")],
+    sourceUrl: "https://www.uni-potsdam.de/en/studium/dates-and-deadlines/important-dates-and-deadlines-during-your-studies" },
+  { university: "University of Potsdam", city: "Potsdam", country: "Germany", term: "spring",
+    start: "2027-04-12", end: "2027-07-23", breaks: [],
+    sourceUrl: "https://www.uni-potsdam.de/en/studium/dates-and-deadlines/important-dates-and-deadlines-during-your-studies" },
+  { university: "BI Norwegian Business School", city: "Oslo", country: "Norway", term: "fall",
+    start: "2026-08-17", end: "2026-12-21",
+    breaks: [b("Christmas closure", "2026-12-23", "2027-01-04", "christmas")],
+    sourceUrl: "https://www.bi.no/en/study-at-bi/international-students/practical-info/academic-calendar/" },
+  { university: "BI Norwegian Business School", city: "Oslo", country: "Norway", term: "spring",
+    start: "2027-01-11", end: "2027-06-18", breaks: [],
+    sourceUrl: "https://www.bi.no/en/study-at-bi/international-students/practical-info/academic-calendar/" },
+  { university: "Universidad Carlos III de Madrid", city: "Madrid", country: "Spain", term: "fall",
+    start: "2026-09-07", end: "2027-01-25",
+    breaks: [b("Navidad (Christmas)", "2026-12-23", "2027-01-08", "christmas")],
+    sourceUrl: "https://www.uc3m.es/grado/media/grado/doc/archivo/doc_calendario_2627/calendario_grado_2026_2027_v9.pdf" },
+  { university: "Universidad Carlos III de Madrid", city: "Madrid", country: "Spain", term: "spring",
+    start: "2027-01-26", end: "2027-05-28",
+    breaks: [b("Semana Santa (Easter)", "2027-03-22", "2027-03-29", "easter")],
+    sourceUrl: "https://www.uc3m.es/grado/media/grado/doc/archivo/doc_calendario_2627/calendario_grado_2026_2027_v9.pdf" },
+  { university: "Universitat Politecnica de Valencia", city: "Valencia", country: "Spain", term: "fall",
+    start: "2026-09-07", end: "2027-01-29",
+    breaks: [b("Navidad (Christmas)", "2026-12-23", "2027-01-06", "christmas")],
+    sourceUrl: "https://www.upv.es/entidades/SG/infoweb/sg/info/U0985732.pdf" },
+  { university: "Universitat Politecnica de Valencia", city: "Valencia", country: "Spain", term: "spring",
+    start: "2027-02-01", end: "2027-06-25",
+    breaks: [
+      b("Fallas (Valencia/Gandia campus)", "2027-03-17", "2027-03-19", "special"),
+      b("Semana Santa (Easter, Valencia/Gandia campus)", "2027-03-25", "2027-04-05", "easter"),
+    ],
+    sourceUrl: "https://www.upv.es/entidades/SG/infoweb/sg/info/U0985732.pdf" },
 ];
 
 export function universityNames(): string[] {
