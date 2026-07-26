@@ -1,15 +1,20 @@
 "use client";
 
+import { useMemo, useState } from "react";
+import Link from "next/link";
 import type { Trip } from "@/data/trips";
 import { TRIP_PHOTOS } from "@/data/tripPhotos";
-import { usePlanStore } from "@/lib/store/plan";
+import { useActivePlan, usePlanStore } from "@/lib/store/plan";
+import { getSlotsForPlan } from "@/lib/calc/semester";
 import { formatMoney } from "@/lib/calc/currency";
 import { TYPE_LABEL, TYPE_STYLE, TIER_LABEL, TIER_STYLE, tierOf, MO_SHORT } from "@/lib/tripDisplay";
 import TripPhoto from "./TripPhoto";
+import SetupWizardModal from "./onboarding/SetupWizardModal";
 
-/** Minimal click-to-expand detail view for a trip -- photo, blurb, full
- * activity/food lists, price range. Read-only; placing a trip on the
- * calendar still happens from the Calendar tab, not from here. */
+/** Click-to-expand detail view for a trip -- photo, blurb, full activity/
+ * food lists, price range, and an "Add to weekend" picker so a trip can be
+ * placed straight from the Catalog without going to Calendar first. Reads
+ * trip data directly; the trip doesn't need to be placed anywhere yet. */
 export default function TripDetailSheet({
   trip,
   floor,
@@ -25,7 +30,32 @@ export default function TripDetailSheet({
   const tier = tierOf(trip.ci);
   const photo = TRIP_PHOTOS[trip.id];
 
+  const activePlan = useActivePlan();
+  const addStop = usePlanStore((s) => s.addStop);
+  const updateStop = usePlanStore((s) => s.updateStop);
+  const slots = useMemo(() => getSlotsForPlan(activePlan), [activePlan]);
+
+  const [nights, setNights] = useState(trip.g);
+  const [addedTo, setAddedTo] = useState<{ slotId: string; label: string; date: string } | null>(null);
+  const [wizardOpen, setWizardOpen] = useState(false);
+
+  function handleAddToSlot(slotId: string) {
+    addStop(slotId, trip.id);
+    // addStop always seeds the suggested nights via defaultStop() -- only
+    // follow up with an extra store write if the picked nights differ from
+    // that suggestion, reusing the existing updateStop action rather than
+    // giving addStop a new parameter.
+    if (nights !== trip.g) {
+      const freshStops = usePlanStore.getState().plans[usePlanStore.getState().activeId]?.placements[slotId]?.stops ?? [];
+      const newIndex = freshStops.length - 1;
+      if (newIndex >= 0) updateStop(slotId, newIndex, { nights });
+    }
+    const slot = slots.find((s) => s.id === slotId);
+    if (slot) setAddedTo({ slotId, label: slot.label, date: slot.date });
+  }
+
   return (
+    <>
     <div
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink/50 px-4 py-10"
       onClick={onClose}
@@ -111,7 +141,84 @@ export default function TripDetailSheet({
             ))}
           </ul>
         </div>
+
+        <div className="mt-5 border-t border-border pt-4">
+          <h3 className="text-xs font-semibold tracking-wide text-muted uppercase">📅 Add to weekend</h3>
+
+          {slots.length === 0 ? (
+            <div className="mt-2 rounded-md border-2 border-dashed border-border p-3 text-center text-xs text-muted">
+              <p>Set up your host city and semester dates first so your calendar has real weekends to add trips to.</p>
+              <button
+                type="button"
+                onClick={() => setWizardOpen(true)}
+                className="mt-2 rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-white hover:bg-primary-hover"
+              >
+                Set up now
+              </button>
+            </div>
+          ) : (
+            <>
+              {trip.g > 0 && (
+                <div className="mt-2 flex items-center gap-2 rounded-lg border border-border bg-surface-muted px-3 py-1.5 text-xs">
+                  <span className="text-muted">Nights</span>
+                  <button
+                    type="button"
+                    onClick={() => setNights((n) => Math.max(0, n - 1))}
+                    className="rounded-md border border-border px-2 py-0.5 font-bold text-ink"
+                  >
+                    −
+                  </button>
+                  <span className="w-6 text-center font-bold text-primary">{nights}</span>
+                  <button
+                    type="button"
+                    onClick={() => setNights((n) => Math.min(14, n + 1))}
+                    className="rounded-md border border-border px-2 py-0.5 font-bold text-ink"
+                  >
+                    +
+                  </button>
+                  <span className="text-muted">(suggested: {trip.g})</span>
+                </div>
+              )}
+
+              {addedTo && (
+                <div className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-success/30 bg-success/10 px-3 py-2 text-xs text-ink">
+                  <span>
+                    ✓ Added to <b>{addedTo.label}</b> — {addedTo.date}
+                  </span>
+                  <Link href={`/calendar?slot=${addedTo.slotId}`} className="font-semibold text-primary underline">
+                    Open on calendar
+                  </Link>
+                </div>
+              )}
+
+              <div className="mt-2 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                {slots.map((slot) => {
+                  const stopCount = activePlan.placements[slot.id]?.stops.length ?? 0;
+                  const justAdded = addedTo?.slotId === slot.id;
+                  return (
+                    <button
+                      key={slot.id}
+                      type="button"
+                      onClick={() => handleAddToSlot(slot.id)}
+                      className={`rounded-lg border px-3 py-2 text-left text-xs transition-colors ${
+                        justAdded ? "border-success bg-success/10" : "border-border bg-surface hover:border-primary/50"
+                      }`}
+                    >
+                      <span className="block font-semibold text-ink">{slot.label}</span>
+                      <span className="text-muted">
+                        {slot.date}
+                        {stopCount > 0 ? ` · ${stopCount} trip${stopCount > 1 ? "s" : ""} already` : ""}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
+    {wizardOpen && <SetupWizardModal onClose={() => setWizardOpen(false)} />}
+    </>
   );
 }
