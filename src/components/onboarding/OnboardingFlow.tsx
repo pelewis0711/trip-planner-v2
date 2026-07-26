@@ -4,13 +4,23 @@
 // university -> term -> confirm dates), the order and skip rules Parker
 // picked explicitly. Reused by both /onboarding (first sign-in, step-by-step)
 // and /settings (edit anytime, single page) via the `layout` prop.
+//
+// Phase 12: Step 5's date auto-fill now comes from a single searchable
+// picker (src/data/programCalendars.ts) covering BOTH study-abroad
+// providers (CEA CAPA, IES Abroad, ...) and host universities -- merged
+// with the earlier Phase 6 host-university auto-fill rather than running
+// alongside it, so there's one dataset and one mechanism, not two. Step 2
+// ("Host university") is now a plain free-text field (still with a
+// typing-assist datalist) that no longer has the side effect of changing
+// dates -- picking a result in Step 5's search box is the one explicit
+// action that fills in real dates.
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { HOMES } from "@/data/homes";
 import { EUROPEAN_CITIES } from "@/data/europeanCities";
 import { lookupCity, resolveHome } from "@/lib/resolveHome";
-import { universityNames, findUniversitySemester } from "@/data/universitySemesters";
-import { smartDefaultSemester, postFinalsBreak, type Term } from "@/lib/calc/onboarding";
+import { universityProgramNames, searchPrograms, toSemesterConfig, type ProgramCalendar } from "@/data/programCalendars";
+import { smartDefaultSemester, type Term } from "@/lib/calc/onboarding";
 import type { SemesterConfig } from "@/lib/calc/semester";
 import SemesterDatesForm from "@/components/SemesterDatesForm";
 import { usePlanStore } from "@/lib/store/plan";
@@ -103,26 +113,26 @@ export default function OnboardingFlow({
   const [term, setTerm] = useState<Term>(initial.term);
 
   const [semester, setSemester] = useState<SemesterConfig>(initial.semester);
-  const [datesTouched, setDatesTouched] = useState(false);
   const [studyingInEurope, setStudyingInEurope] = useState(initial.studyingInEurope);
   const [currency, setCurrency] = useState<Currency>(initial.currency);
 
-  const uniNames = useMemo(() => universityNames(), []);
+  // Phase 12: the one thing that fills in real dates -- picking a search
+  // result in Step 5. appliedProgram just tracks what's currently shown as
+  // the source for the "auto-filled from X" callout; it's cleared the
+  // moment the dates are hand-edited so that callout never lies about
+  // where the current dates actually came from.
+  const [programQuery, setProgramQuery] = useState("");
+  const [appliedProgram, setAppliedProgram] = useState<ProgramCalendar | null>(null);
+  const programResults = useMemo(() => searchPrograms(programQuery), [programQuery]);
 
-  // Re-seed the dates form from the seed DB (or smart defaults) whenever
-  // host university or term changes -- unless the user already edited dates
-  // by hand, in which case we don't clobber their edits.
-  function reseedDates(nextUniversity: string, nextTerm: Term) {
-    if (datesTouched) return;
-    const matched = findUniversitySemester(nextUniversity, nextTerm);
-    // seed-DB breaks are only ever the university's own published ones
-    // (mid-semester breaks, reading weeks) -- the post-finals window is
-    // always computed, never researched, so add it here regardless of source
-    setSemester(
-      matched
-        ? { start: matched.start, end: matched.end, breaks: [...matched.breaks, postFinalsBreak(matched.end)] }
-        : smartDefaultSemester(nextTerm)
-    );
+  const uniNames = useMemo(() => universityProgramNames(), []);
+
+  function applyProgram(p: ProgramCalendar) {
+    setSemester(toSemesterConfig(p));
+    setAppliedProgram(p);
+    setProgramQuery("");
+    if (/spring/i.test(p.term)) setTerm("spring");
+    else if (/fall/i.test(p.term)) setTerm("fall");
   }
 
   async function handleAddCity() {
@@ -320,10 +330,7 @@ export default function OnboardingFlow({
             type="text"
             list="host-university-options"
             value={hostUniversity}
-            onChange={(e) => {
-              setHostUniversity(e.target.value);
-              reseedDates(e.target.value, term);
-            }}
+            onChange={(e) => setHostUniversity(e.target.value)}
             placeholder="Start typing…"
             className="w-full max-w-sm rounded-md border border-border bg-surface-muted px-3 py-1.5 text-sm text-ink placeholder:text-muted"
           />
@@ -358,10 +365,7 @@ export default function OnboardingFlow({
               <button
                 key={t}
                 type="button"
-                onClick={() => {
-                  setTerm(t);
-                  reseedDates(hostUniversity, t);
-                }}
+                onClick={() => setTerm(t)}
                 className={`rounded-md border px-4 py-1.5 text-sm font-semibold capitalize ${
                   term === t
                     ? "border-primary bg-primary-soft text-primary"
@@ -378,15 +382,74 @@ export default function OnboardingFlow({
       {(layout === "single-page" || step === 5) && (
         <section className="space-y-2">
           <h3 className="font-heading text-sm font-semibold text-ink">5. Confirm semester dates</h3>
-          <p className="text-xs text-muted">
-            {findUniversitySemester(hostUniversity, term)
-              ? `Pre-filled from ${hostUniversity}'s published calendar — double-check it.`
-              : "No match in our database — pre-filled with typical dates for this term. Edit anything below."}
-          </p>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-ink">Search your program or university</label>
+            <input
+              type="text"
+              value={programQuery}
+              onChange={(e) => setProgramQuery(e.target.value)}
+              placeholder="e.g. CEA CAPA Prague, Trinity College Dublin…"
+              className="w-full max-w-sm rounded-md border border-border bg-surface-muted px-3 py-1.5 text-sm text-ink placeholder:text-muted"
+            />
+            {programQuery.trim() && (
+              <div className="max-w-sm space-y-0.5 rounded-md border border-border bg-surface p-1.5">
+                {programResults.length ? (
+                  programResults.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => applyProgram(p)}
+                      className="block w-full rounded-md px-2 py-1.5 text-left text-xs hover:bg-primary-soft"
+                    >
+                      <span className="font-semibold text-ink">{p.name}</span>{" "}
+                      <span className="text-muted">
+                        · {p.city}, {p.country} · {p.term}
+                      </span>
+                    </button>
+                  ))
+                ) : (
+                  <p className="px-2 py-1.5 text-xs text-muted">No match — enter dates manually below.</p>
+                )}
+              </div>
+            )}
+            <p className="text-[11px] text-muted">
+              My program isn&apos;t listed — that&apos;s fine, just edit the dates directly below.
+            </p>
+          </div>
+
+          {appliedProgram ? (
+            <div className="rounded-md border border-primary/30 bg-primary-soft px-3 py-2 text-xs text-ink">
+              <p>
+                ✓ Auto-filled from <b>{appliedProgram.name}</b> ({appliedProgram.term})
+                {appliedProgram.sourceUrl && (
+                  <>
+                    {" "}
+                    —{" "}
+                    <a
+                      href={appliedProgram.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-primary underline"
+                    >
+                      source
+                    </a>
+                  </>
+                )}
+              </p>
+              <p className="mt-0.5 text-muted">{appliedProgram.verifyNote}</p>
+            </div>
+          ) : (
+            <p className="text-xs text-muted">
+              Search above to auto-fill from a real published calendar, or these dates are already
+              fully yours to edit below.
+            </p>
+          )}
+
           <SemesterDatesForm
             value={semester}
             onChange={(next) => {
-              setDatesTouched(true);
+              setAppliedProgram(null);
               setSemester(next);
             }}
           />

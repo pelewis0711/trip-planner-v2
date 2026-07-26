@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useActivePlan, usePlanStore } from "@/lib/store/plan";
 import { getSlotsForPlan } from "@/lib/calc/semester";
 import { makeCtx } from "@/lib/calc/context";
@@ -13,6 +14,18 @@ import EditModal from "@/components/calendar/EditModal";
 import SetupWizardModal from "@/components/onboarding/SetupWizardModal";
 
 export default function CalendarPage() {
+  return (
+    <Suspense fallback={null}>
+      <CalendarPageInner />
+    </Suspense>
+  );
+}
+
+function CalendarPageInner() {
+  // Reads ?slot=<id> so a link from the Catalog's "Add to weekend" flow
+  // (TripDetailSheet) can land here with that exact slot's edit modal
+  // already open, instead of just a generic /calendar landing.
+  const searchParams = useSearchParams();
   const activePlan = useActivePlan();
   const { home, bag, placements } = activePlan;
   const slots = useMemo(() => getSlotsForPlan(activePlan), [activePlan]);
@@ -29,7 +42,7 @@ export default function CalendarPage() {
 
   const [view, setView] = useState<"weekend" | "month">("weekend");
   const [armedId, setArmedId] = useState<string | null>(null);
-  const [editingSlotId, setEditingSlotId] = useState<string | null>(null);
+  const [editingSlotId, setEditingSlotId] = useState<string | null>(() => searchParams.get("slot"));
   const [trayOpen, setTrayOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [editSlotsMode, setEditSlotsMode] = useState(false);

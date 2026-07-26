@@ -16,6 +16,7 @@ import { slotCosts, tripPriceRange, travelersFor, grandTotals } from "../costs";
 import { makeCtx } from "../context";
 import { foodTiers, daysOf, lodgingTiers } from "../cost";
 import { convert, formatMoney, RATES } from "../currency";
+import { searchPrograms, toSemesterConfig } from "@/data/programCalendars";
 
 const rome = TRIPS.find((t) => t.id === "rome")!;
 const dublin = TRIPS.find((t) => t.id === "dublin")!;
@@ -489,5 +490,45 @@ describe("Profile layer: no hardcoded 'Prague' for a brand-new visitor", () => {
     const after = usePlanStore.getState().plans;
     const newId = Object.keys(after).find((id) => !before.has(id))!;
     expect(after[newId].home).toBe("");
+  });
+});
+
+describe("Phase 12: merged program-calendar picker (providers + universities)", () => {
+  it("searchPrograms finds a provider entry by partial name", () => {
+    const results = searchPrograms("CEA CAPA Prague");
+    expect(results.length).toBeGreaterThan(0);
+    expect(results.every((r) => r.type === "provider")).toBe(true);
+    expect(results.some((r) => r.name === "CEA CAPA Prague")).toBe(true);
+  });
+
+  it("searchPrograms finds a university entry by partial name", () => {
+    const results = searchPrograms("Anglo-American");
+    expect(results.length).toBeGreaterThan(0);
+    expect(results.every((r) => r.type === "university")).toBe(true);
+    expect(results.some((r) => r.name === "Anglo-American University")).toBe(true);
+  });
+
+  it("searchPrograms also matches by city, across both provider and university entries", () => {
+    const results = searchPrograms("Prague", 20);
+    expect(results.some((r) => r.type === "provider" && r.name === "CEA CAPA Prague")).toBe(true);
+    expect(results.some((r) => r.type === "university" && r.name === "Anglo-American University")).toBe(true);
+  });
+
+  it("toSemesterConfig auto-fills correctly from a provider entry", () => {
+    const entry = searchPrograms("CEA CAPA Prague").find((e) => e.term === "Spring 2027")!;
+    const config = toSemesterConfig(entry);
+    expect(config.start).toBe(entry.start);
+    expect(config.end).toBe(entry.end);
+    // a post-finals window is always appended, computed regardless of source
+    expect(config.breaks.some((b) => b.kind === "post")).toBe(true);
+  });
+
+  it("toSemesterConfig auto-fills correctly from a university entry, preserving its own researched breaks", () => {
+    const entry = searchPrograms("Anglo-American").find((e) => e.term === "Spring 2027")!;
+    const config = toSemesterConfig(entry);
+    expect(config.start).toBe(entry.start);
+    expect(config.end).toBe(entry.end);
+    expect(config.breaks.some((b) => b.label === entry.breaks[0].label)).toBe(true);
+    expect(config.breaks.some((b) => b.kind === "post")).toBe(true);
   });
 });

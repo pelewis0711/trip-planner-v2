@@ -8,6 +8,7 @@ import { slotCosts } from "@/lib/calc/costs";
 import { slotWarnings } from "@/lib/calc/warnings";
 import { usePlanStore } from "@/lib/store/plan";
 import { formatMoney } from "@/lib/calc/currency";
+import TripPhoto from "@/components/TripPhoto";
 
 const KIND_STYLE: Record<string, string> = {
   weekend: "border-border",
@@ -154,10 +155,13 @@ export default function SlotCard({
                 key={i}
                 className="flex items-center justify-between gap-2 rounded-lg border border-border bg-surface-muted px-2.5 py-1.5"
               >
-                <span className="min-w-0 truncate text-xs font-medium text-ink">
-                  {t?.n ?? "?"}{" "}
-                  <span className="text-muted">
-                    {st.nights === 0 ? "day" : `${st.nights}n`}
+                <span className="flex min-w-0 items-center gap-2">
+                  {t && <TripPhoto tripId={t.id} name={t.n} country={t.c} ratio="aspect-square" className="w-8 shrink-0" />}
+                  <span className="min-w-0 truncate text-xs font-medium text-ink">
+                    {t?.n ?? "?"}{" "}
+                    <span className="text-muted">
+                      {st.nights === 0 ? "day" : `${st.nights}n`}
+                    </span>
                   </span>
                 </span>
                 <button

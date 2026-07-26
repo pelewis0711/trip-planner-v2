@@ -118,12 +118,17 @@ export const UNIVERSITY_SEMESTERS: UniversitySemesterEntry[] = [
     start: "2027-01-18", end: "2027-05-28",
     breaks: [b("Easter Vacation", "2027-03-22", "2027-04-02", "easter")],
     sourceUrl: "https://www.qub.ac.uk/Study/international-students/incoming-exchange/semester-dates/2026-27/" },
-  { university: "University of Glasgow", city: "Glasgow", country: "United Kingdom", term: "fall",
-    start: "2026-09-21", end: "2026-12-18", breaks: [],
+  // country corrected from "United Kingdom" to "Scotland" during UIUC
+  // partner research (batch 5) -- this app treats England/Scotland/
+  // Wales/Northern Ireland as their own countries (Schengen exemption
+  // logic depends on it), a convention this specific entry predated.
+  { university: "University of Glasgow", city: "Glasgow", country: "Scotland", term: "fall",
+    start: "2026-09-21", end: "2026-12-18",
+    breaks: [b("Winter Break", "2026-12-23", "2027-01-04", "winter")],
     sourceUrl: "https://www.gla.ac.uk/myglasgow/apg/sessiondates/session2026-27/" },
-  { university: "University of Glasgow", city: "Glasgow", country: "United Kingdom", term: "spring",
+  { university: "University of Glasgow", city: "Glasgow", country: "Scotland", term: "spring",
     start: "2027-01-11", end: "2027-05-28",
-    breaks: [b("Spring Vacation", "2027-03-29", "2027-04-16", "spring")],
+    breaks: [b("Spring Break", "2027-03-29", "2027-04-16", "spring")],
     sourceUrl: "https://www.gla.ac.uk/myglasgow/apg/sessiondates/session2026-27/" },
   { university: "Royal Holloway, University of London", city: "Egham", country: "United Kingdom", term: "fall",
     start: "2026-09-21", end: "2026-12-11", breaks: [],
@@ -332,6 +337,334 @@ export const UNIVERSITY_SEMESTERS: UniversitySemesterEntry[] = [
   { university: "Deree - The American College of Greece", city: "Athens", country: "Greece", term: "fall",
     start: "2026-09-10", end: "2026-12-18", breaks: [],
     sourceUrl: "https://www.acg.edu/wp-content/uploads/2026/04/UG_Calendar_2026_27_v3.pdf" },
+
+  // --- University of Illinois Urbana-Champaign's real European exchange
+  // partners (batch 1 of that effort), sourced from UIUC's own official
+  // program database (app.studyabroad.illinois.edu, Region = Europe) --
+  // NOT a curated "top universities" list, the actual real list UIUC
+  // students can pick from. Flag worth knowing: this database does NOT
+  // include Anglo-American University, Prague, anywhere -- searched
+  // explicitly for "AAU"/"Anglo-American"/"Prague" and found only CEA CAPA
+  // (a provider, already in programCalendars.ts) and one faculty-led short
+  // course. AAU Prague appears to be a non-UIUC-affiliated enrollment path,
+  // not a campus exchange -- a real, separate fact from anything about the
+  // app's own baked-in dates.
+  //
+  // Flags worth a second look:
+  // - EPFL Spring 2027 not included -- EPFL's own calendar page only
+  //   publishes Spring 2025-26 (current) and Fall 2026-27; Spring 2027
+  //   genuinely isn't published yet.
+  // - Humboldt-Universitat zu Berlin not included at all -- every page/PDF
+  //   on hu-berlin.de returned a bot-protection challenge page rather than
+  //   content, and no citable mirror was found either. Worth a retry.
+  // - University of Manchester's dates come from an official but
+  //   explicitly provisional planning document (its own disclaimer:
+  //   "prepared to assist in timetable planning only... based on our best
+  //   understanding of term dates") -- very likely accurate, not a final
+  //   locked calendar.
+  // - VU Amsterdam's dates came from VU's own official 2026-27 exchange
+  //   factsheet, but the reachable copy was hosted on a partner
+  //   university's site (Universitas Gadjah Mada's international office)
+  //   rather than fetched directly from vu.nl (whose own PDFs didn't
+  //   render as text) -- content itself carries VU letterhead/contacts.
+  { university: "ETH Zurich", city: "Zurich", country: "Switzerland", term: "fall",
+    start: "2026-09-14", end: "2026-12-18",
+    breaks: [b("Christmas Break", "2026-12-24", "2027-01-03", "christmas")],
+    sourceUrl: "https://mtec.ethz.ch/news/academic-calendar.html" },
+  { university: "ETH Zurich", city: "Zurich", country: "Switzerland", term: "spring",
+    start: "2027-02-22", end: "2027-06-04",
+    breaks: [b("Easter Break", "2027-03-26", "2027-04-04", "easter")],
+    sourceUrl: "https://mtec.ethz.ch/news/academic-calendar.html" },
+  { university: "EPFL", city: "Lausanne", country: "Switzerland", term: "fall",
+    start: "2026-09-07", end: "2026-12-18", breaks: [],
+    sourceUrl: "https://www.epfl.ch/education/studies/en/rules-and-procedures/academic-calendar/" },
+  { university: "TU Delft", city: "Delft", country: "Netherlands", term: "fall",
+    start: "2026-09-07", end: "2027-01-29",
+    breaks: [b("Christmas Holidays", "2026-12-21", "2027-01-03", "christmas")],
+    sourceUrl: "https://www.tudelft.nl/en/student/my-study-me/education/academic-calendar" },
+  { university: "TU Delft", city: "Delft", country: "Netherlands", term: "spring",
+    start: "2027-02-01", end: "2027-06-25",
+    breaks: [b("Spring Break", "2027-02-01", "2027-02-07", "spring")],
+    sourceUrl: "https://www.tudelft.nl/en/student/my-study-me/education/academic-calendar" },
+  { university: "VU Amsterdam", city: "Amsterdam", country: "Netherlands", term: "fall",
+    start: "2026-08-31", end: "2027-01-29", breaks: [],
+    sourceUrl: "https://vu.nl/en/education/more-about/academic-calendar" },
+  { university: "VU Amsterdam", city: "Amsterdam", country: "Netherlands", term: "spring",
+    start: "2027-02-01", end: "2027-06-25", breaks: [],
+    sourceUrl: "https://vu.nl/en/education/more-about/academic-calendar" },
+  { university: "Heidelberg University", city: "Heidelberg", country: "Germany", term: "fall",
+    start: "2026-10-12", end: "2027-02-06",
+    breaks: [b("Christmas/New Year Break", "2026-12-21", "2027-01-06", "christmas")],
+    sourceUrl: "https://www.uni-heidelberg.de/en/study/management-of-studies/key-dates-deadlines/further-semester-dates" },
+  { university: "Heidelberg University", city: "Heidelberg", country: "Germany", term: "spring",
+    start: "2027-04-12", end: "2027-07-24", breaks: [],
+    sourceUrl: "https://www.uni-heidelberg.de/en/study/management-of-studies/key-dates-deadlines/further-semester-dates" },
+  { university: "University of Bristol", city: "Bristol", country: "England", term: "fall",
+    start: "2026-09-21", end: "2026-12-18",
+    breaks: [b("Winter Break", "2026-12-21", "2027-01-08", "winter")],
+    sourceUrl: "https://www.bristol.ac.uk/university/dates/" },
+  { university: "University of Bristol", city: "Bristol", country: "England", term: "spring",
+    start: "2027-01-18", end: "2027-05-21",
+    breaks: [b("Spring Vacation", "2027-03-22", "2027-04-09", "spring")],
+    sourceUrl: "https://www.bristol.ac.uk/university/dates/" },
+  { university: "University of Manchester", city: "Manchester", country: "England", term: "fall",
+    start: "2026-09-21", end: "2027-01-31",
+    breaks: [b("Christmas Vacation", "2026-12-21", "2027-01-10", "christmas")],
+    sourceUrl: "https://documents.manchester.ac.uk/DocuInfo.aspx?DocID=78064" },
+  { university: "University of Manchester", city: "Manchester", country: "England", term: "spring",
+    start: "2027-02-01", end: "2027-06-13",
+    breaks: [b("Easter Vacation", "2027-03-22", "2027-04-11", "easter")],
+    sourceUrl: "https://documents.manchester.ac.uk/DocuInfo.aspx?DocID=78064" },
+
+  // UIUC exchange partners, batch 2. 5 of 8 requested universities sourced.
+  // Flags worth a second look:
+  // - WHU Otto Beisheim School of Management NOT attempted at all --
+  //   whu.edu's robots.txt explicitly disallows ClaudeBot while
+  //   whitelisting Googlebot/Bingbot, so this was treated as a policy
+  //   boundary to respect, not a technical failure to route around.
+  // - University of Bologna NOT included -- its academic calendars are
+  //   decentralized per-school/per-degree with no single working central
+  //   page found after checking the sitemap, international-mobility nav,
+  //   and internal search.
+  // - Tilburg University NOT included -- the live site 403s (Cloudflare
+  //   bot challenge) on every page. A real official PDF was found via the
+  //   Wayback Machine, but its own 2026-27 section is explicitly labeled
+  //   "DRAFT: THE START OF ACADEMIC YEAR 2026-2027 IS STILL IN DRAFT" with
+  //   only a preliminary start window and no end date or spring dates --
+  //   genuinely not ready to record, not a fetch failure.
+  // - TUM/TU Darmstadt/Bern: each publishes both a broader administrative
+  //   "semester" and a narrower actual-teaching "lecture period" inside
+  //   it -- the lecture period is what's recorded below (what actually
+  //   matters for when an exchange student is in class), not the wider
+  //   window that mostly pads exam/break time on both ends.
+  // - TUM/KTH/Karolinska show breaks: [] because their own pages say so
+  //   explicitly (Karolinska: "no official holidays such as Christmas or
+  //   Easter"; KTH: continuous study/exam periods, no gap) -- not a
+  //   search gap.
+  { university: "Technical University of Munich (TUM)", city: "Munich", country: "Germany", term: "fall",
+    start: "2026-10-12", end: "2027-02-05", breaks: [],
+    sourceUrl: "https://www.tum.de/en/studies/application/application-info-portal/dates-periods-and-deadlines/" },
+  { university: "Technical University of Munich (TUM)", city: "Munich", country: "Germany", term: "spring",
+    start: "2027-04-12", end: "2027-07-16", breaks: [],
+    sourceUrl: "https://www.tum.de/en/studies/application/application-info-portal/dates-periods-and-deadlines/" },
+  { university: "TU Darmstadt", city: "Darmstadt", country: "Germany", term: "fall",
+    start: "2026-10-12", end: "2027-02-12",
+    breaks: [b("Christmas Break (Weihnachtspause)", "2026-12-21", "2027-01-08", "christmas")],
+    sourceUrl: "https://www.tu-darmstadt.de/studieren/studierende_tu/semestermine/index.de.jsp" },
+  { university: "TU Darmstadt", city: "Darmstadt", country: "Germany", term: "spring",
+    start: "2027-04-12", end: "2027-07-16", breaks: [],
+    sourceUrl: "https://www.tu-darmstadt.de/studieren/studierende_tu/semestermine/index.de.jsp" },
+  { university: "KTH Royal Institute of Technology", city: "Stockholm", country: "Sweden", term: "fall",
+    start: "2026-08-24", end: "2027-01-11", breaks: [],
+    sourceUrl: "https://www.kth.se/en/student/studier/schema/lasarsindelning-1.912374" },
+  { university: "KTH Royal Institute of Technology", city: "Stockholm", country: "Sweden", term: "spring",
+    start: "2027-01-12", end: "2027-05-31", breaks: [],
+    sourceUrl: "https://www.kth.se/en/student/studier/schema/lasarsindelning-1.912374" },
+  { university: "Karolinska Institute", city: "Stockholm", country: "Sweden", term: "fall",
+    start: "2026-08-31", end: "2027-01-17", breaks: [],
+    sourceUrl: "https://education.ki.se/student-at-ki/academic-calendar" },
+  { university: "Karolinska Institute", city: "Stockholm", country: "Sweden", term: "spring",
+    start: "2027-01-18", end: "2027-06-06", breaks: [],
+    sourceUrl: "https://education.ki.se/student-at-ki/academic-calendar" },
+  { university: "University of Bern", city: "Bern", country: "Switzerland", term: "fall",
+    start: "2026-09-14", end: "2026-12-18", breaks: [],
+    sourceUrl: "https://www.unibe.ch/studies/dates/semesterdates/index_eng.html" },
+  { university: "University of Bern", city: "Bern", country: "Switzerland", term: "spring",
+    start: "2027-02-22", end: "2027-06-04",
+    breaks: [b("Spring vacation", "2027-03-26", "2027-04-04", "spring")],
+    sourceUrl: "https://www.unibe.ch/studies/dates/semesterdates/index_eng.html" },
+
+  // UIUC exchange partners, batch 3. 5 of 8 requested universities sourced.
+  // Flags worth a second look:
+  // - EBS Universitat (Wiesbaden) NOT included -- no academic-calendar
+  //   page found anywhere on ebs.edu after checking the sitemap, student
+  //   services, and orientation pages; may be behind a student-only
+  //   portal or simply not published on a dedicated page.
+  // - University of Bergen NOT included -- its official page only
+  //   describes a generic recurring pattern ("autumn starts week 32...")
+  //   without confirming it's specifically the 2026/27 dates rather than
+  //   a template description. Not reported rather than treated as exact.
+  // - Universidade Catolica Portuguesa (Lisbon) NOT included as a
+  //   fall/spring entry -- its real, dated academic-calendar PDF exists
+  //   (year starts Sept 1 2026, ends July 31 2027, with dated Christmas
+  //   and Easter closures) but the document itself isn't organized into a
+  //   fall/spring split, so guessing where one ends and the other begins
+  //   was avoided rather than invented.
+  // - UC3M/UPV Valencia: "end" is each term's own exam-period end (both
+  //   universities' own documents frame it this way -- "fin de semestre"
+  //   = when all evaluation acts must be finished), not last day of
+  //   classes -- this is why Fall's end date lands in late January, after
+  //   Christmas break. A real structural feature of the Spanish academic
+  //   calendar, not an error.
+  // - BI Norwegian's Christmas-break end date (Jan 4) is an inference from
+  //   the source's own vaguer "23 December to early January" phrasing, not
+  //   a date literally printed on the page.
+  { university: "Friedrich-Schiller-Universitat Jena", city: "Jena", country: "Germany", term: "fall",
+    start: "2026-10-19", end: "2027-02-12",
+    breaks: [b("Christmas/New Year break", "2026-12-21", "2027-01-01", "christmas")],
+    sourceUrl: "https://www.uni-jena.de/unijenamedia/38740/zuletzt-vom-senat-zur-kenntnis-genommener-terminplan.pdf" },
+  { university: "Friedrich-Schiller-Universitat Jena", city: "Jena", country: "Germany", term: "spring",
+    start: "2027-04-12", end: "2027-07-16",
+    breaks: [b("Schillertag (Dies Academicus)", "2027-06-25", "2027-06-25", "special")],
+    sourceUrl: "https://www.uni-jena.de/unijenamedia/38740/zuletzt-vom-senat-zur-kenntnis-genommener-terminplan.pdf" },
+  { university: "University of Potsdam", city: "Potsdam", country: "Germany", term: "fall",
+    start: "2026-10-12", end: "2027-02-05",
+    breaks: [b("Christmas Break", "2026-12-21", "2027-01-01", "christmas")],
+    sourceUrl: "https://www.uni-potsdam.de/en/studium/dates-and-deadlines/important-dates-and-deadlines-during-your-studies" },
+  { university: "University of Potsdam", city: "Potsdam", country: "Germany", term: "spring",
+    start: "2027-04-12", end: "2027-07-23", breaks: [],
+    sourceUrl: "https://www.uni-potsdam.de/en/studium/dates-and-deadlines/important-dates-and-deadlines-during-your-studies" },
+  { university: "BI Norwegian Business School", city: "Oslo", country: "Norway", term: "fall",
+    start: "2026-08-17", end: "2026-12-21",
+    breaks: [b("Christmas closure", "2026-12-23", "2027-01-04", "christmas")],
+    sourceUrl: "https://www.bi.no/en/study-at-bi/international-students/practical-info/academic-calendar/" },
+  { university: "BI Norwegian Business School", city: "Oslo", country: "Norway", term: "spring",
+    start: "2027-01-11", end: "2027-06-18", breaks: [],
+    sourceUrl: "https://www.bi.no/en/study-at-bi/international-students/practical-info/academic-calendar/" },
+  { university: "Universidad Carlos III de Madrid", city: "Madrid", country: "Spain", term: "fall",
+    start: "2026-09-07", end: "2027-01-25",
+    breaks: [b("Navidad (Christmas)", "2026-12-23", "2027-01-08", "christmas")],
+    sourceUrl: "https://www.uc3m.es/grado/media/grado/doc/archivo/doc_calendario_2627/calendario_grado_2026_2027_v9.pdf" },
+  { university: "Universidad Carlos III de Madrid", city: "Madrid", country: "Spain", term: "spring",
+    start: "2027-01-26", end: "2027-05-28",
+    breaks: [b("Semana Santa (Easter)", "2027-03-22", "2027-03-29", "easter")],
+    sourceUrl: "https://www.uc3m.es/grado/media/grado/doc/archivo/doc_calendario_2627/calendario_grado_2026_2027_v9.pdf" },
+  { university: "Universitat Politecnica de Valencia", city: "Valencia", country: "Spain", term: "fall",
+    start: "2026-09-07", end: "2027-01-29",
+    breaks: [b("Navidad (Christmas)", "2026-12-23", "2027-01-06", "christmas")],
+    sourceUrl: "https://www.upv.es/entidades/SG/infoweb/sg/info/U0985732.pdf" },
+  { university: "Universitat Politecnica de Valencia", city: "Valencia", country: "Spain", term: "spring",
+    start: "2027-02-01", end: "2027-06-25",
+    breaks: [
+      b("Fallas (Valencia/Gandia campus)", "2027-03-17", "2027-03-19", "special"),
+      b("Semana Santa (Easter, Valencia/Gandia campus)", "2027-03-25", "2027-04-05", "easter"),
+    ],
+    sourceUrl: "https://www.upv.es/entidades/SG/infoweb/sg/info/U0985732.pdf" },
+
+  // UIUC exchange partners, batch 4. All 8 requested universities sourced
+  // -- the first batch in this series with zero gaps.
+  // Flags worth a second look:
+  // - Term start = first day of TEACHING, not orientation/welcome week, so
+  //   several starts are later than a "welcome week" date you might see
+  //   elsewhere (Cardiff, Birmingham, Galway, QMUL all start teaching
+  //   roughly a week after their welcome/enrolment week).
+  // - Jagiellonian's own "summer semester" officially runs Feb 25-Sep 30,
+  //   2027 -- unusually long because Jagiellonian's own definition
+  //   includes the full retake-exam window (through mid-September) and an
+  //   administrative close-out, not just teaching+first exams. Used
+  //   exactly as published rather than guessing a shorter "real" end.
+  // - SLU has no single home city (multi-campus: Uppsala, Alnarp, Umea) --
+  //   Uppsala (the largest/HQ campus) was chosen as a judgment call, not
+  //   a sourced fact.
+  // - University of Birmingham's accessible page didn't publish a named
+  //   reading-week/break, so breaks: [] reflects that rather than a
+  //   guessed gap.
+  // - "University of Galway" is the current name (formerly NUI Galway) --
+  //   used as researched.
+  { university: "Swedish University of Agricultural Sciences (SLU)", city: "Uppsala", country: "Sweden", term: "fall",
+    start: "2026-08-31", end: "2027-01-17",
+    breaks: [b("Winter break (no classes)", "2026-12-23", "2026-12-31", "winter")],
+    sourceUrl: "https://www.slu.se/en/study/application-and-admission/academi-calendar/" },
+  { university: "Swedish University of Agricultural Sciences (SLU)", city: "Uppsala", country: "Sweden", term: "spring",
+    start: "2027-01-18", end: "2027-06-06", breaks: [],
+    sourceUrl: "https://www.slu.se/en/study/application-and-admission/academi-calendar/" },
+  { university: "Bogazici University", city: "Istanbul", country: "Turkey", term: "fall",
+    start: "2026-09-21", end: "2026-12-18",
+    breaks: [b("Republic Day", "2026-10-28", "2026-10-29", "special")],
+    sourceUrl: "https://intl.bogazici.edu.tr/sites/intl.bogazici.edu.tr/files/academic_calendar_2026-2027.pdf" },
+  { university: "Bogazici University", city: "Istanbul", country: "Turkey", term: "spring",
+    start: "2027-02-08", end: "2027-05-28",
+    breaks: [
+      b("Ramadan Holiday", "2027-03-08", "2027-03-11", "special"),
+      b("Spring Break", "2027-04-19", "2027-04-23", "break"),
+      b("Eid al-Adha Holiday", "2027-05-15", "2027-05-19", "special"),
+    ],
+    sourceUrl: "https://intl.bogazici.edu.tr/sites/intl.bogazici.edu.tr/files/academic_calendar_2026-2027.pdf" },
+  { university: "Cardiff University", city: "Cardiff", country: "Wales", term: "fall",
+    start: "2026-10-05", end: "2027-01-31",
+    breaks: [b("Christmas Break", "2026-12-19", "2027-01-10", "christmas")],
+    sourceUrl: "https://www.cardiff.ac.uk/public-information/corporate-information/semester-dates" },
+  { university: "Cardiff University", city: "Cardiff", country: "Wales", term: "spring",
+    start: "2027-02-01", end: "2027-06-18",
+    breaks: [b("Easter Break", "2027-03-20", "2027-04-11", "easter")],
+    sourceUrl: "https://www.cardiff.ac.uk/public-information/corporate-information/semester-dates" },
+  { university: "University of Birmingham", city: "Birmingham", country: "England", term: "fall",
+    start: "2026-09-28", end: "2026-12-11", breaks: [],
+    sourceUrl: "https://www.birmingham.ac.uk/undergraduate/courses/academicyear" },
+  { university: "University of Birmingham", city: "Birmingham", country: "England", term: "spring",
+    start: "2027-01-11", end: "2027-03-26", breaks: [],
+    sourceUrl: "https://www.birmingham.ac.uk/undergraduate/courses/academicyear" },
+  { university: "University of Galway", city: "Galway", country: "Ireland", term: "fall",
+    start: "2026-09-07", end: "2026-12-18",
+    breaks: [b("Christmas Break", "2026-12-19", "2027-01-10", "christmas")],
+    sourceUrl: "https://www.universityofgalway.ie/media/registrationoffice/files/26-27-All-Students-Final.pdf" },
+  { university: "University of Galway", city: "Galway", country: "Ireland", term: "spring",
+    start: "2027-01-11", end: "2027-05-06",
+    breaks: [b("Easter Break", "2027-03-26", "2027-03-29", "easter")],
+    sourceUrl: "https://www.universityofgalway.ie/media/registrationoffice/files/26-27-All-Students-Final.pdf" },
+  { university: "Jagiellonian University", city: "Krakow", country: "Poland", term: "fall",
+    start: "2026-10-01", end: "2027-02-24",
+    breaks: [
+      b("Christmas Break", "2026-12-23", "2027-01-06", "christmas"),
+      b("Inter-semester Break", "2027-02-11", "2027-02-17", "break"),
+    ],
+    sourceUrl: "https://internationalstudents.uj.edu.pl/en_GB/studenci/kalendarz-akademicki" },
+  { university: "Jagiellonian University", city: "Krakow", country: "Poland", term: "spring",
+    start: "2027-02-25", end: "2027-09-30",
+    breaks: [b("Easter Break", "2027-03-25", "2027-03-30", "easter")],
+    sourceUrl: "https://internationalstudents.uj.edu.pl/en_GB/studenci/kalendarz-akademicki" },
+  { university: "University of Southampton", city: "Southampton", country: "England", term: "fall",
+    start: "2026-09-14", end: "2027-01-23",
+    breaks: [b("Christmas Break", "2026-12-13", "2027-01-03", "christmas")],
+    sourceUrl: "https://www.southampton.ac.uk/about/term-dates" },
+  { university: "University of Southampton", city: "Southampton", country: "England", term: "spring",
+    start: "2027-01-25", end: "2027-05-29",
+    breaks: [b("Easter Break", "2027-03-21", "2027-04-11", "easter")],
+    sourceUrl: "https://www.southampton.ac.uk/about/term-dates" },
+  { university: "Queen Mary University of London", city: "London", country: "England", term: "fall",
+    start: "2026-09-21", end: "2027-01-22",
+    breaks: [b("Christmas/New Year Vacation", "2026-12-24", "2027-01-03", "christmas")],
+    sourceUrl: "https://www.qmul.ac.uk/about/calendar/" },
+  { university: "Queen Mary University of London", city: "London", country: "England", term: "spring",
+    start: "2027-01-25", end: "2027-06-04",
+    breaks: [b("Easter Vacation", "2027-04-17", "2027-05-03", "easter")],
+    sourceUrl: "https://www.qmul.ac.uk/about/calendar/" },
+
+  // UIUC exchange partners, batch 5 (direct-enroll universities). This
+  // closes out UIUC's remaining direct-enroll list, minus the "Illinois
+  // program center" entries with no clear single host institution -- see
+  // CLAUDE.md for what was found/not found there.
+  // - Newcastle's own page presents two incompatible date structures
+  //   ("term dates" vs. "semester dates"); "term dates" was used since the
+  //   source explicitly labels those as applying to undergraduate taught
+  //   students. No break dates were published on this page at all.
+  // - Stirling has separate UG/PGT calendars -- undergraduate dates used
+  //   as more relevant to a direct-enroll exchange student.
+  // - Lucerne (HSLU) is a federation of ~6 schools each with its own dates
+  //   page -- sourced from the Lucerne School of Information Technology
+  //   (the one with a clean English page); other HSLU schools may run a
+  //   few days off from this.
+  { university: "Newcastle University", city: "Newcastle", country: "England", term: "fall",
+    start: "2026-09-21", end: "2026-12-11", breaks: [],
+    sourceUrl: "https://www.ncl.ac.uk/regulations/term-dates/" },
+  { university: "Newcastle University", city: "Newcastle", country: "England", term: "spring",
+    start: "2027-01-04", end: "2027-03-25", breaks: [],
+    sourceUrl: "https://www.ncl.ac.uk/regulations/term-dates/" },
+  { university: "University of Stirling", city: "Stirling", country: "Scotland", term: "fall",
+    start: "2026-09-14", end: "2026-12-18",
+    breaks: [b("Mid-semester Break", "2026-10-26", "2026-10-30", "break")],
+    sourceUrl: "https://www.stir.ac.uk/study/semester-dates/" },
+  { university: "University of Stirling", city: "Stirling", country: "Scotland", term: "spring",
+    start: "2027-01-18", end: "2027-05-07",
+    breaks: [b("Mid-semester Break", "2027-03-01", "2027-03-05", "break")],
+    sourceUrl: "https://www.stir.ac.uk/study/semester-dates/" },
+  { university: "Lucerne University of Applied Sciences and Arts", city: "Lucerne", country: "Switzerland", term: "fall",
+    start: "2026-09-14", end: "2026-12-19", breaks: [],
+    sourceUrl: "https://www.hslu.ch/en/lucerne-school-of-information-technology/degree-programs/academic-calendar/" },
+  { university: "Lucerne University of Applied Sciences and Arts", city: "Lucerne", country: "Switzerland", term: "spring",
+    start: "2027-02-22", end: "2027-05-05",
+    breaks: [b("Easter Break", "2027-03-26", "2027-03-30", "easter")],
+    sourceUrl: "https://www.hslu.ch/en/lucerne-school-of-information-technology/degree-programs/academic-calendar/" },
 ];
 
 export function universityNames(): string[] {
