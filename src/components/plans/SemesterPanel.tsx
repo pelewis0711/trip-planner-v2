@@ -6,6 +6,7 @@ import { usePlanStore, slotsToBeLost } from "@/lib/store/plan";
 import type { SemesterConfig } from "@/lib/calc/semester";
 import { smartDefaultSemester } from "@/lib/calc/onboarding";
 import SemesterDatesForm from "@/components/SemesterDatesForm";
+import ProgramSearchPicker from "@/components/ProgramSearchPicker";
 
 // Neutral, computed-from-today starting point (same helper onboarding uses)
 // -- NOT a hardcoded date range, so this panel never surfaces one specific
@@ -16,6 +17,7 @@ export default function SemesterPanel({ plan, onClose }: { plan: Plan; onClose: 
   const regenerateSlotsFor = usePlanStore((s) => s.regenerateSlotsFor);
   const isCustom = !!plan.semester;
   const [form, setForm] = useState<SemesterConfig>(plan.semester ?? BLANK_TEMPLATE);
+  const [pickerKey, setPickerKey] = useState(0);
 
   // "warn me first instead of silently deleting" -- named here, confirmed
   // before regenerateSlotsFor actually touches anything. Custom (hand-added)
@@ -57,7 +59,15 @@ export default function SemesterPanel({ plan, onClose }: { plan: Plan; onClose: 
         removed entirely gets called out before saving.
       </p>
 
-      <SemesterDatesForm value={form} onChange={setForm} />
+      <ProgramSearchPicker key={pickerKey} onApply={(sem) => setForm(sem)} />
+
+      <SemesterDatesForm
+        value={form}
+        onChange={(next) => {
+          setPickerKey((k) => k + 1);
+          setForm(next);
+        }}
+      />
 
       <div className="flex flex-wrap gap-2 pt-1">
         <button

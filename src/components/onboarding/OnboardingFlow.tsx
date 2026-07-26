@@ -19,10 +19,11 @@ import Link from "next/link";
 import { HOMES } from "@/data/homes";
 import { EUROPEAN_CITIES } from "@/data/europeanCities";
 import { lookupCity, resolveHome } from "@/lib/resolveHome";
-import { universityProgramNames, searchPrograms, toSemesterConfig, type ProgramCalendar } from "@/data/programCalendars";
+import { universityProgramNames } from "@/data/programCalendars";
 import { smartDefaultSemester, type Term } from "@/lib/calc/onboarding";
 import type { SemesterConfig } from "@/lib/calc/semester";
 import SemesterDatesForm from "@/components/SemesterDatesForm";
+import ProgramSearchPicker from "@/components/ProgramSearchPicker";
 import { usePlanStore } from "@/lib/store/plan";
 
 export interface HostCity {
@@ -117,23 +118,15 @@ export default function OnboardingFlow({
   const [currency, setCurrency] = useState<Currency>(initial.currency);
 
   // Phase 12: the one thing that fills in real dates -- picking a search
-  // result in Step 5. appliedProgram just tracks what's currently shown as
-  // the source for the "auto-filled from X" callout; it's cleared the
-  // moment the dates are hand-edited so that callout never lies about
-  // where the current dates actually came from.
-  const [programQuery, setProgramQuery] = useState("");
-  const [appliedProgram, setAppliedProgram] = useState<ProgramCalendar | null>(null);
-  const programResults = useMemo(() => searchPrograms(programQuery), [programQuery]);
+  // result via the shared ProgramSearchPicker (also used by the Plans-tab
+  // SemesterPanel, so this isn't the only place it lives anymore). Bumping
+  // pickerKey remounts the picker, which clears its own "auto-filled from
+  // X" banner -- used whenever the dates are hand-edited afterward, so
+  // that banner never lies about where the current dates actually came
+  // from.
+  const [pickerKey, setPickerKey] = useState(0);
 
   const uniNames = useMemo(() => universityProgramNames(), []);
-
-  function applyProgram(p: ProgramCalendar) {
-    setSemester(toSemesterConfig(p));
-    setAppliedProgram(p);
-    setProgramQuery("");
-    if (/spring/i.test(p.term)) setTerm("spring");
-    else if (/fall/i.test(p.term)) setTerm("fall");
-  }
 
   async function handleAddCity() {
     const q = cityInput.trim();
@@ -383,73 +376,19 @@ export default function OnboardingFlow({
         <section className="space-y-2">
           <h3 className="font-heading text-sm font-semibold text-ink">5. Confirm semester dates</h3>
 
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-ink">Search your program or university</label>
-            <input
-              type="text"
-              value={programQuery}
-              onChange={(e) => setProgramQuery(e.target.value)}
-              placeholder="e.g. CEA CAPA Prague, Trinity College Dublin…"
-              className="w-full max-w-sm rounded-md border border-border bg-surface-muted px-3 py-1.5 text-sm text-ink placeholder:text-muted"
-            />
-            {programQuery.trim() && (
-              <div className="max-w-sm space-y-0.5 rounded-md border border-border bg-surface p-1.5">
-                {programResults.length ? (
-                  programResults.map((p) => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => applyProgram(p)}
-                      className="block w-full rounded-md px-2 py-1.5 text-left text-xs hover:bg-primary-soft"
-                    >
-                      <span className="font-semibold text-ink">{p.name}</span>{" "}
-                      <span className="text-muted">
-                        · {p.city}, {p.country} · {p.term}
-                      </span>
-                    </button>
-                  ))
-                ) : (
-                  <p className="px-2 py-1.5 text-xs text-muted">No match — enter dates manually below.</p>
-                )}
-              </div>
-            )}
-            <p className="text-[11px] text-muted">
-              My program isn&apos;t listed — that&apos;s fine, just edit the dates directly below.
-            </p>
-          </div>
-
-          {appliedProgram ? (
-            <div className="rounded-md border border-primary/30 bg-primary-soft px-3 py-2 text-xs text-ink">
-              <p>
-                ✓ Auto-filled from <b>{appliedProgram.name}</b> ({appliedProgram.term})
-                {appliedProgram.sourceUrl && (
-                  <>
-                    {" "}
-                    —{" "}
-                    <a
-                      href={appliedProgram.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-semibold text-primary underline"
-                    >
-                      source
-                    </a>
-                  </>
-                )}
-              </p>
-              <p className="mt-0.5 text-muted">{appliedProgram.verifyNote}</p>
-            </div>
-          ) : (
-            <p className="text-xs text-muted">
-              Search above to auto-fill from a real published calendar, or these dates are already
-              fully yours to edit below.
-            </p>
-          )}
+          <ProgramSearchPicker
+            key={pickerKey}
+            onApply={(sem, p) => {
+              setSemester(sem);
+              if (/spring/i.test(p.term)) setTerm("spring");
+              else if (/fall/i.test(p.term)) setTerm("fall");
+            }}
+          />
 
           <SemesterDatesForm
             value={semester}
             onChange={(next) => {
-              setAppliedProgram(null);
+              setPickerKey((k) => k + 1);
               setSemester(next);
             }}
           />
