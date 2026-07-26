@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "fetch-photos": "node scripts/fetch-photos.mjs"
+    "fetch-photos": "node --env-file=.env.local scripts/fetch-photos.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.4",
