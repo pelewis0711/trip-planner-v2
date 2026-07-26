@@ -317,6 +317,65 @@ const PROVIDER_ENTRIES: ProgramCalendar[] = [
     term: "Spring 2027", start: "2027-01-25", end: "2027-05-06", breaks: [],
     sourceUrl: "https://www.iesabroad.org/programs/rome-language-area-studies",
     verifyNote: VERIFY_NOTE },
+
+  // Batch 5 -- more city coverage. CEA CAPA skipped entirely this round
+  // (batch 4's 403 bot-blocking was domain-wide, not city-specific, so
+  // not worth retrying yet).
+  // - CIEE Amsterdam's own page labels its "Semester in Amsterdam" as a
+  //   12-week program (shorter than the ~15-16 week semester norm
+  //   elsewhere in this dataset) and calls its own dates "tentative" --
+  //   fetched twice to rule out grabbing the wrong track (CIEE separately
+  //   offers a "Quarter" and "Open Campus Block" in Amsterdam too), both
+  //   fetches agreed, so this looks like a genuine structural quirk of
+  //   that program rather than a scraping error.
+  // - IES Abroad Madrid/Berlin: IES runs multiple parallel program tracks
+  //   per city (Language & Area Studies / Business / Security Studies /
+  //   etc.) with slightly different day-level dates -- one track was
+  //   picked per city for consistency; the deltas between tracks are only
+  //   a few days.
+  // - AIFS Barcelona Spring 2027 is NOT included -- the program's own
+  //   dates page is a JS Fall/Spring toggle that only ever exposed Fall
+  //   2026 content to a static fetch. Fall 2026 also mentions a real,
+  //   included "Pyrenees excursion" with no published date range -- left
+  //   out of breaks entirely rather than recorded with placeholder dates.
+  // - API Madrid: NOT included, and likely doesn't exist rather than just
+  //   being unsourced -- API's own Spain destination list names Barcelona,
+  //   Bilbao, Granada, Salamanca, Seville, and Valencia, with no Madrid
+  //   program among them.
+  // - ISA Florence: NOT included -- "ISA" appears to have been fully
+  //   absorbed into the WorldStrides Higher Ed brand (isabroad.org now
+  //   redirects through studiesabroad.com to worldstrides.com with no ISA
+  //   branding left), and the only Florence programs findable under
+  //   WorldStrides are unrelated "Florence University of the Arts" (FUA)
+  //   tracks, not ISA.
+  { id: "ciee-amsterdam-fall-2026", type: "provider", name: "CIEE Amsterdam", city: "Amsterdam", country: "Netherlands",
+    term: "Fall 2026", start: "2026-08-17", end: "2026-11-07", breaks: [],
+    sourceUrl: "https://www.ciee.org/go-abroad/college-study-abroad/programs/netherlands/amsterdam/semester-amsterdam",
+    verifyNote: VERIFY_NOTE },
+  { id: "ciee-amsterdam-spring-2027", type: "provider", name: "CIEE Amsterdam", city: "Amsterdam", country: "Netherlands",
+    term: "Spring 2027", start: "2027-01-04", end: "2027-03-27", breaks: [],
+    sourceUrl: "https://www.ciee.org/go-abroad/college-study-abroad/programs/netherlands/amsterdam/semester-amsterdam",
+    verifyNote: VERIFY_NOTE },
+  { id: "ies-abroad-madrid-fall-2026", type: "provider", name: "IES Abroad Madrid", city: "Madrid", country: "Spain",
+    term: "Fall 2026", start: "2026-09-01", end: "2026-12-18", breaks: [],
+    sourceUrl: "https://www.iesabroad.org/programs/madrid-language-area-studies",
+    verifyNote: VERIFY_NOTE },
+  { id: "ies-abroad-madrid-spring-2027", type: "provider", name: "IES Abroad Madrid", city: "Madrid", country: "Spain",
+    term: "Spring 2027", start: "2027-01-13", end: "2027-05-08", breaks: [],
+    sourceUrl: "https://www.iesabroad.org/programs/madrid-language-area-studies",
+    verifyNote: VERIFY_NOTE },
+  { id: "ies-abroad-berlin-fall-2026", type: "provider", name: "IES Abroad Berlin", city: "Berlin", country: "Germany",
+    term: "Fall 2026", start: "2026-09-02", end: "2026-12-19", breaks: [],
+    sourceUrl: "https://www.iesabroad.org/programs/berlin-security-studies-international-affairs",
+    verifyNote: VERIFY_NOTE },
+  { id: "ies-abroad-berlin-spring-2027", type: "provider", name: "IES Abroad Berlin", city: "Berlin", country: "Germany",
+    term: "Spring 2027", start: "2027-01-20", end: "2027-05-08", breaks: [],
+    sourceUrl: "https://www.iesabroad.org/programs/berlin-security-studies-international-affairs",
+    verifyNote: VERIFY_NOTE },
+  { id: "aifs-barcelona-fall-2026", type: "provider", name: "AIFS Barcelona", city: "Barcelona", country: "Spain",
+    term: "Fall 2026", start: "2026-09-01", end: "2026-12-18", breaks: [],
+    sourceUrl: "https://www.aifsabroad.com/programs/study-abroad-barcelona-semester/",
+    verifyNote: VERIFY_NOTE },
 ];
 
 export const PROGRAM_CALENDARS: ProgramCalendar[] = [...UNIVERSITY_ENTRIES, ...PROVIDER_ENTRIES];
