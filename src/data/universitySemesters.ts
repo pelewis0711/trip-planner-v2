@@ -118,12 +118,17 @@ export const UNIVERSITY_SEMESTERS: UniversitySemesterEntry[] = [
     start: "2027-01-18", end: "2027-05-28",
     breaks: [b("Easter Vacation", "2027-03-22", "2027-04-02", "easter")],
     sourceUrl: "https://www.qub.ac.uk/Study/international-students/incoming-exchange/semester-dates/2026-27/" },
-  { university: "University of Glasgow", city: "Glasgow", country: "United Kingdom", term: "fall",
-    start: "2026-09-21", end: "2026-12-18", breaks: [],
+  // country corrected from "United Kingdom" to "Scotland" during UIUC
+  // partner research (batch 5) -- this app treats England/Scotland/
+  // Wales/Northern Ireland as their own countries (Schengen exemption
+  // logic depends on it), a convention this specific entry predated.
+  { university: "University of Glasgow", city: "Glasgow", country: "Scotland", term: "fall",
+    start: "2026-09-21", end: "2026-12-18",
+    breaks: [b("Winter Break", "2026-12-23", "2027-01-04", "winter")],
     sourceUrl: "https://www.gla.ac.uk/myglasgow/apg/sessiondates/session2026-27/" },
-  { university: "University of Glasgow", city: "Glasgow", country: "United Kingdom", term: "spring",
+  { university: "University of Glasgow", city: "Glasgow", country: "Scotland", term: "spring",
     start: "2027-01-11", end: "2027-05-28",
-    breaks: [b("Spring Vacation", "2027-03-29", "2027-04-16", "spring")],
+    breaks: [b("Spring Break", "2027-03-29", "2027-04-16", "spring")],
     sourceUrl: "https://www.gla.ac.uk/myglasgow/apg/sessiondates/session2026-27/" },
   { university: "Royal Holloway, University of London", city: "Egham", country: "United Kingdom", term: "fall",
     start: "2026-09-21", end: "2026-12-11", breaks: [],
@@ -624,6 +629,42 @@ export const UNIVERSITY_SEMESTERS: UniversitySemesterEntry[] = [
     start: "2027-01-25", end: "2027-06-04",
     breaks: [b("Easter Vacation", "2027-04-17", "2027-05-03", "easter")],
     sourceUrl: "https://www.qmul.ac.uk/about/calendar/" },
+
+  // UIUC exchange partners, batch 5 (direct-enroll universities). This
+  // closes out UIUC's remaining direct-enroll list, minus the "Illinois
+  // program center" entries with no clear single host institution -- see
+  // CLAUDE.md for what was found/not found there.
+  // - Newcastle's own page presents two incompatible date structures
+  //   ("term dates" vs. "semester dates"); "term dates" was used since the
+  //   source explicitly labels those as applying to undergraduate taught
+  //   students. No break dates were published on this page at all.
+  // - Stirling has separate UG/PGT calendars -- undergraduate dates used
+  //   as more relevant to a direct-enroll exchange student.
+  // - Lucerne (HSLU) is a federation of ~6 schools each with its own dates
+  //   page -- sourced from the Lucerne School of Information Technology
+  //   (the one with a clean English page); other HSLU schools may run a
+  //   few days off from this.
+  { university: "Newcastle University", city: "Newcastle", country: "England", term: "fall",
+    start: "2026-09-21", end: "2026-12-11", breaks: [],
+    sourceUrl: "https://www.ncl.ac.uk/regulations/term-dates/" },
+  { university: "Newcastle University", city: "Newcastle", country: "England", term: "spring",
+    start: "2027-01-04", end: "2027-03-25", breaks: [],
+    sourceUrl: "https://www.ncl.ac.uk/regulations/term-dates/" },
+  { university: "University of Stirling", city: "Stirling", country: "Scotland", term: "fall",
+    start: "2026-09-14", end: "2026-12-18",
+    breaks: [b("Mid-semester Break", "2026-10-26", "2026-10-30", "break")],
+    sourceUrl: "https://www.stir.ac.uk/study/semester-dates/" },
+  { university: "University of Stirling", city: "Stirling", country: "Scotland", term: "spring",
+    start: "2027-01-18", end: "2027-05-07",
+    breaks: [b("Mid-semester Break", "2027-03-01", "2027-03-05", "break")],
+    sourceUrl: "https://www.stir.ac.uk/study/semester-dates/" },
+  { university: "Lucerne University of Applied Sciences and Arts", city: "Lucerne", country: "Switzerland", term: "fall",
+    start: "2026-09-14", end: "2026-12-19", breaks: [],
+    sourceUrl: "https://www.hslu.ch/en/lucerne-school-of-information-technology/degree-programs/academic-calendar/" },
+  { university: "Lucerne University of Applied Sciences and Arts", city: "Lucerne", country: "Switzerland", term: "spring",
+    start: "2027-02-22", end: "2027-05-05",
+    breaks: [b("Easter Break", "2027-03-26", "2027-03-30", "easter")],
+    sourceUrl: "https://www.hslu.ch/en/lucerne-school-of-information-technology/degree-programs/academic-calendar/" },
 ];
 
 export function universityNames(): string[] {
