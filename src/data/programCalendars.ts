@@ -200,6 +200,71 @@ const PROVIDER_ENTRIES: ProgramCalendar[] = [
     breaks: [{ label: "Spring Break", start: "2027-03-22", end: "2027-03-26" }],
     sourceUrl: "https://ldminstitute.com/wp-content/uploads/2025/12/LdM-Academic-Calendar-2026-2027_2025.12.10.pdf",
     verifyNote: VERIFY_NOTE },
+
+  // Batch 3 (Arcadia, AIFS, ISA, SAI) -- the thinnest batch so far in terms
+  // of coverage per provider, flagged rather than padded out:
+  // - Arcadia's own domain (studyabroad.arcadia.edu) 403'd every fetch
+  //   attempt, including via Google cache -- both Arcadia entries below
+  //   came from a partner university's education-abroad portal (UT
+  //   Austin's utdirect.utexas.edu, which mirrors Arcadia's official
+  //   program data), same workaround pattern as batch 2's API/LdM case.
+  //   Only Arcadia London Spring 2027 was findable this way -- Fall 2026
+  //   and both Arcadia Granada terms are NOT included: a WebSearch summary
+  //   claimed a Fall 2026 date for London, but the underlying page only
+  //   actually displayed Spring 2027 when fetched directly, so the claim
+  //   was dropped rather than trusted unverified. Granada's program is
+  //   real and current (a genuine UGR-partnered offering) but only
+  //   2025/2026 dates were reachable, not the requested terms.
+  // - AIFS Florence Spring 2027 came from a partner community college's
+  //   page (Santa Rosa Junior College) that had transcribed AIFS's full
+  //   calendar in detail, since aifsabroad.com's own Spring 2027 page
+  //   exists but doesn't expose date content to a direct fetch (likely
+  //   client-rendered) -- one step removed from AIFS's own copy, moderate
+  //   confidence but internally detailed and consistent.
+  // - AIFS London Spring 2027 wasn't found anywhere -- several program-
+  //   variant URLs all only showed Fall 2026 detail.
+  // - AIFS London Fall 2026's own official PDF literally labels its
+  //   Oct 17-25 break "Spring Break" despite being the Fall term -- a
+  //   clear copy-paste template artifact in AIFS's own document, not an
+  //   error introduced here. Relabeled "Fall Break" below for sanity.
+  // - ISA is now marketed under the WorldStrides brand
+  //   (studiesabroad.com redirects to worldstrides.com) -- dates below are
+  //   current on that live domain, under what's still called the ISA
+  //   Barcelona program.
+  { id: "aifs-florence-fall-2026", type: "provider", name: "AIFS Florence", city: "Florence", country: "Italy",
+    term: "Fall 2026", start: "2026-09-03", end: "2026-12-04", breaks: [],
+    sourceUrl: "https://www.aifsabroad.com/programs/study-abroad-florence-semester",
+    verifyNote: VERIFY_NOTE },
+  { id: "aifs-florence-spring-2027", type: "provider", name: "AIFS Florence", city: "Florence", country: "Italy",
+    term: "Spring 2027", start: "2027-01-31", end: "2027-04-30",
+    breaks: [{ label: "Mid-Semester Break", start: "2027-03-13", end: "2027-03-21" }],
+    sourceUrl: "https://study-abroad.santarosa.edu/florence-spring-2027-information",
+    verifyNote: VERIFY_NOTE },
+  { id: "aifs-london-fall-2026", type: "provider", name: "AIFS London", city: "London", country: "England",
+    term: "Fall 2026", start: "2026-09-04", end: "2026-12-04",
+    breaks: [{ label: "Fall Break", start: "2026-10-17", end: "2026-10-25" }],
+    sourceUrl: "https://secure.aifsabroad.com/College/Common/ViewDocument.aspx?docType=catalog&division=PART&docPath=QGNYHA1EIRQR/NCSAC+London+Info.pdf",
+    verifyNote: VERIFY_NOTE },
+  { id: "arcadia-london-spring-2027", type: "provider", name: "Arcadia London", city: "London", country: "England",
+    term: "Spring 2027", start: "2027-01-04", end: "2027-04-19", breaks: [],
+    sourceUrl: "https://utdirect.utexas.edu/apps/abroad/student/pgm_list/detail/nlogon/61/",
+    verifyNote: VERIFY_NOTE },
+  { id: "isa-barcelona-fall-2026", type: "provider", name: "ISA Barcelona", city: "Barcelona", country: "Spain",
+    term: "Fall 2026", start: "2026-09-05", end: "2026-12-18", breaks: [],
+    sourceUrl: "https://worldstrides.com/destinations/europe/spain/barcelona/international-studies-business--culture",
+    verifyNote: VERIFY_NOTE },
+  { id: "isa-barcelona-spring-2027", type: "provider", name: "ISA Barcelona", city: "Barcelona", country: "Spain",
+    term: "Spring 2027", start: "2027-01-09", end: "2027-04-28", breaks: [],
+    sourceUrl: "https://worldstrides.com/destinations/europe/spain/barcelona/international-studies-business--culture",
+    verifyNote: VERIFY_NOTE },
+  { id: "sai-rome-fall-2026", type: "provider", name: "SAI Rome", city: "Rome", country: "Italy",
+    term: "Fall 2026", start: "2026-08-26", end: "2026-12-12", breaks: [],
+    sourceUrl: "https://www.saiprograms.com/rome/jcu/jcu-fall-semester-2026",
+    verifyNote: VERIFY_NOTE },
+  { id: "sai-rome-spring-2027", type: "provider", name: "SAI Rome", city: "Rome", country: "Italy",
+    term: "Spring 2027", start: "2027-01-13", end: "2027-05-08", breaks: [],
+    sourceUrl: "https://www.saiprograms.com/rome/jcu/jcu-spring-semester-2027",
+    verifyNote: VERIFY_NOTE },
 ];
 
 export const PROGRAM_CALENDARS: ProgramCalendar[] = [...UNIVERSITY_ENTRIES, ...PROVIDER_ENTRIES];
