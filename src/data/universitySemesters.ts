@@ -332,6 +332,84 @@ export const UNIVERSITY_SEMESTERS: UniversitySemesterEntry[] = [
   { university: "Deree - The American College of Greece", city: "Athens", country: "Greece", term: "fall",
     start: "2026-09-10", end: "2026-12-18", breaks: [],
     sourceUrl: "https://www.acg.edu/wp-content/uploads/2026/04/UG_Calendar_2026_27_v3.pdf" },
+
+  // --- University of Illinois Urbana-Champaign's real European exchange
+  // partners (batch 1 of that effort), sourced from UIUC's own official
+  // program database (app.studyabroad.illinois.edu, Region = Europe) --
+  // NOT a curated "top universities" list, the actual real list UIUC
+  // students can pick from. Flag worth knowing: this database does NOT
+  // include Anglo-American University, Prague, anywhere -- searched
+  // explicitly for "AAU"/"Anglo-American"/"Prague" and found only CEA CAPA
+  // (a provider, already in programCalendars.ts) and one faculty-led short
+  // course. AAU Prague appears to be a non-UIUC-affiliated enrollment path,
+  // not a campus exchange -- a real, separate fact from anything about the
+  // app's own baked-in dates.
+  //
+  // Flags worth a second look:
+  // - EPFL Spring 2027 not included -- EPFL's own calendar page only
+  //   publishes Spring 2025-26 (current) and Fall 2026-27; Spring 2027
+  //   genuinely isn't published yet.
+  // - Humboldt-Universitat zu Berlin not included at all -- every page/PDF
+  //   on hu-berlin.de returned a bot-protection challenge page rather than
+  //   content, and no citable mirror was found either. Worth a retry.
+  // - University of Manchester's dates come from an official but
+  //   explicitly provisional planning document (its own disclaimer:
+  //   "prepared to assist in timetable planning only... based on our best
+  //   understanding of term dates") -- very likely accurate, not a final
+  //   locked calendar.
+  // - VU Amsterdam's dates came from VU's own official 2026-27 exchange
+  //   factsheet, but the reachable copy was hosted on a partner
+  //   university's site (Universitas Gadjah Mada's international office)
+  //   rather than fetched directly from vu.nl (whose own PDFs didn't
+  //   render as text) -- content itself carries VU letterhead/contacts.
+  { university: "ETH Zurich", city: "Zurich", country: "Switzerland", term: "fall",
+    start: "2026-09-14", end: "2026-12-18",
+    breaks: [b("Christmas Break", "2026-12-24", "2027-01-03", "christmas")],
+    sourceUrl: "https://mtec.ethz.ch/news/academic-calendar.html" },
+  { university: "ETH Zurich", city: "Zurich", country: "Switzerland", term: "spring",
+    start: "2027-02-22", end: "2027-06-04",
+    breaks: [b("Easter Break", "2027-03-26", "2027-04-04", "easter")],
+    sourceUrl: "https://mtec.ethz.ch/news/academic-calendar.html" },
+  { university: "EPFL", city: "Lausanne", country: "Switzerland", term: "fall",
+    start: "2026-09-07", end: "2026-12-18", breaks: [],
+    sourceUrl: "https://www.epfl.ch/education/studies/en/rules-and-procedures/academic-calendar/" },
+  { university: "TU Delft", city: "Delft", country: "Netherlands", term: "fall",
+    start: "2026-09-07", end: "2027-01-29",
+    breaks: [b("Christmas Holidays", "2026-12-21", "2027-01-03", "christmas")],
+    sourceUrl: "https://www.tudelft.nl/en/student/my-study-me/education/academic-calendar" },
+  { university: "TU Delft", city: "Delft", country: "Netherlands", term: "spring",
+    start: "2027-02-01", end: "2027-06-25",
+    breaks: [b("Spring Break", "2027-02-01", "2027-02-07", "spring")],
+    sourceUrl: "https://www.tudelft.nl/en/student/my-study-me/education/academic-calendar" },
+  { university: "VU Amsterdam", city: "Amsterdam", country: "Netherlands", term: "fall",
+    start: "2026-08-31", end: "2027-01-29", breaks: [],
+    sourceUrl: "https://vu.nl/en/education/more-about/academic-calendar" },
+  { university: "VU Amsterdam", city: "Amsterdam", country: "Netherlands", term: "spring",
+    start: "2027-02-01", end: "2027-06-25", breaks: [],
+    sourceUrl: "https://vu.nl/en/education/more-about/academic-calendar" },
+  { university: "Heidelberg University", city: "Heidelberg", country: "Germany", term: "fall",
+    start: "2026-10-12", end: "2027-02-06",
+    breaks: [b("Christmas/New Year Break", "2026-12-21", "2027-01-06", "christmas")],
+    sourceUrl: "https://www.uni-heidelberg.de/en/study/management-of-studies/key-dates-deadlines/further-semester-dates" },
+  { university: "Heidelberg University", city: "Heidelberg", country: "Germany", term: "spring",
+    start: "2027-04-12", end: "2027-07-24", breaks: [],
+    sourceUrl: "https://www.uni-heidelberg.de/en/study/management-of-studies/key-dates-deadlines/further-semester-dates" },
+  { university: "University of Bristol", city: "Bristol", country: "England", term: "fall",
+    start: "2026-09-21", end: "2026-12-18",
+    breaks: [b("Winter Break", "2026-12-21", "2027-01-08", "winter")],
+    sourceUrl: "https://www.bristol.ac.uk/university/dates/" },
+  { university: "University of Bristol", city: "Bristol", country: "England", term: "spring",
+    start: "2027-01-18", end: "2027-05-21",
+    breaks: [b("Spring Vacation", "2027-03-22", "2027-04-09", "spring")],
+    sourceUrl: "https://www.bristol.ac.uk/university/dates/" },
+  { university: "University of Manchester", city: "Manchester", country: "England", term: "fall",
+    start: "2026-09-21", end: "2027-01-31",
+    breaks: [b("Christmas Vacation", "2026-12-21", "2027-01-10", "christmas")],
+    sourceUrl: "https://documents.manchester.ac.uk/DocuInfo.aspx?DocID=78064" },
+  { university: "University of Manchester", city: "Manchester", country: "England", term: "spring",
+    start: "2027-02-01", end: "2027-06-13",
+    breaks: [b("Easter Vacation", "2027-03-22", "2027-04-11", "easter")],
+    sourceUrl: "https://documents.manchester.ac.uk/DocuInfo.aspx?DocID=78064" },
 ];
 
 export function universityNames(): string[] {
