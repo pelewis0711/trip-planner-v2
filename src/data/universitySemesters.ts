@@ -535,6 +535,95 @@ export const UNIVERSITY_SEMESTERS: UniversitySemesterEntry[] = [
       b("Semana Santa (Easter, Valencia/Gandia campus)", "2027-03-25", "2027-04-05", "easter"),
     ],
     sourceUrl: "https://www.upv.es/entidades/SG/infoweb/sg/info/U0985732.pdf" },
+
+  // UIUC exchange partners, batch 4. All 8 requested universities sourced
+  // -- the first batch in this series with zero gaps.
+  // Flags worth a second look:
+  // - Term start = first day of TEACHING, not orientation/welcome week, so
+  //   several starts are later than a "welcome week" date you might see
+  //   elsewhere (Cardiff, Birmingham, Galway, QMUL all start teaching
+  //   roughly a week after their welcome/enrolment week).
+  // - Jagiellonian's own "summer semester" officially runs Feb 25-Sep 30,
+  //   2027 -- unusually long because Jagiellonian's own definition
+  //   includes the full retake-exam window (through mid-September) and an
+  //   administrative close-out, not just teaching+first exams. Used
+  //   exactly as published rather than guessing a shorter "real" end.
+  // - SLU has no single home city (multi-campus: Uppsala, Alnarp, Umea) --
+  //   Uppsala (the largest/HQ campus) was chosen as a judgment call, not
+  //   a sourced fact.
+  // - University of Birmingham's accessible page didn't publish a named
+  //   reading-week/break, so breaks: [] reflects that rather than a
+  //   guessed gap.
+  // - "University of Galway" is the current name (formerly NUI Galway) --
+  //   used as researched.
+  { university: "Swedish University of Agricultural Sciences (SLU)", city: "Uppsala", country: "Sweden", term: "fall",
+    start: "2026-08-31", end: "2027-01-17",
+    breaks: [b("Winter break (no classes)", "2026-12-23", "2026-12-31", "winter")],
+    sourceUrl: "https://www.slu.se/en/study/application-and-admission/academi-calendar/" },
+  { university: "Swedish University of Agricultural Sciences (SLU)", city: "Uppsala", country: "Sweden", term: "spring",
+    start: "2027-01-18", end: "2027-06-06", breaks: [],
+    sourceUrl: "https://www.slu.se/en/study/application-and-admission/academi-calendar/" },
+  { university: "Bogazici University", city: "Istanbul", country: "Turkey", term: "fall",
+    start: "2026-09-21", end: "2026-12-18",
+    breaks: [b("Republic Day", "2026-10-28", "2026-10-29", "special")],
+    sourceUrl: "https://intl.bogazici.edu.tr/sites/intl.bogazici.edu.tr/files/academic_calendar_2026-2027.pdf" },
+  { university: "Bogazici University", city: "Istanbul", country: "Turkey", term: "spring",
+    start: "2027-02-08", end: "2027-05-28",
+    breaks: [
+      b("Ramadan Holiday", "2027-03-08", "2027-03-11", "special"),
+      b("Spring Break", "2027-04-19", "2027-04-23", "break"),
+      b("Eid al-Adha Holiday", "2027-05-15", "2027-05-19", "special"),
+    ],
+    sourceUrl: "https://intl.bogazici.edu.tr/sites/intl.bogazici.edu.tr/files/academic_calendar_2026-2027.pdf" },
+  { university: "Cardiff University", city: "Cardiff", country: "Wales", term: "fall",
+    start: "2026-10-05", end: "2027-01-31",
+    breaks: [b("Christmas Break", "2026-12-19", "2027-01-10", "christmas")],
+    sourceUrl: "https://www.cardiff.ac.uk/public-information/corporate-information/semester-dates" },
+  { university: "Cardiff University", city: "Cardiff", country: "Wales", term: "spring",
+    start: "2027-02-01", end: "2027-06-18",
+    breaks: [b("Easter Break", "2027-03-20", "2027-04-11", "easter")],
+    sourceUrl: "https://www.cardiff.ac.uk/public-information/corporate-information/semester-dates" },
+  { university: "University of Birmingham", city: "Birmingham", country: "England", term: "fall",
+    start: "2026-09-28", end: "2026-12-11", breaks: [],
+    sourceUrl: "https://www.birmingham.ac.uk/undergraduate/courses/academicyear" },
+  { university: "University of Birmingham", city: "Birmingham", country: "England", term: "spring",
+    start: "2027-01-11", end: "2027-03-26", breaks: [],
+    sourceUrl: "https://www.birmingham.ac.uk/undergraduate/courses/academicyear" },
+  { university: "University of Galway", city: "Galway", country: "Ireland", term: "fall",
+    start: "2026-09-07", end: "2026-12-18",
+    breaks: [b("Christmas Break", "2026-12-19", "2027-01-10", "christmas")],
+    sourceUrl: "https://www.universityofgalway.ie/media/registrationoffice/files/26-27-All-Students-Final.pdf" },
+  { university: "University of Galway", city: "Galway", country: "Ireland", term: "spring",
+    start: "2027-01-11", end: "2027-05-06",
+    breaks: [b("Easter Break", "2027-03-26", "2027-03-29", "easter")],
+    sourceUrl: "https://www.universityofgalway.ie/media/registrationoffice/files/26-27-All-Students-Final.pdf" },
+  { university: "Jagiellonian University", city: "Krakow", country: "Poland", term: "fall",
+    start: "2026-10-01", end: "2027-02-24",
+    breaks: [
+      b("Christmas Break", "2026-12-23", "2027-01-06", "christmas"),
+      b("Inter-semester Break", "2027-02-11", "2027-02-17", "break"),
+    ],
+    sourceUrl: "https://internationalstudents.uj.edu.pl/en_GB/studenci/kalendarz-akademicki" },
+  { university: "Jagiellonian University", city: "Krakow", country: "Poland", term: "spring",
+    start: "2027-02-25", end: "2027-09-30",
+    breaks: [b("Easter Break", "2027-03-25", "2027-03-30", "easter")],
+    sourceUrl: "https://internationalstudents.uj.edu.pl/en_GB/studenci/kalendarz-akademicki" },
+  { university: "University of Southampton", city: "Southampton", country: "England", term: "fall",
+    start: "2026-09-14", end: "2027-01-23",
+    breaks: [b("Christmas Break", "2026-12-13", "2027-01-03", "christmas")],
+    sourceUrl: "https://www.southampton.ac.uk/about/term-dates" },
+  { university: "University of Southampton", city: "Southampton", country: "England", term: "spring",
+    start: "2027-01-25", end: "2027-05-29",
+    breaks: [b("Easter Break", "2027-03-21", "2027-04-11", "easter")],
+    sourceUrl: "https://www.southampton.ac.uk/about/term-dates" },
+  { university: "Queen Mary University of London", city: "London", country: "England", term: "fall",
+    start: "2026-09-21", end: "2027-01-22",
+    breaks: [b("Christmas/New Year Vacation", "2026-12-24", "2027-01-03", "christmas")],
+    sourceUrl: "https://www.qmul.ac.uk/about/calendar/" },
+  { university: "Queen Mary University of London", city: "London", country: "England", term: "spring",
+    start: "2027-01-25", end: "2027-06-04",
+    breaks: [b("Easter Vacation", "2027-04-17", "2027-05-03", "easter")],
+    sourceUrl: "https://www.qmul.ac.uk/about/calendar/" },
 ];
 
 export function universityNames(): string[] {
