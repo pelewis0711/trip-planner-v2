@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Plan } from "@/lib/store/plan";
+import { generateSlots } from "@/lib/calc/semester";
 import { fetchProfileEmails } from "./profiles";
 
 export interface PlanRow {
@@ -22,6 +23,15 @@ export function rowToPlan(row: PlanRow, emails: Map<string, string>): Plan {
     id: row.id,
     name: row.name,
     ...row.data,
+    // Backfill for a row synced before `slots`/`deletedAutoSlots` were part
+    // of the sync payload (see planToInsertRow/AuthSync's savePlanData call)
+    // -- without this, a plan round-tripped through a legacy row comes back
+    // with slots: undefined, wiping the calendar the next time this remote
+    // version wins a merge. Regenerating from the row's own semester loses
+    // any manual weekend deletions made before this fix shipped (never
+    // captured server-side), but a full edge-to-edge weekend list is far
+    // better than a blank one.
+    slots: row.data.slots ?? (row.data.semester ? generateSlots(row.data.semester) : []),
     ownerId: row.user_id,
     shareViewToken: row.share_view_token,
     shareCollabToken: row.share_collab_token,
@@ -56,6 +66,8 @@ export function planToInsertRow(userId: string, p: Plan) {
       created: p.created,
       updated: p.updated,
       semester: p.semester,
+      slots: p.slots,
+      deletedAutoSlots: p.deletedAutoSlots,
     },
     updated_at: new Date(p.updated).toISOString(),
   };

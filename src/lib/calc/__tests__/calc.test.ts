@@ -18,6 +18,7 @@ import { foodTiers, daysOf, lodgingTiers } from "../cost";
 import { convert, formatMoney, RATES } from "../currency";
 import { searchPrograms, toSemesterConfig } from "@/data/programCalendars";
 import { parsePlanFile, sanitizePlacements } from "@/lib/planIO";
+import { rowToPlan, planToInsertRow, type PlanRow } from "@/lib/supabase/sharing";
 
 const rome = TRIPS.find((t) => t.id === "rome")!;
 const dublin = TRIPS.find((t) => t.id === "dublin")!;
@@ -282,6 +283,72 @@ describe("Onboarding-loop fix: setOnboardingDefaults also configures the active 
     expect(after.semester).toEqual(originalSemester);
     expect(after.slots).toEqual(originalSlots);
     expect(after.placements[originalSlots[0].id]).toBeTruthy();
+  });
+});
+
+describe("Account-sync fix: slots/deletedAutoSlots round-trip through Supabase instead of vanishing on refresh", () => {
+  function baseRow(data: Partial<PlanRow["data"]>): PlanRow {
+    return {
+      id: "p1",
+      user_id: "u1",
+      name: "Test plan",
+      data: {
+        home: "Prague",
+        bag: "cabin",
+        budget: null,
+        placements: {},
+        created: 1000,
+        updated: 2000,
+        semester: DEFAULT_SEMESTER,
+        ...data,
+      } as PlanRow["data"],
+      share_view_token: null,
+      share_collab_token: null,
+      collaborator_ids: [],
+      last_edited_by: null,
+      last_edited_at: null,
+    };
+  }
+
+  it("planToInsertRow includes slots and deletedAutoSlots in the synced payload (the actual bug: these were previously omitted entirely)", () => {
+    const plan = {
+      id: "p1",
+      home: "Prague",
+      bag: "cabin",
+      budget: null,
+      placements: {},
+      created: 1000,
+      updated: 2000,
+      semester: DEFAULT_SEMESTER,
+      slots: generateSlots(DEFAULT_SEMESTER),
+      deletedAutoSlots: [{ s: [1, 30] as [number, number], e: [1, 31] as [number, number] }],
+    } as unknown as Plan;
+
+    const row = planToInsertRow("u1", plan);
+    expect(row.data.slots).toEqual(plan.slots);
+    expect(row.data.deletedAutoSlots).toEqual(plan.deletedAutoSlots);
+  });
+
+  it("rowToPlan preserves real slots/deletedAutoSlots when the row actually has them", () => {
+    const slots = generateSlots(DEFAULT_SEMESTER);
+    const deletedAutoSlots = [{ s: slots[0].s, e: slots[0].e }];
+    const row = baseRow({ slots, deletedAutoSlots });
+    const plan = rowToPlan(row, new Map());
+    expect(plan.slots).toEqual(slots);
+    expect(plan.deletedAutoSlots).toEqual(deletedAutoSlots);
+  });
+
+  it("rowToPlan backfills a full edge-to-edge weekend list from the row's semester when slots is missing (a legacy row synced before this fix)", () => {
+    const row = baseRow({}); // no `slots` key at all -- the pre-fix shape
+    const plan = rowToPlan(row, new Map());
+    expect(plan.slots).toEqual(generateSlots(DEFAULT_SEMESTER));
+    expect(plan.slots!.length).toBeGreaterThan(10);
+  });
+
+  it("rowToPlan returns an empty slot list (not a crash) for a legacy row with neither slots nor a semester", () => {
+    const row = baseRow({ semester: undefined });
+    const plan = rowToPlan(row, new Map());
+    expect(plan.slots).toEqual([]);
   });
 });
 

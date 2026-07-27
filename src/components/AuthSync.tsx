@@ -70,6 +70,8 @@ async function syncPlansUp(supabase: SupabaseClient, userId: string, plans: Plan
         created: p.created,
         updated: p.updated,
         semester: p.semester,
+        slots: p.slots,
+        deletedAutoSlots: p.deletedAutoSlots,
       });
       if (updated) {
         usePlanStore.getState().patchPlan(p.id, {
