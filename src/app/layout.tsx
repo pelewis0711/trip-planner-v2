@@ -31,6 +31,10 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Semesterly",
   description: "Plan your study-abroad semester of travel — budgets, calendar, and bookings in one place.",
+  // noindex placeholder: to hide the app from Google, add
+  // `robots: { index: false, follow: false }` here (and a matching
+  // app/robots.ts). Not set -- the app is intentionally public/indexable
+  // right now.
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

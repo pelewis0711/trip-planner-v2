@@ -12,6 +12,7 @@ import type { Placement, Placements, SlotActuals, Stop } from "@/lib/calc/types"
 import { generateSlots, DEFAULT_SEMESTER, fmtMonthDay, type SemesterConfig } from "@/lib/calc/semester";
 import type { Currency } from "@/components/onboarding/OnboardingFlow";
 import { LEGACY_SLOTS, type Slot, type SlotKind } from "@/data/slots";
+import { sanitizePlacements } from "@/lib/planIO";
 
 const isKnownHome = isKnownCity;
 
@@ -607,7 +608,11 @@ export const usePlanStore = create<PlanStoreState>()(
               home: pl.home && isKnownHome(pl.home) ? pl.home : NO_HOME,
               bag: pl.bag === "none" || pl.bag === "checked" ? pl.bag : "cabin",
               budget: typeof pl.budget === "number" ? pl.budget : null,
-              placements: pl.placements ?? {},
+              // Defense in depth: parsePlanFile() already sanitizes this
+              // (the real untrusted-file boundary), but importPlans is a
+              // public store action any caller could reach directly, so
+              // this doesn't just trust whatever's on pl.placements.
+              placements: sanitizePlacements(pl.placements),
               created: now,
               updated: now,
             });

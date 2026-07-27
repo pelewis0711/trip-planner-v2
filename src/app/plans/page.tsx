@@ -37,10 +37,12 @@ export default function PlansPage() {
       .text()
       .then((text) => {
         const incoming = parsePlanFile(text);
-        if (!incoming.length) throw new Error("empty");
+        if (!incoming.length) throw new Error("That doesn't look like a plan file.");
         importPlans(incoming);
       })
-      .catch(() => alert("Could not read that plan file."));
+      .catch((err: unknown) => {
+        alert(err instanceof Error ? err.message : "Could not read that plan file.");
+      });
   };
 
   const handleDelete = (id: string) => {

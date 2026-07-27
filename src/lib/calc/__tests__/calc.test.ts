@@ -17,6 +17,7 @@ import { makeCtx } from "../context";
 import { foodTiers, daysOf, lodgingTiers } from "../cost";
 import { convert, formatMoney, RATES } from "../currency";
 import { searchPrograms, toSemesterConfig } from "@/data/programCalendars";
+import { parsePlanFile, sanitizePlacements } from "@/lib/planIO";
 
 const rome = TRIPS.find((t) => t.id === "rome")!;
 const dublin = TRIPS.find((t) => t.id === "dublin")!;
@@ -559,5 +560,67 @@ describe("Phase 12: merged program-calendar picker (providers + universities)", 
 
     // a post-finals slot is always appended regardless of source
     expect(slots.some((s) => s.kind === "post")).toBe(true);
+  });
+});
+
+describe("Hardening: safe plan import (untrusted JSON files)", () => {
+  it("round-trips a real, valid plan export unchanged", () => {
+    const text = JSON.stringify({
+      kind: "study-abroad-plan",
+      version: 2,
+      plan: {
+        name: "My trip",
+        home: "Prague",
+        bag: "checked",
+        budget: 2000,
+        placements: {
+          w1: { stops: [{ tripId: "rome", nights: 2, act: [true, false], sig: [true], l: 1, fd: 1 }], travelers: 2 },
+        },
+      },
+    });
+    const [imported] = parsePlanFile(text);
+    expect(imported.name).toBe("My trip");
+    expect(imported.home).toBe("Prague");
+    expect(imported.bag).toBe("checked");
+    expect(imported.budget).toBe(2000);
+    expect(imported.placements!.w1.stops[0]).toEqual({ tripId: "rome", nights: 2, act: [true, false], sig: [true], l: 1, fd: 1 });
+    expect(imported.placements!.w1.travelers).toBe(2);
+  });
+
+  it("strips __proto__/constructor/prototype keys instead of letting them through", () => {
+    const malicious = JSON.parse(
+      '{"__proto__": {"polluted": true}, "constructor": {"stops": []}, "w1": {"stops": []}}'
+    );
+    const clean = sanitizePlacements(malicious);
+    expect(Object.keys(clean)).toEqual(["w1"]);
+    // the real check: assigning through a plain object literal must never
+    // have touched Object.prototype
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+  });
+
+  it("rejects a file that's too large with a friendly error, not a crash", () => {
+    const huge = JSON.stringify({ plan: { name: "x".repeat(3_000_000) } });
+    expect(() => parsePlanFile(huge)).toThrow(/too large/i);
+  });
+
+  it("rejects malformed JSON with a friendly error, not a raw parse exception", () => {
+    expect(() => parsePlanFile("{not valid json")).toThrow(/valid JSON/i);
+  });
+
+  it("rejects a file with no plan/plans field", () => {
+    expect(() => parsePlanFile(JSON.stringify({ hello: "world" }))).toThrow(/plan file/i);
+  });
+
+  it("drops garbage stops instead of importing them", () => {
+    const text = JSON.stringify({
+      plan: {
+        placements: {
+          w1: { stops: [{ tripId: "rome", nights: 2, act: [], sig: [], l: 0, fd: 0 }, { tripId: 12345, nights: "lots" }, "not an object"] },
+        },
+      },
+    });
+    const [imported] = parsePlanFile(text);
+    expect(imported.placements!.w1.stops).toHaveLength(1);
+    expect(imported.placements!.w1.stops[0].tripId).toBe("rome");
   });
 });

@@ -316,16 +316,16 @@ export default function SlotItinerary({
                 </div>
               ))}
               <div className="mt-1 flex flex-wrap gap-1.5 text-[10.5px]">
-                <a href={STATIC_LINKS.skyscanner} target="_blank" rel="noopener" className="text-primary">
+                <a href={STATIC_LINKS.skyscanner} target="_blank" rel="noopener noreferrer" className="text-primary">
                   Skyscanner
                 </a>
-                <a href={STATIC_LINKS.kiwi} target="_blank" rel="noopener" className="text-primary">
+                <a href={STATIC_LINKS.kiwi} target="_blank" rel="noopener noreferrer" className="text-primary">
                   Kiwi
                 </a>
-                <a href={STATIC_LINKS.ryanair} target="_blank" rel="noopener" className="text-primary">
+                <a href={STATIC_LINKS.ryanair} target="_blank" rel="noopener noreferrer" className="text-primary">
                   Ryanair
                 </a>
-                <a href={STATIC_LINKS.wizzair} target="_blank" rel="noopener" className="text-primary">
+                <a href={STATIC_LINKS.wizzair} target="_blank" rel="noopener noreferrer" className="text-primary">
                   Wizz Air
                 </a>
               </div>
@@ -339,13 +339,13 @@ export default function SlotItinerary({
                 </div>
               ))}
               <div className="mt-1 flex flex-wrap gap-1.5 text-[10.5px]">
-                <a href={STATIC_LINKS.omio} target="_blank" rel="noopener" className="text-primary">
+                <a href={STATIC_LINKS.omio} target="_blank" rel="noopener noreferrer" className="text-primary">
                   Omio
                 </a>
-                <a href={STATIC_LINKS.trainline} target="_blank" rel="noopener" className="text-primary">
+                <a href={STATIC_LINKS.trainline} target="_blank" rel="noopener noreferrer" className="text-primary">
                   Trainline
                 </a>
-                <a href={STATIC_LINKS.flixbus} target="_blank" rel="noopener" className="text-primary">
+                <a href={STATIC_LINKS.flixbus} target="_blank" rel="noopener noreferrer" className="text-primary">
                   FlixBus
                 </a>
               </div>
@@ -363,13 +363,13 @@ export default function SlotItinerary({
                       {t.n} <span className="font-normal text-muted">{nice(d.in)} → {nice(d.out)}</span>
                     </div>
                     <div className="flex flex-wrap gap-1.5 text-[10.5px]">
-                      <a href={hostelworldUrl(t.n, ci, co, travelers)} target="_blank" rel="noopener" className="text-primary">
+                      <a href={hostelworldUrl(t.n, ci, co, travelers)} target="_blank" rel="noopener noreferrer" className="text-primary">
                         Hostelworld
                       </a>
-                      <a href={bookingComUrl(t.n, ci, co, travelers)} target="_blank" rel="noopener" className="text-primary">
+                      <a href={bookingComUrl(t.n, ci, co, travelers)} target="_blank" rel="noopener noreferrer" className="text-primary">
                         Booking
                       </a>
-                      <a href={airbnbUrl(t.n, ci, co, travelers)} target="_blank" rel="noopener" className="text-primary">
+                      <a href={airbnbUrl(t.n, ci, co, travelers)} target="_blank" rel="noopener noreferrer" className="text-primary">
                         Airbnb
                       </a>
                     </div>
@@ -386,13 +386,13 @@ export default function SlotItinerary({
                 <div key={i} className="mb-1">
                   <div className="text-[11px] font-semibold text-ink">{t.n}</div>
                   <div className="flex flex-wrap gap-1.5 text-[10.5px]">
-                    <a href={getYourGuideUrl(t.n)} target="_blank" rel="noopener" className="text-primary">
+                    <a href={getYourGuideUrl(t.n)} target="_blank" rel="noopener noreferrer" className="text-primary">
                       GetYourGuide
                     </a>
-                    <a href={viatorUrl(t.n)} target="_blank" rel="noopener" className="text-primary">
+                    <a href={viatorUrl(t.n)} target="_blank" rel="noopener noreferrer" className="text-primary">
                       Viator
                     </a>
-                    <a href={tiqetsUrl(t.n)} target="_blank" rel="noopener" className="text-primary">
+                    <a href={tiqetsUrl(t.n)} target="_blank" rel="noopener noreferrer" className="text-primary">
                       Tiqets
                     </a>
                   </div>
@@ -417,7 +417,7 @@ export default function SlotItinerary({
                       key={`${st.tripId}-${name}`}
                       href={mapsBestDishUrl(name, t.n)}
                       target="_blank"
-                      rel="noopener"
+                      rel="noopener noreferrer"
                       className="text-primary"
                     >
                       {name} in {t.n}
@@ -450,7 +450,7 @@ function BookLink({ label, href }: { label: string; href: string }) {
   return (
     <div className="text-[11.5px] text-muted">
       {label}:{" "}
-      <a href={href} target="_blank" rel="noopener" className="font-medium text-primary">
+      <a href={href} target="_blank" rel="noopener noreferrer" className="font-medium text-primary">
         Google Flights ↗
       </a>
     </div>
