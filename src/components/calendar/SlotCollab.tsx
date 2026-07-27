@@ -151,12 +151,7 @@ export default function SlotCollab({
           placeholder="Add a comment…"
           className="min-w-0 flex-1 rounded-md border border-border bg-surface px-2.5 py-1.5 text-[12px] text-ink placeholder:text-muted"
         />
-        <button
-          type="button"
-          onClick={handlePost}
-          disabled={posting || !draft.trim()}
-          className="shrink-0 rounded-md border border-border px-2.5 py-1.5 text-[12px] font-semibold text-ink hover:border-primary/50 disabled:opacity-50"
-        >
+        <button type="button" onClick={handlePost} disabled={posting || !draft.trim()} className="btn btn-secondary btn-sm shrink-0">
           Post
         </button>
       </div>

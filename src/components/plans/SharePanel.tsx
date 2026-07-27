@@ -77,7 +77,7 @@ export default function SharePanel({ plan, onClose }: { plan: Plan; onClose: () 
             <button
               type="button"
               onClick={() => copy("view", plan.shareViewToken!)}
-              className="shrink-0 rounded-md border border-border px-2 py-1 font-semibold text-muted"
+              className="btn btn-secondary btn-sm shrink-0"
             >
               {copied === "view" ? "Copied!" : "Copy"}
             </button>
@@ -108,7 +108,7 @@ export default function SharePanel({ plan, onClose }: { plan: Plan; onClose: () 
               <button
                 type="button"
                 onClick={() => copy("collab", plan.shareCollabToken!)}
-                className="shrink-0 rounded-md border border-border px-2 py-1 font-semibold text-muted"
+                className="btn btn-secondary btn-sm shrink-0"
               >
                 {copied === "collab" ? "Copied!" : "Copy"}
               </button>

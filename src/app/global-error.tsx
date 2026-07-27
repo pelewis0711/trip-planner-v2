@@ -18,7 +18,18 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
           <button
             type="button"
             onClick={reset}
-            style={{ marginTop: "1.25rem", borderRadius: "0.5rem", background: "#5a4ad1", color: "#fff", padding: "0.5rem 1rem", fontSize: "0.875rem", fontWeight: 700, border: "none", cursor: "pointer" }}
+            style={{
+              marginTop: "1.25rem",
+              borderRadius: "9999px",
+              background: "#5a4ad1",
+              color: "#fff",
+              padding: "0.65rem 1.35rem",
+              fontSize: "0.875rem",
+              fontWeight: 700,
+              border: "none",
+              cursor: "pointer",
+              boxShadow: "0 2px 0 #4a3bb8, 0 4px 10px rgba(90,74,209,0.2)",
+            }}
           >
             Try again
           </button>

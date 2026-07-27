@@ -94,27 +94,20 @@ export default function OnboardingPage() {
         Everything here is editable later from Settings.
       </p>
       {saveError && (
-        <div className="mt-6 rounded-card border border-red-300 bg-red-50 p-4 text-sm text-red-800">
+        <div className="mt-6 rounded-card border border-danger/30 bg-danger/10 p-4 text-sm text-danger">
           <p className="font-semibold">Your setup was saved on this device, but syncing it to your account failed.</p>
           <p className="mt-1">
             Your calendar and plan already reflect what you just entered — this only affects seeing it on other
             devices. Check your connection and try again.
           </p>
-          <button
-            type="button"
-            onClick={retrySave}
-            disabled={saving}
-            className="mt-3 rounded-lg bg-red-700 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-800 disabled:opacity-60"
-          >
-            {saving ? "Retrying…" : "Retry sync"}
-          </button>
-          <button
-            type="button"
-            onClick={() => router.replace("/")}
-            className="mt-3 ml-2 rounded-lg border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-800 hover:bg-red-100"
-          >
-            Continue anyway
-          </button>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button type="button" onClick={retrySave} disabled={saving} className="btn btn-danger btn-sm">
+              {saving ? "Retrying…" : "Retry sync"}
+            </button>
+            <button type="button" onClick={() => router.replace("/")} className="btn btn-ghost btn-sm">
+              Continue anyway
+            </button>
+          </div>
         </div>
       )}
       <div className="mt-8 rounded-card border border-border bg-surface p-5">

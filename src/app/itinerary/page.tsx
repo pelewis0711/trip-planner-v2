@@ -64,11 +64,7 @@ export default function ItineraryPage() {
               : "Head to the Trip Catalog and drag options onto your Calendar. Your live itinerary and category totals will build here."}
           </p>
           {isUnconfigured && (
-            <button
-              type="button"
-              onClick={() => setWizardOpen(true)}
-              className="mt-5 rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-hover"
-            >
+            <button type="button" onClick={() => setWizardOpen(true)} className="btn btn-primary btn-lg mt-5">
               Set up now
             </button>
           )}
@@ -89,11 +85,7 @@ export default function ItineraryPage() {
               recomputes as you edit trips on the Calendar.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="print:hidden rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-muted hover:border-primary/50 hover:text-primary"
-          >
+          <button type="button" onClick={() => window.print()} className="btn btn-secondary btn-sm print:hidden">
             🖨️ Print / Save as PDF
           </button>
         </div>
@@ -158,7 +150,7 @@ export default function ItineraryPage() {
             <button
               type="button"
               onClick={() => setDefaultTravelers(Math.max(1, (defaultTravelers ?? 1) - 1))}
-              className="rounded-md border border-border px-1.5 font-bold text-ink"
+              className="btn btn-secondary px-1.5 font-bold text-ink"
             >
               −
             </button>
@@ -166,7 +158,7 @@ export default function ItineraryPage() {
             <button
               type="button"
               onClick={() => setDefaultTravelers(Math.min(20, (defaultTravelers ?? 1) + 1))}
-              className="rounded-md border border-border px-1.5 font-bold text-ink"
+              className="btn btn-secondary px-1.5 font-bold text-ink"
             >
               +
             </button>
@@ -196,7 +188,7 @@ export default function ItineraryPage() {
                   setBudget(budgetInput === "" ? null : Math.max(0, +budgetInput || 0));
                   setEditingBudget(false);
                 }}
-                className="rounded-md bg-primary px-2 py-1 font-bold text-white"
+                className="btn btn-primary px-2 py-1 font-bold"
               >
                 Save
               </button>
@@ -208,7 +200,7 @@ export default function ItineraryPage() {
                 setBudgetInput(budget !== null ? String(budget) : "");
                 setEditingBudget(true);
               }}
-              className="rounded-full border border-border bg-surface px-3 py-1.5 font-semibold text-muted hover:border-primary/50 hover:text-primary"
+              className="btn btn-secondary btn-sm"
             >
               💰 {budget !== null ? `Budget: ${money(budget)}` : "Set travel budget"}
             </button>

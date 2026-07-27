@@ -92,19 +92,12 @@ export default function Header() {
   const authControl = authLoading ? null : user ? (
     <div className="flex shrink-0 items-center gap-2 text-xs">
       <span className="hidden max-w-[140px] truncate text-muted sm:inline">{user.email}</span>
-      <button
-        type="button"
-        onClick={handleSignOut}
-        className="rounded-lg border border-border px-3 py-2 font-medium text-muted transition-colors hover:border-accent hover:text-accent-hover"
-      >
+      <button type="button" onClick={handleSignOut} className="btn btn-secondary btn-sm">
         Sign out
       </button>
     </div>
   ) : (
-    <Link
-      href="/login"
-      className="shrink-0 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-primary-hover"
-    >
+    <Link href="/login" className="btn btn-primary btn-sm shrink-0">
       Sign in
     </Link>
   );
@@ -133,12 +126,7 @@ export default function Header() {
           <option key={c} value={c} />
         ))}
       </datalist>
-      <button
-        type="button"
-        onClick={handleAddCity}
-        disabled={geocoding}
-        className="rounded-md bg-primary px-2.5 py-1.5 font-bold text-white disabled:opacity-50"
-      >
+      <button type="button" onClick={handleAddCity} disabled={geocoding} className="btn btn-primary btn-sm">
         {geocoding ? "…" : "✓"}
       </button>
       <button
@@ -155,11 +143,7 @@ export default function Header() {
       {geocodeError && !manualEntry && (
         <div className="flex w-full flex-wrap items-center gap-1.5 pt-1">
           <span className="text-danger">{geocodeError}</span>
-          <button
-            type="button"
-            onClick={() => setManualEntry(true)}
-            className="rounded-md border border-border px-1.5 py-1 font-semibold text-muted"
-          >
+          <button type="button" onClick={() => setManualEntry(true)} className="btn btn-ghost btn-sm">
             Enter coordinates manually
           </button>
         </div>
@@ -189,25 +173,17 @@ export default function Header() {
             placeholder="Lon"
             className="w-16 rounded-md border border-border bg-surface-muted px-1.5 py-1 text-ink placeholder:text-muted"
           />
-          <button
-            type="button"
-            onClick={confirmManualEntry}
-            className="rounded-md bg-primary px-2.5 py-1.5 font-bold text-white"
-          >
+          <button type="button" onClick={confirmManualEntry} className="btn btn-primary btn-sm">
             Use
           </button>
         </div>
       )}
     </div>
   ) : (
-    <label className="flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-2 text-xs font-medium text-muted">
+    <label className="pill-select">
       <span aria-hidden>🏠</span>
       <span>Home</span>
-      <select
-        value={home}
-        onChange={(e) => (e.target.value === OTHER_CITY ? setAddingCity(true) : setHome(e.target.value))}
-        className="rounded-md border border-border bg-surface-muted px-2 py-1 text-sm font-semibold text-ink"
-      >
+      <select value={home} onChange={(e) => (e.target.value === OTHER_CITY ? setAddingCity(true) : setHome(e.target.value))}>
         {!home && (
           <option value="" disabled>
             Choose a city…
@@ -229,14 +205,10 @@ export default function Header() {
   );
 
   const planPicker = (
-    <label className="flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-2 text-xs font-medium text-muted">
+    <label className="pill-select">
       <span aria-hidden>📋</span>
       <span>Plan</span>
-      <select
-        value={id}
-        onChange={(e) => switchPlan(e.target.value)}
-        className="max-w-[140px] rounded-md border border-border bg-surface-muted px-2 py-1 text-sm font-semibold text-ink"
-      >
+      <select value={id} onChange={(e) => switchPlan(e.target.value)} className="max-w-[140px]">
         {planIds.map((pid) => (
           <option key={pid} value={pid}>
             {plans[pid].name}

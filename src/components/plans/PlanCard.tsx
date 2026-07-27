@@ -131,29 +131,17 @@ export default function PlanCard({
 
       <div className="mt-3 flex flex-wrap items-center gap-1.5">
         {plan.readOnly ? (
-          <button
-            type="button"
-            onClick={onRemoveShared}
-            className="rounded-md border border-border px-2.5 py-1 text-[11.5px] font-semibold text-muted hover:border-danger/50 hover:text-danger"
-          >
+          <button type="button" onClick={onRemoveShared} className="btn btn-danger btn-sm">
             Remove from my plans
           </button>
         ) : (
           <>
             {!isActive && (
-              <button
-                type="button"
-                onClick={onOpen}
-                className="rounded-md bg-primary px-2.5 py-1 text-[11.5px] font-bold text-white hover:bg-primary-hover"
-              >
+              <button type="button" onClick={onOpen} className="btn btn-primary btn-sm">
                 Open
               </button>
             )}
-            <button
-              type="button"
-              onClick={onDuplicate}
-              className="rounded-md border border-border px-2.5 py-1 text-[11.5px] font-semibold text-muted hover:border-primary/40"
-            >
+            <button type="button" onClick={onDuplicate} className="btn btn-secondary btn-sm">
               Duplicate
             </button>
             <button
@@ -162,49 +150,28 @@ export default function PlanCard({
                 setNameInput(plan.name);
                 setRenaming(true);
               }}
-              className="rounded-md border border-border px-2.5 py-1 text-[11.5px] font-semibold text-muted hover:border-primary/40"
+              className="btn btn-secondary btn-sm"
             >
               Rename
             </button>
             {isOwner && (
-              <button
-                type="button"
-                onClick={() => setSharing((s) => !s)}
-                className="rounded-md border border-border px-2.5 py-1 text-[11.5px] font-semibold text-muted hover:border-primary/40"
-              >
+              <button type="button" onClick={() => setSharing((s) => !s)} className="btn btn-secondary btn-sm">
                 🔗 Share
               </button>
             )}
             {isOwner && (
-              <button
-                type="button"
-                onClick={() => setEditingSemester((s) => !s)}
-                className="rounded-md border border-border px-2.5 py-1 text-[11.5px] font-semibold text-muted hover:border-primary/40"
-              >
+              <button type="button" onClick={() => setEditingSemester((s) => !s)} className="btn btn-secondary btn-sm">
                 📅 Semester
               </button>
             )}
-            <button
-              type="button"
-              onClick={onExport}
-              className="rounded-md border border-border px-2.5 py-1 text-[11.5px] font-semibold text-muted hover:border-primary/40"
-            >
+            <button type="button" onClick={onExport} className="btn btn-secondary btn-sm">
               Export .json
             </button>
-            <button
-              type="button"
-              onClick={handleExportXlsx}
-              disabled={buildingXlsx}
-              className="rounded-md border border-border px-2.5 py-1 text-[11.5px] font-semibold text-muted hover:border-primary/40 disabled:opacity-50"
-            >
+            <button type="button" onClick={handleExportXlsx} disabled={buildingXlsx} className="btn btn-secondary btn-sm">
               {buildingXlsx ? "Building…" : "📊 Excel"}
             </button>
             {isOwner && (
-              <button
-                type="button"
-                onClick={onDelete}
-                className="rounded-md bg-danger/10 px-2.5 py-1 text-[11.5px] font-bold text-danger hover:bg-danger/20"
-              >
+              <button type="button" onClick={onDelete} className="btn btn-danger btn-sm">
                 Delete
               </button>
             )}

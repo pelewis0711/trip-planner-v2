@@ -20,7 +20,7 @@ export default function OfflineIndicator() {
 
   if (!online) {
     return (
-      <div className="shrink-0 rounded-lg border border-amber-500/50 px-2.5 py-1.5 text-xs font-semibold text-amber-400">
+      <div className="shrink-0 rounded-full border border-warning/40 bg-warning/10 px-2.5 py-1.5 text-xs font-semibold text-warning">
         📴 Offline — changes save here, sync once you&apos;re back online
       </div>
     );
@@ -28,7 +28,7 @@ export default function OfflineIndicator() {
 
   if (pendingCount > 0) {
     return (
-      <div className="shrink-0 rounded-lg border border-sky-500/50 px-2.5 py-1.5 text-xs font-semibold text-sky-400">
+      <div className="shrink-0 rounded-full border border-primary/40 bg-primary-soft px-2.5 py-1.5 text-xs font-semibold text-primary">
         🔄 Syncing {pendingCount} change{pendingCount > 1 ? "s" : ""}…
       </div>
     );

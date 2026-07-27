@@ -66,11 +66,7 @@ export default function EditModal({
             <h2 className="font-heading text-lg font-semibold text-ink">{slot.label}</h2>
             <p className="text-xs text-muted">{slot.date}</p>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-muted hover:text-ink"
-          >
+          <button type="button" onClick={onClose} className="btn btn-secondary btn-sm">
             Close
           </button>
         </div>
@@ -80,7 +76,7 @@ export default function EditModal({
           <button
             type="button"
             onClick={() => setTravelersFor(slot.id, Math.max(1, travelers - 1))}
-            className="rounded-md border border-border px-2 py-0.5 font-bold text-ink"
+            className="btn btn-secondary px-2 py-0.5 font-bold text-ink"
           >
             −
           </button>
@@ -88,7 +84,7 @@ export default function EditModal({
           <button
             type="button"
             onClick={() => setTravelersFor(slot.id, Math.min(20, travelers + 1))}
-            className="rounded-md border border-border px-2 py-0.5 font-bold text-ink"
+            className="btn btn-secondary px-2 py-0.5 font-bold text-ink"
           >
             +
           </button>
@@ -121,7 +117,7 @@ export default function EditModal({
                       type="button"
                       disabled={i === 0}
                       onClick={() => moveStop(slot.id, i, i - 1)}
-                      className="rounded-md border border-border px-1.5 py-0.5 text-xs text-muted disabled:opacity-30"
+                      className="btn btn-secondary px-1.5 py-0.5 text-xs text-muted"
                     >
                       ↑
                     </button>
@@ -129,15 +125,11 @@ export default function EditModal({
                       type="button"
                       disabled={i === stops.length - 1}
                       onClick={() => moveStop(slot.id, i, i + 1)}
-                      className="rounded-md border border-border px-1.5 py-0.5 text-xs text-muted disabled:opacity-30"
+                      className="btn btn-secondary px-1.5 py-0.5 text-xs text-muted"
                     >
                       ↓
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => removeStop(slot.id, i)}
-                      className="rounded-md bg-danger/10 px-2 py-0.5 text-xs font-bold text-danger hover:bg-danger/20"
-                    >
+                    <button type="button" onClick={() => removeStop(slot.id, i)} className="btn btn-danger px-2 py-0.5 text-xs font-bold">
                       Remove
                     </button>
                   </div>
@@ -163,7 +155,7 @@ export default function EditModal({
                   <button
                     type="button"
                     onClick={() => updateStop(slot.id, i, { nights: Math.max(0, st.nights - 1) })}
-                    className="rounded-md border border-border px-2 py-0.5 font-bold text-ink"
+                    className="btn btn-secondary px-2 py-0.5 font-bold text-ink"
                   >
                     −
                   </button>
@@ -171,7 +163,7 @@ export default function EditModal({
                   <button
                     type="button"
                     onClick={() => updateStop(slot.id, i, { nights: Math.min(14, st.nights + 1) })}
-                    className="rounded-md border border-border px-2 py-0.5 font-bold text-ink"
+                    className="btn btn-secondary px-2 py-0.5 font-bold text-ink"
                   >
                     +
                   </button>

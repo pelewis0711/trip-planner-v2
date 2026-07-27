@@ -71,11 +71,7 @@ export default function SemesterDatesForm({
       <div>
         <div className="mb-1.5 flex items-center justify-between">
           <span className="font-semibold text-ink">Breaks / special windows</span>
-          <button
-            type="button"
-            onClick={() => addBreak()}
-            className="rounded-md border border-border px-2 py-0.5 text-[11px] font-semibold text-muted hover:border-primary/40"
-          >
+          <button type="button" onClick={() => addBreak()} className="btn btn-secondary px-2 py-0.5 text-[11px]">
             ＋ Add break
           </button>
         </div>
@@ -123,11 +119,7 @@ export default function SemesterDatesForm({
                   </option>
                 ))}
               </select>
-              <button
-                type="button"
-                onClick={() => removeBreak(b.id)}
-                className="shrink-0 rounded-md bg-danger/10 px-2 py-1 font-bold text-danger hover:bg-danger/20"
-              >
+              <button type="button" onClick={() => removeBreak(b.id)} className="btn btn-danger px-2 py-1 font-bold shrink-0">
                 ✕
               </button>
             </div>

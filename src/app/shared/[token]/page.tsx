@@ -108,12 +108,7 @@ export default function SharedPlanPage({ params }: { params: Promise<{ token: st
 
         <div className="mt-4 flex flex-wrap gap-2">
           {isCollabLink && (
-            <button
-              type="button"
-              onClick={handleJoin}
-              disabled={joining || authLoading}
-              className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary-hover disabled:opacity-50"
-            >
+            <button type="button" onClick={handleJoin} disabled={joining || authLoading} className="btn btn-primary btn-lg">
               {joining
                 ? "Joining…"
                 : authLoading
@@ -123,11 +118,7 @@ export default function SharedPlanPage({ params }: { params: Promise<{ token: st
                     : "Sign in to join & edit"}
             </button>
           )}
-          <button
-            type="button"
-            onClick={handleAddToCompare}
-            className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-ink hover:border-primary/50"
-          >
+          <button type="button" onClick={handleAddToCompare} className="btn btn-secondary btn-lg">
             Add to my Compare (view only)
           </button>
         </div>

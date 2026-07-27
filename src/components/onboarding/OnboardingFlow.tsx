@@ -197,12 +197,7 @@ export default function OnboardingFlow({
                     <option key={c} value={c} />
                   ))}
                 </datalist>
-                <button
-                  type="button"
-                  onClick={handleAddCity}
-                  disabled={geocoding}
-                  className="rounded-md bg-primary px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
-                >
+                <button type="button" onClick={handleAddCity} disabled={geocoding} className="btn btn-primary btn-sm">
                   {geocoding ? "Looking up…" : "Confirm"}
                 </button>
                 <button
@@ -227,14 +222,14 @@ export default function OnboardingFlow({
                         setAddingCity(false);
                         setGeocodeError(null);
                       }}
-                      className="rounded-md border border-warning/40 px-2 py-1 font-semibold text-warning"
+                      className="btn btn-ghost btn-sm border-warning/40 text-warning hover:border-warning hover:bg-warning/10 hover:text-warning"
                     >
                       Pick the nearest city from the list instead
                     </button>
                     <button
                       type="button"
                       onClick={() => setManualEntry(true)}
-                      className="rounded-md border border-warning/40 px-2 py-1 font-semibold text-warning"
+                      className="btn btn-ghost btn-sm border-warning/40 text-warning hover:border-warning hover:bg-warning/10 hover:text-warning"
                     >
                       Enter coordinates manually
                     </button>
@@ -271,11 +266,7 @@ export default function OnboardingFlow({
                       placeholder="Longitude"
                       className="w-28 rounded-md border border-border bg-surface px-2 py-1 text-xs text-ink placeholder:text-muted"
                     />
-                    <button
-                      type="button"
-                      onClick={confirmManualEntry}
-                      className="rounded-md bg-primary px-3 py-1 text-xs font-bold text-white"
-                    >
+                    <button type="button" onClick={confirmManualEntry} className="btn btn-primary btn-sm">
                       Use these coordinates
                     </button>
                   </div>
@@ -359,11 +350,7 @@ export default function OnboardingFlow({
                 key={t}
                 type="button"
                 onClick={() => setTerm(t)}
-                className={`rounded-md border px-4 py-1.5 text-sm font-semibold capitalize ${
-                  term === t
-                    ? "border-primary bg-primary-soft text-primary"
-                    : "border-border text-muted hover:border-primary/40"
-                }`}
+                className={`btn btn-md capitalize ${term === t ? "btn-primary" : "btn-secondary"}`}
               >
                 {t}
               </button>
@@ -430,11 +417,7 @@ export default function OnboardingFlow({
                   Read more
                 </Link>
               </span>
-              <button
-                type="button"
-                onClick={dismissPrivacyNotice}
-                className="shrink-0 rounded-md border border-primary/50 bg-primary/10 px-2.5 py-1 font-semibold text-primary"
-              >
+              <button type="button" onClick={dismissPrivacyNotice} className="btn btn-secondary btn-sm shrink-0">
                 Got it
               </button>
             </div>
@@ -448,11 +431,7 @@ export default function OnboardingFlow({
     return (
       <div className="space-y-6">
         {stepBody}
-        <button
-          type="button"
-          onClick={finish}
-          className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary-hover"
-        >
+        <button type="button" onClick={finish} className="btn btn-primary btn-lg">
           {submitLabel}
         </button>
       </div>
@@ -476,36 +455,23 @@ export default function OnboardingFlow({
           type="button"
           onClick={() => setStep((s) => Math.max(1, s - 1))}
           disabled={step === 1}
-          className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-muted disabled:opacity-30"
+          className="btn btn-secondary btn-lg"
         >
           Back
         </button>
         {step < 5 ? (
           <div className="flex gap-2">
             {(step === 2 || step === 3) && (
-              <button
-                type="button"
-                onClick={() => setStep((s) => s + 1)}
-                className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-muted hover:border-primary/40"
-              >
+              <button type="button" onClick={() => setStep((s) => s + 1)} className="btn btn-secondary btn-lg">
                 Skip
               </button>
             )}
-            <button
-              type="button"
-              onClick={() => setStep((s) => s + 1)}
-              disabled={!canNext}
-              className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white disabled:opacity-40"
-            >
+            <button type="button" onClick={() => setStep((s) => s + 1)} disabled={!canNext} className="btn btn-primary btn-lg">
               Next
             </button>
           </div>
         ) : (
-          <button
-            type="button"
-            onClick={finish}
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary-hover"
-          >
+          <button type="button" onClick={finish} className="btn btn-primary btn-lg">
             {submitLabel}
           </button>
         )}

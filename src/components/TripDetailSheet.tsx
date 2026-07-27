@@ -71,12 +71,7 @@ export default function TripDetailSheet({
               {trip.c === trip.reg ? trip.c : `${trip.c} · ${trip.reg}`}
             </p>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="shrink-0 rounded-md border border-border px-2 py-1 text-xs font-semibold text-muted"
-            aria-label="Close"
-          >
+          <button type="button" onClick={onClose} className="btn btn-secondary btn-sm shrink-0" aria-label="Close">
             ✕
           </button>
         </div>
@@ -148,11 +143,7 @@ export default function TripDetailSheet({
           {slots.length === 0 ? (
             <div className="mt-2 rounded-md border-2 border-dashed border-border p-3 text-center text-xs text-muted">
               <p>Set up your host city and semester dates first so your calendar has real weekends to add trips to.</p>
-              <button
-                type="button"
-                onClick={() => setWizardOpen(true)}
-                className="mt-2 rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-white hover:bg-primary-hover"
-              >
+              <button type="button" onClick={() => setWizardOpen(true)} className="btn btn-primary btn-sm mt-2">
                 Set up now
               </button>
             </div>
@@ -164,7 +155,7 @@ export default function TripDetailSheet({
                   <button
                     type="button"
                     onClick={() => setNights((n) => Math.max(0, n - 1))}
-                    className="rounded-md border border-border px-2 py-0.5 font-bold text-ink"
+                    className="btn btn-secondary px-2 py-0.5 font-bold text-ink"
                   >
                     −
                   </button>
@@ -172,7 +163,7 @@ export default function TripDetailSheet({
                   <button
                     type="button"
                     onClick={() => setNights((n) => Math.min(14, n + 1))}
-                    className="rounded-md border border-border px-2 py-0.5 font-bold text-ink"
+                    className="btn btn-secondary px-2 py-0.5 font-bold text-ink"
                   >
                     +
                   </button>

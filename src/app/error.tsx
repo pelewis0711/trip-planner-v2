@@ -16,17 +16,10 @@ export default function ErrorBoundary({ reset }: { error: Error & { digest?: str
           That&apos;s on us, not you — your plans are safe. Try again, or head back to the homepage.
         </p>
         <div className="mt-5 flex flex-wrap justify-center gap-2">
-          <button
-            type="button"
-            onClick={reset}
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary-hover"
-          >
+          <button type="button" onClick={reset} className="btn btn-primary btn-md">
             Try again
           </button>
-          <Link
-            href="/"
-            className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-ink hover:border-primary/50"
-          >
+          <Link href="/" className="btn btn-secondary btn-md">
             Go home
           </Link>
         </div>

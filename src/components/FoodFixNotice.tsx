@@ -14,7 +14,7 @@ export default function FoodFixNotice() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pt-3 sm:px-6">
-      <div className="flex items-center justify-between gap-3 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-2.5 text-[12.5px] text-amber-200">
+      <div className="flex items-center justify-between gap-3 rounded-xl border border-warning/40 bg-warning/10 px-4 py-2.5 text-[12.5px] text-warning">
         <span>
           🍽️ Food pricing was fixed: signature dishes used to add their price on top of your food
           tier — they&apos;re now a free bucket list (the tier already covers a day&apos;s eating). Your
@@ -23,7 +23,7 @@ export default function FoodFixNotice() {
         <button
           type="button"
           onClick={dismiss}
-          className="shrink-0 rounded-md border border-amber-500/40 px-2 py-1 font-semibold text-amber-300"
+          className="btn btn-ghost btn-sm shrink-0 border-warning/40 text-warning hover:border-warning hover:bg-warning/10 hover:text-warning"
           aria-label="Dismiss"
         >
           ✕

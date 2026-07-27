@@ -98,11 +98,7 @@ function CalendarPageInner() {
             Pick your host city and semester dates so your calendar shows your own program&apos;s
             weekends — not anyone else&apos;s.
           </p>
-          <button
-            type="button"
-            onClick={() => setWizardOpen(true)}
-            className="mt-5 rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-hover"
-          >
+          <button type="button" onClick={() => setWizardOpen(true)} className="btn btn-primary btn-lg mt-5">
             Set up now
           </button>
         </div>
@@ -125,11 +121,7 @@ function CalendarPageInner() {
       {armedId && (
         <div className="mt-3 flex items-center gap-3 rounded-xl border border-primary bg-primary-soft px-4 py-2.5 text-sm font-medium text-primary">
           <span>✓ {ctx.tripOf(armedId)?.n} armed — tap a slot to add it</span>
-          <button
-            type="button"
-            onClick={() => setArmedId(null)}
-            className="ml-auto rounded-md border border-primary/50 px-2.5 py-1 text-xs font-semibold"
-          >
+          <button type="button" onClick={() => setArmedId(null)} className="btn btn-secondary btn-sm ml-auto">
             Cancel
           </button>
         </div>
@@ -168,18 +160,14 @@ function CalendarPageInner() {
             <button
               type="button"
               onClick={() => filledCount && confirm("Clear all placed trips?") && clearAll()}
-              className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-muted hover:border-danger/50 hover:text-danger"
+              className="btn btn-danger btn-sm"
             >
               Clear all
             </button>
             <button
               type="button"
               onClick={() => setEditSlotsMode((m) => !m)}
-              className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
-                editSlotsMode
-                  ? "border-primary bg-primary-soft text-primary"
-                  : "border-border bg-surface text-muted hover:border-primary/50"
-              }`}
+              className={`btn btn-sm ${editSlotsMode ? "btn-primary" : "btn-secondary"}`}
             >
               {editSlotsMode ? "Done editing" : "✏️ Edit slots"}
             </button>
@@ -262,15 +250,11 @@ function CalendarPageInner() {
                               setNewSlotLabel("");
                               setAddingSlot(false);
                             }}
-                            className="rounded-md bg-primary px-3 py-1.5 text-xs font-bold text-white"
+                            className="btn btn-primary btn-sm"
                           >
                             Add
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => setAddingSlot(false)}
-                            className="rounded-md border border-border px-3 py-1.5 text-xs font-semibold text-muted"
-                          >
+                          <button type="button" onClick={() => setAddingSlot(false)} className="btn btn-secondary btn-sm">
                             Cancel
                           </button>
                         </div>

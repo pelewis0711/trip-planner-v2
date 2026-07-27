@@ -73,11 +73,7 @@ export default function CatalogPage() {
             Pick your host city so trip distances and prices are calculated from your own program,
             not someone else&apos;s.
           </p>
-          <button
-            type="button"
-            onClick={() => setWizardOpen(true)}
-            className="mt-5 rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-hover"
-          >
+          <button type="button" onClick={() => setWizardOpen(true)} className="btn btn-primary btn-lg mt-5">
             Set up now
           </button>
         </div>
@@ -107,19 +103,11 @@ export default function CatalogPage() {
           placeholder="🔎 Search city, country, or region…"
           className="w-full min-w-[220px] flex-1 rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-muted sm:w-auto"
         />
-        <button
-          type="button"
-          onClick={() => setShowFilters((s) => !s)}
-          className="rounded-full border border-border bg-surface px-3.5 py-2 text-xs font-semibold text-muted hover:border-primary/50 hover:text-primary"
-        >
+        <button type="button" onClick={() => setShowFilters((s) => !s)} className="btn btn-secondary btn-sm">
           ⚙ Filters {activeCount ? `(${activeCount})` : ""} {showFilters ? "▲" : "▼"}
         </button>
         {activeCount > 0 && (
-          <button
-            type="button"
-            onClick={clearAll}
-            className="rounded-full border border-border bg-surface px-3.5 py-2 text-xs font-semibold text-muted hover:border-primary/50 hover:text-primary"
-          >
+          <button type="button" onClick={clearAll} className="btn btn-secondary btn-sm">
             Clear all
           </button>
         )}

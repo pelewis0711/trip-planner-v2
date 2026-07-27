@@ -81,7 +81,7 @@ function LoginForm() {
               type="button"
               onClick={handleGoogle}
               disabled={loading !== null}
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:border-primary/50 disabled:opacity-50"
+              className="btn btn-secondary btn-lg mt-6 w-full"
             >
               <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden>
                 <path
@@ -119,11 +119,7 @@ function LoginForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-muted focus:border-primary focus:outline-none"
               />
-              <button
-                type="submit"
-                disabled={loading !== null}
-                className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
-              >
+              <button type="submit" disabled={loading !== null} className="btn btn-primary btn-lg w-full">
                 {loading === "email" ? "Sending…" : "Send me a sign-in link"}
               </button>
             </form>

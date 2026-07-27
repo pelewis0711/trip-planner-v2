@@ -70,18 +70,10 @@ export default function SemesterPanel({ plan, onClose }: { plan: Plan; onClose: 
       />
 
       <div className="flex flex-wrap gap-2 pt-1">
-        <button
-          type="button"
-          onClick={handleSave}
-          className="rounded-md bg-primary px-3 py-1.5 text-[12px] font-bold text-white hover:bg-primary-hover"
-        >
+        <button type="button" onClick={handleSave} className="btn btn-primary btn-sm">
           Save semester
         </button>
-        <button
-          type="button"
-          onClick={handleReset}
-          className="rounded-md border border-border px-3 py-1.5 text-[12px] font-semibold text-muted hover:border-primary/40"
-        >
+        <button type="button" onClick={handleReset} className="btn btn-secondary btn-sm">
           Reset to blank template
         </button>
       </div>

@@ -54,3 +54,135 @@ body {
   background: var(--color-bg);
   color: var(--color-ink);
 }
+
+/* Shared button + pill-select language -- replaces ~24 places that each
+   hand-picked their own radius/padding/shadow. One consistent pill shape,
+   a soft "pressed" shadow on the primary variant with a hover lift, same
+   palette as everywhere else in the app (no new colors). */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  border-radius: 9999px;
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1.2;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    border-color 0.12s ease,
+    background-color 0.12s ease,
+    color 0.12s ease,
+    opacity 0.12s ease;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  box-shadow:
+    0 2px 0 var(--color-primary-hover),
+    0 4px 10px rgba(90, 74, 209, 0.2);
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow:
+    0 3px 0 var(--color-primary-hover),
+    0 6px 14px rgba(90, 74, 209, 0.25);
+}
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 0 var(--color-primary-hover);
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: 1.5px solid var(--color-border);
+}
+.btn-secondary:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--color-danger);
+  border: 1.5px solid transparent;
+}
+.btn-danger:hover:not(:disabled) {
+  border-color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 10%, var(--color-surface));
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-muted);
+  border: 1.5px solid var(--color-border);
+}
+.btn-ghost:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  color: var(--color-accent-hover);
+}
+
+.btn-sm {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.75rem;
+}
+.btn-md {
+  padding: 0.55rem 1rem;
+  font-size: 0.8rem;
+}
+.btn-lg {
+  padding: 0.65rem 1.35rem;
+  font-size: 0.875rem;
+}
+.btn-icon {
+  padding: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+/* The Home/Plan header pickers, and any similar labeled-select pill --
+   used to nest a separately-bordered, separately-backgrounded <select>
+   inside the pill's own border (a box inside a box). This is one seamless
+   pill; the <select> itself goes borderless/transparent. */
+.pill-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  padding: 0.45rem 0.5rem 0.45rem 0.9rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-muted);
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+.pill-select:hover,
+.pill-select:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+.pill-select select {
+  border: none;
+  background-color: transparent;
+  appearance: none;
+  padding: 0.25rem 1.25rem 0.25rem 0.25rem;
+  font-size: 0.85rem;
+  color: var(--color-ink);
+  font-weight: 700;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236f6a85' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.15rem center;
+}

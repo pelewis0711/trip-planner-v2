@@ -196,7 +196,7 @@ export default function SlotCard({
               e.stopPropagation();
               onEdit();
             }}
-            className="mt-1 w-full rounded-lg border border-border bg-surface py-1.5 text-[11.5px] font-semibold text-muted hover:border-primary/50 hover:text-primary"
+            className="btn btn-secondary btn-sm mt-1 w-full"
           >
             Edit
           </button>
