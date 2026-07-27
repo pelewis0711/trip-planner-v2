@@ -15,6 +15,7 @@ import { grandTotals } from "@/lib/calc/costs";
 import { describeTerm } from "@/lib/calc/semester";
 import { formatMoney, RATES_AS_OF } from "@/lib/calc/currency";
 import OfflineIndicator from "./OfflineIndicator";
+import Combobox from "./Combobox";
 
 const NAV = [
   { href: "/", label: "Overview" },
@@ -24,8 +25,6 @@ const NAV = [
   { href: "/plans", label: "Plans & Compare" },
   { href: "/settings", label: "Settings" },
 ];
-
-const OTHER_CITY = "__other__";
 
 export default function Header() {
   const pathname = usePathname();
@@ -180,42 +179,31 @@ export default function Header() {
       )}
     </div>
   ) : (
-    <label className="pill-select">
-      <span aria-hidden>🏠</span>
-      <span>Home</span>
-      <select value={home} onChange={(e) => (e.target.value === OTHER_CITY ? setAddingCity(true) : setHome(e.target.value))}>
-        {!home && (
-          <option value="" disabled>
-            Choose a city…
-          </option>
-        )}
-        {Object.keys(HOMES).map((h) => (
-          <option key={h} value={h}>
-            {h}
-          </option>
-        ))}
-        {Object.keys(customHomes).map((h) => (
-          <option key={h} value={h}>
-            {h}
-          </option>
-        ))}
-        <option value={OTHER_CITY}>Other city…</option>
-      </select>
-    </label>
+    <Combobox
+      icon="🏠"
+      label="Home"
+      value={home}
+      options={[
+        ...Object.keys(HOMES).map((h) => ({ value: h, label: h })),
+        ...Object.keys(customHomes).map((h) => ({ value: h, label: h })),
+      ]}
+      onChange={setHome}
+      placeholder="Choose a city…"
+      searchPlaceholder="Search cities…"
+      specialOption={{ label: "Other city…", onSelect: () => setAddingCity(true) }}
+    />
   );
 
   const planPicker = (
-    <label className="pill-select">
-      <span aria-hidden>📋</span>
-      <span>Plan</span>
-      <select value={id} onChange={(e) => switchPlan(e.target.value)} className="max-w-[140px]">
-        {planIds.map((pid) => (
-          <option key={pid} value={pid}>
-            {plans[pid].name}
-          </option>
-        ))}
-      </select>
-    </label>
+    <Combobox
+      icon="📋"
+      label="Plan"
+      value={id}
+      options={planIds.map((pid) => ({ value: pid, label: plans[pid].name }))}
+      onChange={switchPlan}
+      searchPlaceholder="Search plans…"
+      panelWidth="14rem"
+    />
   );
 
   return (
@@ -237,7 +225,7 @@ export default function Header() {
         </Link>
 
         {/* desktop: everything inline */}
-        <nav className="ml-4 hidden flex-1 flex-wrap items-center gap-1.5 lg:flex">
+        <nav className="ml-4 hidden flex-1 flex-wrap items-center gap-1.5 xl:flex">
           {NAV.map((item) => {
             const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
             return (
@@ -254,7 +242,7 @@ export default function Header() {
           })}
         </nav>
 
-        <div className="ml-auto hidden items-center gap-2 lg:flex">
+        <div className="ml-auto hidden items-center gap-2 xl:flex">
           {cityPicker}
           {planPicker}
           <OfflineIndicator />
@@ -266,7 +254,7 @@ export default function Header() {
         <button
           type="button"
           onClick={() => setMenuOpen((o) => !o)}
-          className="ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-surface text-ink lg:hidden"
+          className="ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-surface text-ink xl:hidden"
           aria-label={menuOpen ? "Close menu" : "Open menu"}
         >
           {menuOpen ? "✕" : "☰"}
@@ -274,7 +262,7 @@ export default function Header() {
       </div>
 
       {menuOpen && (
-        <div className="border-t border-border bg-surface px-4 py-4 lg:hidden">
+        <div className="border-t border-border bg-surface px-4 py-4 xl:hidden">
           <nav className="grid grid-cols-2 gap-2">
             {NAV.map((item) => {
               const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
