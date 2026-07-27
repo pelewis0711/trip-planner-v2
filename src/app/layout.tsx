@@ -3,7 +3,6 @@ import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AuthSync from "@/components/AuthSync";
-import CustomTripsSync from "@/components/CustomTripsSync";
 import RegisterServiceWorker from "@/components/RegisterServiceWorker";
 import InstallPrompt from "@/components/InstallPrompt";
 import FoodFixNotice from "@/components/FoodFixNotice";
@@ -56,7 +55,6 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col bg-bg text-ink">
         <RegisterServiceWorker />
         <AuthSync />
-        <CustomTripsSync />
         <Header />
         <InstallPrompt />
         <FoodFixNotice />

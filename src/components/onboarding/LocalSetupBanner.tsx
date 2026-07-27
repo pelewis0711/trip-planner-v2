@@ -3,7 +3,7 @@
 // Phase 9 step 3: lets an anonymous (not signed-in) visitor run the same
 // onboarding wizard signed-in accounts get, saved locally on this device --
 // no Supabase call, matching the app's local-first architecture (same spirit
-// as useCustomHomesStore/useCustomTripsStore working fully offline). A
+// as useCustomHomesStore working fully offline). A
 // dismissible banner rather than a forced takeover, so browsing without
 // setup still works exactly as it does today. If they later sign in,
 // AuthSync.tsx's checkOnboarding() picks these local answers up and pushes

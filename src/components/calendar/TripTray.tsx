@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { TRIPS } from "@/data/trips";
-import { useCustomTripsStore } from "@/lib/store/customTrips";
 import { resolveHome } from "@/lib/resolveHome";
 import {
   activeFilterCount,
@@ -24,7 +23,6 @@ export default function TripTray({
   onArm: (tripId: string) => void;
   onDragStart: (tripId: string) => void;
 }) {
-  const customTrips = useCustomTripsStore((s) => s.trips);
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState(emptyFilters());
   const [showFilters, setShowFilters] = useState(false);
@@ -34,13 +32,9 @@ export default function TripTray({
   // all when there's no real home set, so this is a safety net only.
   const resolved = resolveHome(home);
   const homeCoord: [number, number] = resolved ? [resolved.lat, resolved.lon] : [0, 0];
-  const allTrips = useMemo(
-    () => (Object.keys(customTrips).length ? [...TRIPS, ...Object.values(customTrips)] : TRIPS),
-    [customTrips]
-  );
-  const tripById = useMemo(() => new Map(allTrips.map((t) => [t.id, t])), [allTrips]);
+  const tripById = useMemo(() => new Map(TRIPS.map((t) => [t.id, t])), []);
   const coordsOf = (id: string) => tripById.get(id)?.co;
-  const groups = useMemo(() => buildFilterGroups(allTrips), [allTrips]);
+  const groups = useMemo(() => buildFilterGroups(TRIPS), []);
 
   const toggle = (key: FilterKey, val: string) => {
     setFilters((prev) => {
@@ -52,9 +46,9 @@ export default function TripTray({
   };
 
   const visible = useMemo(
-    () => allTrips.filter((t) => tripMatches(t, filters, query, homeCoord, coordsOf)),
+    () => TRIPS.filter((t) => tripMatches(t, filters, query, homeCoord, coordsOf)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [allTrips, filters, query, home]
+    [filters, query, home]
   );
 
   const activeCount = activeFilterCount(filters, query);

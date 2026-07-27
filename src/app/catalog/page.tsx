@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { TRIPS } from "@/data/trips";
 import { useActivePlan } from "@/lib/store/plan";
-import { useCustomTripsStore } from "@/lib/store/customTrips";
 import { resolveHome } from "@/lib/resolveHome";
 import {
   activeFilterCount,
@@ -16,17 +15,14 @@ import { tripPriceRange } from "@/lib/calc/costs";
 import { makeCtx } from "@/lib/calc/context";
 import FilterPanel from "@/components/FilterPanel";
 import TripCard from "@/components/TripCard";
-import DiscoverPanel from "@/components/discover/DiscoverPanel";
 import SetupWizardModal from "@/components/onboarding/SetupWizardModal";
 
 export default function CatalogPage() {
   const activePlan = useActivePlan();
   const { home } = activePlan;
-  const customTrips = useCustomTripsStore((s) => s.trips);
   const [filters, setFilters] = useState(emptyFilters());
   const [query, setQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [showDiscover, setShowDiscover] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
 
   // same "never configured at all" signal Calendar/Itinerary already use --
@@ -41,17 +37,10 @@ export default function CatalogPage() {
   // (e.g. a data inconsistency), since the gate below covers the normal case.
   const resolved = resolveHome(home);
   const homeCoord: [number, number] = resolved ? [resolved.lat, resolved.lon] : [0, 0];
-  // makeCtx reads custom trips from the store internally (not as an arg),
-  // so this dep is what tells the memo to recompute when they change
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const ctx = useMemo(() => makeCtx(home), [home, customTrips]);
-  const allTrips = useMemo(
-    () => (Object.keys(customTrips).length ? [...TRIPS, ...Object.values(customTrips)] : TRIPS),
-    [customTrips]
-  );
-  const tripById = useMemo(() => new Map(allTrips.map((t) => [t.id, t])), [allTrips]);
+  const ctx = useMemo(() => makeCtx(home), [home]);
+  const tripById = useMemo(() => new Map(TRIPS.map((t) => [t.id, t])), []);
   const coordsOf = (id: string) => tripById.get(id)?.co;
-  const groups = useMemo(() => buildFilterGroups(allTrips), [allTrips]);
+  const groups = useMemo(() => buildFilterGroups(TRIPS), []);
 
   const toggle = (key: FilterKey, val: string) => {
     setFilters((prev) => {
@@ -68,9 +57,9 @@ export default function CatalogPage() {
   };
 
   const visible = useMemo(
-    () => allTrips.filter((t) => tripMatches(t, filters, query, homeCoord, coordsOf)),
+    () => TRIPS.filter((t) => tripMatches(t, filters, query, homeCoord, coordsOf)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [allTrips, filters, query, home]
+    [filters, query, home]
   );
 
   const activeCount = activeFilterCount(filters, query);
@@ -101,7 +90,7 @@ export default function CatalogPage() {
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
       <div className="rounded-card border border-border bg-surface p-5">
         <h2 className="font-heading text-xl font-semibold text-ink">
-          Trip Catalog <span className="font-sans text-sm font-normal text-muted">— {visible.length} of {allTrips.length} options</span>
+          Trip Catalog <span className="font-sans text-sm font-normal text-muted">— {visible.length} of {TRIPS.length} options</span>
         </h2>
         <p className="mt-1 text-sm text-muted">
           Prices are per person, round-trip from {home || "your home city (not set yet)"}, mid-range
@@ -134,20 +123,7 @@ export default function CatalogPage() {
             Clear all
           </button>
         )}
-        <button
-          type="button"
-          onClick={() => setShowDiscover((s) => !s)}
-          className="ml-auto rounded-full border border-accent/40 bg-accent-soft px-3.5 py-2 text-xs font-semibold text-accent-hover hover:bg-accent/20"
-        >
-          ✨ Discover more trips {showDiscover ? "▲" : "▼"}
-        </button>
       </div>
-
-      {showDiscover && (
-        <div className="mt-3">
-          <DiscoverPanel filters={filters} query={query} onClose={() => setShowDiscover(false)} />
-        </div>
-      )}
 
       {showFilters && (
         <div className="mt-3">
