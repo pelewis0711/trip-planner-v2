@@ -118,6 +118,28 @@ export default function AuthSync() {
 
   useEffect(() => {
     const supabase = createClient();
+    let cancelled = false;
+
+    // The plan store's localStorage hydration is asynchronous even though
+    // localStorage itself is synchronous (Zustand's persist middleware
+    // always resolves it as a microtask) -- so this effect can run BEFORE
+    // it completes. If mergeOnSignIn reads the store in that window,
+    // plans[activeId] is still the unhydrated DEFAULT_PLAN, whose
+    // `updated: 0` loses to literally any real remote timestamp in
+    // mergeRemote's comparison -- silently overwriting a just-made local
+    // edit (e.g. a weekend deletion) with stale/incomplete account data
+    // the moment the page reloads. Waiting for hydration removes the race
+    // instead of trying to patch around its symptoms.
+    function whenHydrated(fn: () => void) {
+      if (usePlanStore.persist.hasHydrated()) {
+        fn();
+        return;
+      }
+      const unsub = usePlanStore.persist.onFinishHydration(() => {
+        unsub();
+        if (!cancelled) fn();
+      });
+    }
 
     /** Phase 6: pulls the account's onboarding answers (if any) so this
      * device's plan defaults + custom home city match what was set up
@@ -225,7 +247,7 @@ export default function AuthSync() {
       setUser(user);
       if (user && !mergedRef.current) {
         mergedRef.current = true;
-        mergeOnSignIn(user.id);
+        whenHydrated(() => mergeOnSignIn(user.id));
       }
     });
 
@@ -234,7 +256,7 @@ export default function AuthSync() {
       setUser(user);
       if (event === "SIGNED_IN" && user && !mergedRef.current) {
         mergedRef.current = true;
-        mergeOnSignIn(user.id);
+        whenHydrated(() => mergeOnSignIn(user.id));
       }
       if (event === "SIGNED_OUT") {
         mergedRef.current = false;
@@ -242,7 +264,10 @@ export default function AuthSync() {
       }
     });
 
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
   }, [setUser, router]);
 
   // write-through: push plan changes to Postgres while signed in
