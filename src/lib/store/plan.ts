@@ -37,6 +37,15 @@ export interface Plan {
   // `slots` so the "customize semester" panel has something to pre-fill and
   // so regenerating (changing dates) has a starting point to diff against.
   semester?: SemesterConfig;
+  // Auto-generated (weekend/break/post) slots the user explicitly deleted,
+  // tracked by date-range rather than id (ids are just a positional
+  // counter, not stable if the semester's shape changes) -- so that
+  // regenerating slots from the SAME semester window again (e.g. re-saving
+  // unrelated changes in the Semester panel) never silently resurrects a
+  // deleted weekend. Cleared automatically the moment the semester's own
+  // start/end actually change, since a deletion tied to old dates has
+  // nothing meaningful to refer to once the dates are different.
+  deletedAutoSlots?: { s: [number, number]; e: [number, number] }[];
   // when true, totals use live flight prices (where fetched) in place of
   // the estimate for flight legs — see src/lib/calc/livePricing.ts
   useLivePrices?: boolean;
@@ -254,10 +263,24 @@ const isCustomSlot = (id: string) => id.startsWith("custom_");
 // Recomputes the auto-generated (weekend/break/post) slots from `semester`,
 // keeps any user-added custom_* slots as-is, and drops placements for any
 // slot id that no longer exists in the result. Pure -- used by both
-// slotsToBeLost() (preview, no mutation) and the real regenerateSlotsFor
-// store action below.
-function recomputeSlots(plan: Plan, semester: SemesterConfig): { slots: Slot[]; placements: Placements } {
-  const auto = generateSlots(semester);
+// slotsToBeLost() (preview, no mutation) and the real regenerateSlotsFor /
+// setOnboardingDefaults store actions.
+//
+// Respects previously-deleted auto slots (see Plan.deletedAutoSlots) as
+// long as this is the SAME semester window as before -- generateSlots()
+// alone has no memory of a deletion, so without this, re-running it (e.g.
+// re-saving the Semester panel with an unrelated break tweak) would
+// silently bring a deleted weekend back.
+function recomputeSlots(
+  plan: Plan,
+  semester: SemesterConfig
+): { slots: Slot[]; placements: Placements; deletedAutoSlots: { s: [number, number]; e: [number, number] }[] } {
+  const sameWindow = plan.semester?.start === semester.start && plan.semester?.end === semester.end;
+  const deletedAutoSlots = sameWindow ? (plan.deletedAutoSlots ?? []) : [];
+  const isDeleted = (s: Slot) =>
+    deletedAutoSlots.some((d) => d.s[0] === s.s[0] && d.s[1] === s.s[1] && d.e[0] === s.e[0] && d.e[1] === s.e[1]);
+
+  const auto = generateSlots(semester).filter((s) => !isDeleted(s));
   const custom = (plan.slots ?? []).filter((s) => isCustomSlot(s.id));
   const slots = [...auto, ...custom].sort((a, b) => a.s[0] - b.s[0] || a.s[1] - b.s[1]);
   const keep = new Set(slots.map((s) => s.id));
@@ -265,7 +288,7 @@ function recomputeSlots(plan: Plan, semester: SemesterConfig): { slots: Slot[]; 
   Object.entries(plan.placements).forEach(([id, p]) => {
     if (keep.has(id)) placements[id] = p;
   });
-  return { slots, placements };
+  return { slots, placements, deletedAutoSlots };
 }
 
 // Which of this plan's currently-placed slots (with real trips in them)
@@ -497,7 +520,16 @@ export const usePlanStore = create<PlanStoreState>()(
           withActive(state, (p) => {
             const next = { ...p.placements };
             delete next[slotId];
-            return { slots: (p.slots ?? []).filter((s) => s.id !== slotId), placements: next };
+            const target = (p.slots ?? []).find((s) => s.id === slotId);
+            const deletedAutoSlots =
+              target && !isCustomSlot(slotId)
+                ? [...(p.deletedAutoSlots ?? []), { s: target.s, e: target.e }]
+                : p.deletedAutoSlots;
+            return {
+              slots: (p.slots ?? []).filter((s) => s.id !== slotId),
+              placements: next,
+              deletedAutoSlots,
+            };
           })
         ),
 
@@ -661,8 +693,13 @@ export const usePlanStore = create<PlanStoreState>()(
         set((state) => {
           const p = state.plans[id];
           if (!p) return state;
-          const { slots, placements } = recomputeSlots(p, semester);
-          return { plans: { ...state.plans, [id]: { ...p, semester, slots, placements, updated: Date.now() } } };
+          const { slots, placements, deletedAutoSlots } = recomputeSlots(p, semester);
+          return {
+            plans: {
+              ...state.plans,
+              [id]: { ...p, semester, slots, placements, deletedAutoSlots, updated: Date.now() },
+            },
+          };
         }),
 
       addSharedPlan: (plan) =>
@@ -685,13 +722,37 @@ export const usePlanStore = create<PlanStoreState>()(
       clearPendingSync: (ids) =>
         set((state) => ({ pendingSyncIds: state.pendingSyncIds.filter((id) => !ids.includes(id)) })),
 
+      // Seeds the store-wide "defaults for future new plans" AND, when the
+      // currently-active plan is still genuinely unconfigured (no home, no
+      // semester -- the same isUnconfigured signal used by Calendar/Catalog/
+      // Itinerary's empty states), configures that plan too. Without this
+      // second part, finishing onboarding never touched the plan actually on
+      // screen, so isUnconfigured stayed true forever and every setup-gated
+      // page kept re-showing the "let's set up your trip first" prompt --
+      // the reported infinite loop. An already-configured plan (e.g. one
+      // with a real home already chosen) is left completely untouched, same
+      // guarantee Phase 6 established.
       setOnboardingDefaults: (home, semester, studyingInEurope, currency) =>
-        set({
-          defaultHome: home,
-          defaultSemester: semester,
-          defaultSlots: semester ? generateSlots(semester) : [],
-          defaultStudyingInEurope: studyingInEurope,
-          defaultCurrency: currency,
+        set((state) => {
+          const defaultSlots = semester ? generateSlots(semester) : [];
+          const activeId = state.activeId;
+          const active = state.plans[activeId];
+          let plans = state.plans;
+          if (active && !active.home && !active.semester && semester) {
+            const { slots, placements, deletedAutoSlots } = recomputeSlots(active, semester);
+            plans = {
+              ...state.plans,
+              [activeId]: { ...active, home, semester, slots, placements, deletedAutoSlots, updated: Date.now() },
+            };
+          }
+          return {
+            plans,
+            defaultHome: home,
+            defaultSemester: semester,
+            defaultSlots,
+            defaultStudyingInEurope: studyingInEurope,
+            defaultCurrency: currency,
+          };
         }),
 
       dismissFoodFixNotice: () => set({ foodFixNoticeSeen: true }),

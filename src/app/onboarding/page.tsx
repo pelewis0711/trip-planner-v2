@@ -19,6 +19,9 @@ export default function OnboardingPage() {
 
   const [initial, setInitial] = useState<OnboardingValues | null>(null);
   const [alreadyOnboarded, setAlreadyOnboarded] = useState(false);
+  const [saveError, setSaveError] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [pendingResult, setPendingResult] = useState<OnboardingResult | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -40,13 +43,40 @@ export default function OnboardingPage() {
 
   async function handleComplete(result: OnboardingResult) {
     if (!user) return;
+    // Configure the local plan store first (this is what actually gets you
+    // out of the "let's set up your trip first" loop) -- an account-sync
+    // failure below shouldn't leave you stuck re-answering the wizard.
     if (!isKnownCity(result.host.city)) {
       addHome(result.host.city, { lat: result.host.lat, lon: result.host.lon, country: result.host.country });
     }
     setOnboardingDefaults(result.host.city, result.semester, result.studyingInEurope, result.currency);
 
+    setSaving(true);
+    setSaveError(false);
+    setPendingResult(result);
     const supabase = createClient();
-    await saveUserSettings(supabase, user.id, result, alreadyOnboarded);
+    const ok = await saveUserSettings(supabase, user.id, result, alreadyOnboarded);
+    setSaving(false);
+    if (!ok) {
+      setSaveError(true);
+      return;
+    }
+    setPendingResult(null);
+    router.replace("/");
+  }
+
+  async function retrySave() {
+    if (!user || !pendingResult) return;
+    setSaving(true);
+    setSaveError(false);
+    const supabase = createClient();
+    const ok = await saveUserSettings(supabase, user.id, pendingResult, alreadyOnboarded);
+    setSaving(false);
+    if (!ok) {
+      setSaveError(true);
+      return;
+    }
+    setPendingResult(null);
     router.replace("/");
   }
 
@@ -63,6 +93,30 @@ export default function OnboardingPage() {
         A few quick questions so the calendar and Schengen tracker match your actual program.
         Everything here is editable later from Settings.
       </p>
+      {saveError && (
+        <div className="mt-6 rounded-card border border-red-300 bg-red-50 p-4 text-sm text-red-800">
+          <p className="font-semibold">Your setup was saved on this device, but syncing it to your account failed.</p>
+          <p className="mt-1">
+            Your calendar and plan already reflect what you just entered — this only affects seeing it on other
+            devices. Check your connection and try again.
+          </p>
+          <button
+            type="button"
+            onClick={retrySave}
+            disabled={saving}
+            className="mt-3 rounded-lg bg-red-700 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-800 disabled:opacity-60"
+          >
+            {saving ? "Retrying…" : "Retry sync"}
+          </button>
+          <button
+            type="button"
+            onClick={() => router.replace("/")}
+            className="mt-3 ml-2 rounded-lg border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-800 hover:bg-red-100"
+          >
+            Continue anyway
+          </button>
+        </div>
+      )}
       <div className="mt-8 rounded-card border border-border bg-surface p-5">
         <OnboardingFlow initial={initial} onComplete={handleComplete} layout="wizard" />
       </div>

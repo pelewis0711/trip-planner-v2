@@ -236,6 +236,128 @@ describe("Phase 6: plan store onboarding defaults", () => {
   });
 });
 
+describe("Onboarding-loop fix: setOnboardingDefaults also configures the active plan when it's unconfigured", () => {
+  it("populates home/semester/slots on the active plan when it had none (the reported infinite-loop scenario)", () => {
+    const store = usePlanStore.getState();
+    const id = store.newPlan("Loop-bug test plan");
+    // force the freshly-created plan back into a genuinely unconfigured
+    // state, regardless of whatever store-wide defaults were left over from
+    // earlier tests in this file
+    store.patchPlan(id, { home: "", semester: undefined, slots: [], placements: {} });
+    store.switchPlan(id);
+    expect(usePlanStore.getState().plans[id].home).toBe("");
+    expect(usePlanStore.getState().plans[id].semester).toBeUndefined();
+
+    const semester = { start: "2027-01-25", end: "2027-05-16", breaks: [] };
+    store.setOnboardingDefaults("Florence", semester, true, "USD");
+
+    const after = usePlanStore.getState().plans[id];
+    expect(after.home).toBe("Florence");
+    expect(after.semester).toEqual(semester);
+    // edge-to-edge weekend coverage, not just a couple of slots
+    expect(after.slots!.length).toBeGreaterThan(10);
+    expect(after.slots).toEqual(generateSlots(semester));
+  });
+
+  it("leaves an already-configured active plan completely untouched", () => {
+    const store = usePlanStore.getState();
+    const id = store.newPlan("Already-configured test plan");
+    const originalSemester = { start: "2026-08-25", end: "2026-12-12", breaks: [] };
+    const originalSlots = generateSlots(originalSemester);
+    store.patchPlan(id, {
+      home: "Prague",
+      semester: originalSemester,
+      slots: originalSlots,
+      placements: { [originalSlots[0].id]: { stops: [{ tripId: "rome", nights: 2, act: [], sig: [], l: 0, fd: 0 }] } },
+    });
+    store.switchPlan(id);
+
+    // keep studyingInEurope/currency at their store-wide defaults here --
+    // this test is only about the active PLAN staying untouched, and other
+    // tests in this file assert the store's initial default values
+    store.setOnboardingDefaults("Madrid", { start: "2027-01-25", end: "2027-05-16", breaks: [] }, true, "USD");
+
+    const after = usePlanStore.getState().plans[id];
+    expect(after.home).toBe("Prague");
+    expect(after.semester).toEqual(originalSemester);
+    expect(after.slots).toEqual(originalSlots);
+    expect(after.placements[originalSlots[0].id]).toBeTruthy();
+  });
+});
+
+describe("Weekend-deletion fix: deletions persist across regenerating slots, and don't touch neighbors", () => {
+  function freshConfiguredPlan(semester: { start: string; end: string; breaks: never[] }) {
+    const store = usePlanStore.getState();
+    const id = store.newPlan("Deletion test plan");
+    const slots = generateSlots(semester);
+    store.patchPlan(id, { home: "Prague", semester, slots, placements: {} });
+    store.switchPlan(id);
+    return { store, id, slots };
+  }
+
+  it("a deleted auto weekend does not reappear after regenerateSlotsFor is called again with the SAME semester", () => {
+    const semester = { start: "2027-01-25", end: "2027-05-16", breaks: [] };
+    const { store, id, slots } = freshConfiguredPlan(semester);
+    const targetId = slots[3].id;
+
+    store.deleteSlot(targetId);
+    expect(usePlanStore.getState().plans[id].slots!.some((s) => s.id === targetId)).toBe(false);
+    expect(usePlanStore.getState().plans[id].deletedAutoSlots?.length).toBe(1);
+
+    store.regenerateSlotsFor(id, semester);
+    const after = usePlanStore.getState().plans[id];
+    const stillGone = !after.slots!.some((s) => s.s[0] === slots[3].s[0] && s.s[1] === slots[3].s[1] && s.e[0] === slots[3].e[0] && s.e[1] === slots[3].e[1]);
+    expect(stillGone).toBe(true);
+  });
+
+  it("switching to a genuinely different semester clears old deletions", () => {
+    const semester = { start: "2027-01-25", end: "2027-05-16", breaks: [] };
+    const { store, id, slots } = freshConfiguredPlan(semester);
+    store.deleteSlot(slots[3].id);
+    expect(usePlanStore.getState().plans[id].deletedAutoSlots?.length).toBe(1);
+
+    const newSemester = { start: "2026-08-25", end: "2026-12-12", breaks: [] };
+    store.regenerateSlotsFor(id, newSemester);
+    expect(usePlanStore.getState().plans[id].deletedAutoSlots ?? []).toEqual([]);
+  });
+
+  it("deleting one weekend does not remove or renumber its neighbors, and leaves their placements alone", () => {
+    const semester = { start: "2027-01-25", end: "2027-05-16", breaks: [] };
+    const { store, id, slots } = freshConfiguredPlan(semester);
+    const before = slots[2].id;
+    const target = slots[3].id;
+    const after2 = slots[4].id;
+    store.patchPlan(id, {
+      placements: {
+        [before]: { stops: [{ tripId: "rome", nights: 2, act: [], sig: [], l: 0, fd: 0 }] },
+        [after2]: { stops: [{ tripId: "dublin", nights: 2, act: [], sig: [], l: 0, fd: 0 }] },
+      },
+    });
+
+    store.deleteSlot(target);
+
+    const plan = usePlanStore.getState().plans[id];
+    expect(plan.slots!.some((s) => s.id === before)).toBe(true);
+    expect(plan.slots!.some((s) => s.id === after2)).toBe(true);
+    expect(plan.placements[before]?.stops[0].tripId).toBe("rome");
+    expect(plan.placements[after2]?.stops[0].tripId).toBe("dublin");
+  });
+
+  it("deleting a slot that has a placed trip drops its placement (the UI warns first via confirm())", () => {
+    const semester = { start: "2027-01-25", end: "2027-05-16", breaks: [] };
+    const { store, id, slots } = freshConfiguredPlan(semester);
+    const target = slots[3].id;
+    store.patchPlan(id, {
+      placements: { [target]: { stops: [{ tripId: "rome", nights: 2, act: [], sig: [], l: 0, fd: 0 }] } },
+    });
+
+    store.deleteSlot(target);
+
+    const plan = usePlanStore.getState().plans[id];
+    expect(plan.placements[target]).toBeUndefined();
+  });
+});
+
 describe("Phase 9 step 3: local setup wizard defaults", () => {
   it("defaultStudyingInEurope/defaultCurrency start at true/USD and round-trip through setOnboardingDefaults", () => {
     const store = usePlanStore.getState();

@@ -19,6 +19,7 @@ export default function SettingsPage() {
 
   const [initial, setInitial] = useState<OnboardingValues | null>(null);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -43,7 +44,12 @@ export default function SettingsPage() {
     const supabase = createClient();
     // this account has necessarily been through onboarding already to reach
     // Settings (redirected there otherwise) -- always preserve onboarded_at
-    await saveUserSettings(supabase, user.id, result, true);
+    const ok = await saveUserSettings(supabase, user.id, result, true);
+    if (!ok) {
+      setSaveError(true);
+      setTimeout(() => setSaveError(false), 4000);
+      return;
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   }
@@ -66,6 +72,11 @@ export default function SettingsPage() {
       <div className="mt-4 rounded-card border border-border bg-surface p-5">
         <OnboardingFlow initial={initial} onComplete={handleSave} layout="single-page" submitLabel="Save" />
         {saved && <p className="mt-3 text-sm text-success">Saved.</p>}
+        {saveError && (
+          <p className="mt-3 text-sm text-red-700">
+            Saved on this device, but syncing to your account failed — check your connection and try again.
+          </p>
+        )}
       </div>
     </div>
   );
