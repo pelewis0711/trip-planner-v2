@@ -665,6 +665,55 @@ export const UNIVERSITY_SEMESTERS: UniversitySemesterEntry[] = [
     start: "2027-02-22", end: "2027-05-05",
     breaks: [b("Easter Break", "2027-03-26", "2027-03-30", "easter")],
     sourceUrl: "https://www.hslu.ch/en/lucerne-school-of-information-technology/degree-programs/academic-calendar/" },
+
+  // UIUC "Illinois-run program center" host institutions, batch 2 (retry
+  // after batch 1 hit a WebSearch quota wall). Real progress this time on
+  // 3 of the 4 previously-stuck entries -- Univ. of Bologna is now a
+  // 3x-confirmed dead end (its own site: "Each course programme has its
+  // own academic calendar... There is no central University of Bologna
+  // calendar"), and "French Language Studies in Arles" turned out to be a
+  // summer-only ~4-week program with no fall/spring version at all --
+  // structurally out of scope for this dataset, not a search failure.
+  // Barcelona-El Vallès got a corrected host institution (ETSAV, part of
+  // UPC BarcelonaTech -- the earlier La Salle/UIC guess was wrong, per
+  // UIUC's own program database) but ETSAV's own exact semester dates are
+  // behind a JS calendar tool that didn't render as fetchable text --
+  // deliberately NOT added as a dated entry rather than approximated from
+  // UPC's parent-university month-level dates.
+  //
+  // - University of Pavia: no named breaks on its own calendar PDF (just
+  //   lecture + separate exam-session windows) -- breaks: [] is the real
+  //   document, not a search gap.
+  // - CLM Granada offers two program lengths ("extended" vs. "regular"
+  //   semester); the "extended semester" dates are used below since they
+  //   cover the full term. No mid-term breaks published.
+  // - "IAU College" has rebranded to lead with "ACM" (American College of
+  //   the Mediterranean) on its own site, with both names used
+  //   interchangeably in places -- both names kept in this entry's
+  //   `university` string so a search for either still finds it.
+  { university: "University of Pavia", city: "Pavia", country: "Italy", term: "fall",
+    start: "2026-09-14", end: "2027-01-30", breaks: [],
+    sourceUrl: "https://portale.unipv.it/sites/default/files/2026-04/Calendario%20didattico%20a.a.%202026-27.pdf" },
+  { university: "University of Pavia", city: "Pavia", country: "Italy", term: "spring",
+    start: "2027-01-28", end: "2027-06-30", breaks: [],
+    sourceUrl: "https://portale.unipv.it/sites/default/files/2026-04/Calendario%20didattico%20a.a.%202026-27.pdf" },
+  { university: "Centro de Lenguas Modernas (CLM), Universidad de Granada", city: "Granada", country: "Spain", term: "fall",
+    start: "2026-08-30", end: "2026-12-23", breaks: [],
+    sourceUrl: "https://clm-granada.com/programs-2026-2027/" },
+  { university: "Centro de Lenguas Modernas (CLM), Universidad de Granada", city: "Granada", country: "Spain", term: "spring",
+    start: "2027-01-06", end: "2027-05-22", breaks: [],
+    sourceUrl: "https://clm-granada.com/programs-2026-2027/" },
+  { university: "ACM (American College of the Mediterranean) / IAU College", city: "Aix-en-Provence", country: "France", term: "fall",
+    start: "2026-09-07", end: "2026-12-09",
+    breaks: [b("Fall Break", "2026-10-24", "2026-11-01", "break")],
+    sourceUrl: "https://acm.iau.edu/academic-calendar/" },
+  { university: "ACM (American College of the Mediterranean) / IAU College", city: "Aix-en-Provence", country: "France", term: "spring",
+    start: "2027-02-01", end: "2027-04-30",
+    breaks: [
+      b("Spring Break", "2027-03-20", "2027-03-28", "break"),
+      b("Easter Monday (no classes)", "2027-03-29", "2027-03-29", "easter"),
+    ],
+    sourceUrl: "https://acm.iau.edu/academic-calendar/" },
 ];
 
 export function universityNames(): string[] {
