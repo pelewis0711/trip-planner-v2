@@ -531,4 +531,33 @@ describe("Phase 12: merged program-calendar picker (providers + universities)", 
     expect(config.breaks.some((b) => b.label === entry.breaks[0].label)).toBe(true);
     expect(config.breaks.some((b) => b.kind === "post")).toBe(true);
   });
+
+  // Confirms the full chain a picked program actually drives end to end:
+  // toSemesterConfig -> generateSlots -> real weekend + break slots, exactly
+  // the behavior described when this was requested ("weekends auto-added as
+  // 2-day travel weekends, spring break becomes its own slot, editable
+  // afterward").
+  it("picking a program with a real spring break generates 2-day weekend slots plus a dedicated break slot", () => {
+    const entry = searchPrograms("CEA CAPA Florence").find((e) => e.term === "Spring 2027")!;
+    expect(entry.breaks.some((b) => b.label === "Spring Break")).toBe(true);
+
+    const config = toSemesterConfig(entry);
+    const slots = generateSlots(config);
+
+    const weekends = slots.filter((s) => s.kind === "weekend");
+    expect(weekends.length).toBeGreaterThan(0);
+    for (const w of weekends) {
+      const start = new Date(2027, w.s[0] - 1, w.s[1]);
+      const end = new Date(2027, w.e[0] - 1, w.e[1]);
+      const days = (end.getTime() - start.getTime()) / 86_400_000;
+      expect(days).toBe(1); // Sat -> Sun inclusive = 2 calendar days, 1 day apart
+    }
+
+    const springBreakSlot = slots.find((s) => s.label === "Spring Break");
+    expect(springBreakSlot).toBeTruthy();
+    expect(springBreakSlot!.kind).toBe("break");
+
+    // a post-finals slot is always appended regardless of source
+    expect(slots.some((s) => s.kind === "post")).toBe(true);
+  });
 });
