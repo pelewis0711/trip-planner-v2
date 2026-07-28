@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient, hasServiceCredentials } from "@/lib/supabase/service";
+import { PRICING_LIMITER, clientIp, tooManyRequests } from "@/lib/rateLimit";
 
 // Server-only proxy to Travelpayouts (the API token never reaches the
 // browser). Prices are cached ~24h per origin+destination+date in Postgres
@@ -34,11 +36,14 @@ function toResponse(row: CacheRow, cached: boolean) {
 }
 
 export async function GET(request: NextRequest) {
+  const limit = PRICING_LIMITER.check(clientIp(request));
+  if (!limit.allowed) return tooManyRequests(limit);
+
   const { searchParams } = new URL(request.url);
   const origin = (searchParams.get("origin") || "").toUpperCase();
   const destination = (searchParams.get("destination") || "").toUpperCase();
   const date = searchParams.get("date") || "";
-  const forceRefresh = searchParams.get("refresh") === "1";
+  const refreshRequested = searchParams.get("refresh") === "1";
 
   if (!/^[A-Z]{3}$/.test(origin) || !/^[A-Z]{3}$/.test(destination) || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     return NextResponse.json(
@@ -48,6 +53,21 @@ export async function GET(request: NextRequest) {
   }
 
   const supabase = await createClient();
+
+  // ?refresh=1 is the only way to bypass the cache and spend real Travelpayouts
+  // quota, so it's restricted to signed-in users. An anonymous caller isn't
+  // rejected -- the parameter is simply ignored, and they get the cached value
+  // or an ordinary cache-miss lookup like any other request.
+  //
+  // getUser(), not getSession(): on the server getSession() trusts whatever is
+  // in the cookie and can be forged, while getUser() validates against the auth
+  // server. Only called when a refresh was actually asked for, so the common
+  // anonymous path costs no extra round trip.
+  let forceRefresh = false;
+  if (refreshRequested) {
+    const { data } = await supabase.auth.getUser();
+    forceRefresh = Boolean(data.user);
+  }
 
   if (!forceRefresh) {
     const { data: cached } = await supabase
@@ -64,7 +84,11 @@ export async function GET(request: NextRequest) {
   }
 
   const token = process.env.TRAVELPAYOUTS_API_TOKEN;
-  if (!token) {
+  // Checked together: without the service key the cache write below can't
+  // succeed either (0010_revoke_anon_cache_writes.sql removed the anon grant),
+  // so bailing out here keeps the "not configured" answer honest instead of
+  // calling Travelpayouts and then failing to save the result.
+  if (!token || !hasServiceCredentials()) {
     return NextResponse.json({ error: "Live prices aren't configured" }, { status: 503 });
   }
 
@@ -102,8 +126,15 @@ export async function GET(request: NextRequest) {
   }
 
   // cache a miss (price: null) too, so a route with no data doesn't get
-  // re-queried on every page view within the TTL window
-  const { data: saved, error } = await supabase.rpc("upsert_flight_price", {
+  // re-queried on every page view within the TTL window.
+  //
+  // Writes go through the service client, never the request-scoped one above:
+  // 0010_revoke_anon_cache_writes.sql revoked execute on this RPC from anon and
+  // authenticated, so that a visitor holding the public anon key can't write
+  // prices into a cache everyone reads. The read path above deliberately still
+  // uses the normal client -- the cache is meant to be world-readable.
+  const admin = createServiceClient();
+  const { data: saved, error } = await admin.rpc("upsert_flight_price", {
     p_origin: origin,
     p_destination: destination,
     p_depart_date: date,
