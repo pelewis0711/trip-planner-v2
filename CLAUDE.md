@@ -24,14 +24,14 @@ Rebuild `reference-v1-app.html` (a working 187KB single-file app — the source 
 
 - [x] **Phase 0 — Port.** Reproduce v1 feature-for-feature in Next.js/TS with real components. Trip data → typed data module. State in localStorage (same as v1) plus JSON import so his existing plans carry over. Deploy to Vercel. *(Done — live at trip-planner-v2-gamma.vercel.app.)*
 - [x] **Phase 1 — Accounts.** Supabase email/Google auth. Plans move from localStorage to Postgres (keep localStorage as offline cache). Anonymous visitors can still play; signing up keeps their work. *(Done — merged and verified live on trip-planner-v2-gamma.vercel.app; both email magic link and Google sign-in confirmed working.)*
-- [x] **Phase 2 — Sharing.** Share a plan via link (read-only or collaborate). Friend plans appear in Compare. Per-trip votes/comments. Friends at other schools can set their own home city + semester dates (editable slots — v1 hard-codes AAU's). *(Built — needs `0002_sharing.sql` run + Vercel deploy before it's live; see Phase 2 section below.)*
-- [x] **Phase 3 — Live prices.** Flight-offers lookup per leg, cached server-side (respect free-tier rate limits). Live price shown next to the estimate with a "last checked" stamp; estimates remain the fallback everywhere. Lodging has no good free API — keep tier estimates + deep links with dates. *(Built — needs `0003_flight_prices.sql` run + `TRAVELPAYOUTS_API_TOKEN` in Vercel + deploy; see Phase 3 section below. Uses Travelpayouts, not Amadeus — see why.)*
-- [x] **Phase 4 — PWA.** Installable on phone; itinerary, calendar, and booked actuals work offline; syncs when back online. He'll be using this on trains in Europe. *(Built — needs a deploy (no new migration or env var this time); see Phase 4 section below.)*
-- [x] **Phase 6 — Study abroad anywhere.** Onboarding flow (host city/university, home university, term, semester dates) so the app works for any study-abroad student, not just AAU Prague. Dynamic calendar slots generated from confirmed dates instead of the hardcoded 16. Schengen tracker uses the onboarded host country. *(Not in the original roadmap — added by Parker's own request. Built — needs `0005_onboarding.sql` run + deploy; see Phase 6 section below.)*
-- [x] **Phase 7 — Activity depth, selection autonomy, food fix.** Activities expand from ~4/city to 15-25/city (hand-authored, in batches). Placing a trip checks NO activities by default; price ranges (floor/ceiling) replace single numbers; quick presets (Highlights/Balanced/Everything/None) speed up picking. Signature dishes become a $0 bucket list — the food tier already covers a day's eating, so a checked dish no longer adds its price on top (the old double-count bug). *(Not in the original roadmap — added by Parker's own request. Fully complete — all 212 trips expanded, code (Parts B & C) built; needs a PR merge + deploy to go live; see Phase 7 section below.)*
+- [x] **Phase 2 — Sharing.** Share a plan via link (read-only or collaborate). Friend plans appear in Compare. Per-trip votes/comments. Friends at other schools can set their own home city + semester dates (editable slots — v1 hard-codes AAU's). *(Shipped and live. Detail in `docs/PROJECT-LOG.md`.)*
+- [x] **Phase 3 — Live prices.** Flight-offers lookup per leg, cached server-side (respect free-tier rate limits). Live price shown next to the estimate with a "last checked" stamp; estimates remain the fallback everywhere. Lodging has no good free API — keep tier estimates + deep links with dates. *(Shipped and live; verified end-to-end 2026-07-28. Uses Travelpayouts, not Amadeus — see the log for why.)*
+- [x] **Phase 4 — PWA.** Installable on phone; itinerary, calendar, and booked actuals work offline; syncs when back online. He'll be using this on trains in Europe. *(Shipped and live.)*
+- [x] **Phase 6 — Study abroad anywhere.** Onboarding flow (host city/university, home university, term, semester dates) so the app works for any study-abroad student, not just AAU Prague. Dynamic calendar slots generated from confirmed dates instead of the hardcoded 16. Schengen tracker uses the onboarded host country. *(Not in the original roadmap — added by Parker's own request. Shipped and live.)*
+- [x] **Phase 7 — Activity depth, selection autonomy, food fix.** Activities expand from ~4/city to 15-25/city (hand-authored, in batches). Placing a trip checks NO activities by default; price ranges (floor/ceiling) replace single numbers; quick presets (Highlights/Balanced/Everything/None) speed up picking. Signature dishes become a $0 bucket list — the food tier already covers a day's eating, so a checked dish no longer adds its price on top (the old double-count bug). *(Not in the original roadmap — added by Parker's own request. Shipped and live — all 212 trips expanded.)*
 - [x] **Phase 8 — Party size + live hotel pricing.** Every slot gets a travelers count; lodging math becomes group-aware (per person per night, room/unit-sharing formulas); totals show per-person and group amounts everywhere. Live hotel prices for the private-room/boutique tiers. *(Not in the original roadmap — added by Parker's own request. Party size is fully complete and live-ready. Live hotel pricing's plumbing is complete but the upstream provider isn't actually reachable yet — see Phase 8 section below for why, and what unblocks it.)*
 - [x] **Phase 9 — Personal-profile layer.** So a brand-new visitor never looks like Parker specifically: no hardcoded "Prague" defaults anywhere, extending the Phase 6 onboarding/Settings system (not a second parallel one) with a couple of new fields (studying-in-Europe flag, currency), a proper setup wizard and dynamic calendar generator that now work for anonymous visitors too, not just signed-in accounts. *(Not in the original roadmap — added by Parker's own request. Done in 3 steps — see Phase 9 section below.)*
-- [x] **Phase 10 — Rename to "Semesterly" + full visual restyle.** Replace "Trip Planner v2" everywhere user-visible (wordmark, title/metadata, PWA manifest, favicon). Move off the all-dark zinc theme to a light, roomy "clean + playful/college" look: indigo primary + coral accent, Poppins headings, rounded cards, design tokens in `globals.css`. Restyle every screen, mobile-first. *(Not in the original roadmap — added by Parker's own request. Built screen-by-screen with before/after approval at each step, one commit per screen — needs a PR merge + deploy to go live; see Phase 10 section below.)*
+- [x] **Phase 10 — Rename to "Semesterly" + full visual restyle.** Replace "Trip Planner v2" everywhere user-visible (wordmark, title/metadata, PWA manifest, favicon). Move off the all-dark zinc theme to a light, roomy "clean + playful/college" look: indigo primary + coral accent, Poppins headings, rounded cards, design tokens in `globals.css`. Restyle every screen, mobile-first. *(Not in the original roadmap — added by Parker's own request. Shipped and live.)*
 
 ## v1 feature inventory (everything below must survive the port)
 
@@ -78,16 +78,16 @@ Full detail for every phase below lives in `docs/PROJECT-LOG.md` — read it whe
 |---|---|---|
 | 0 | Core app — catalog, calendar, itinerary, plans/compare, Excel export | shipped |
 | 1 | Accounts | shipped |
-| 2 | Sharing | built — needs migration `0002` + deploy |
-| 3 | Live flight prices | built — needs migration `0003` + `TRAVELPAYOUTS_API_TOKEN` + deploy |
-| 4 | PWA | built — needs deploy |
-| 6 | Onboarding + university calendars | built — needs migration `0005` + deploy |
+| 2 | Sharing | shipped |
+| 3 | Live flight prices | shipped — verified live 2026-07-28 |
+| 4 | PWA | shipped |
+| 6 | Onboarding + university calendars | shipped |
 | 7 | Activity expansion + food-model fix | complete — all 212 trips carry 15–25 authored activities |
 | 8 | Party size (A) / live hotel prices (B) | A complete; **B blocked upstream** |
 | 9 | Personal-profile layer (steps 1–8) | complete — nothing further planned |
-| 10 | "Semesterly" rename + visual restyle | built — needs PR merge + deploy |
-| 11 | Privacy note + pre-launch pass | built — ready to merge/deploy |
-| 12 | Trip photos via Unsplash | infra done; **photo fetch mid-run** |
+| 10 | "Semesterly" rename + visual restyle | shipped |
+| 11 | Privacy note + pre-launch pass | shipped |
+| 12 | Trip photos via Unsplash | shipped; **photo fetch mid-run** — 147/212 |
 | 13 | Program-calendar picker + provider research | picker built; research **paused between batches** |
 | 14 | UIUC exchange-partner calendars | **paused** — batch 6 hit a WebSearch quota wall |
 | 15 | Catalog detail sheet "Add to weekend" picker | shipped |
@@ -96,18 +96,28 @@ Full detail for every phase below lives in `docs/PROJECT-LOG.md` — read it whe
 | 18 | Hardening for a public test | shipped |
 | 19 | Setup-loop fix + edge-to-edge weekend generation | shipped |
 | 20 | Consistent button language + Home/Plan picker | shipped |
+| 21 | Pre-launch security hardening — migrations `0009`–`0011` | shipped — verified live 2026-07-28 |
 
 `PROGRAM_CALENDARS` currently holds **142 rows** — 44 provider entries (Phase 13) + 98 university entries (Phase 14).
 
-## Open threads — the only things actually waiting on someone
+**Every migration `0001`–`0011` is applied, and every phase branch is merged into `main`.** There is no deploy backlog — an earlier version of this file claimed Phases 2/3/6 still needed their migrations run, which was already untrue when written. Confirmed 2026-07-28 by querying the live database catalog directly, not by reading these notes.
 
-**1. Deploy backlog.** Phases 2, 3, 4, 6, 10, and 11 are all built but not live. Between them they need migrations `0002`, `0003`, `0005` applied, `TRAVELPAYOUTS_API_TOKEN` set, and a PR merge for 10 and 11. This is the largest gap between "built" and "usable by a real visitor."
+## Security posture (Phase 21 — read before touching RLS or the API routes)
 
-**2. Phase 8 Part B — blocked upstream, not by us.** Travelpayouts' cached hotel pricing "requires special access" via a support request, separate from the flight token — unlike flights, it is not self-serve. Everything downstream is finished (migration `0006`, the route, store, `LiveHotelPrice.tsx`, Excel labels); `api/hotels/price/route.ts` honestly returns 502 "unavailable" (uncached, so it retries cleanly) until access exists. The city→Hotellook location-ID map was deliberately **not** built, since there is no working endpoint to validate it against. To unblock: request hotel-data access on the same account as the flight token, then expect a small tweak to the route's upstream URL/params.
+Three real holes were found and closed just before opening the app to the public. Detail in `docs/PROJECT-LOG.md`; the rules that outlive them:
 
-**3. Phase 12 photo fetch — mid-run.** Last logged progress was 90/212. Resume with `node --env-file=.env.local scripts/fetch-photos.mjs` (plain Node does not auto-load `.env.local` — that is a Next.js convention). Unsplash's free demo tier is 50 req/hour at 2 requests per trip, so roughly 21 trips/hour; the script is resumable, rewrites its manifest after every trip, and stops itself cleanly on the rate-limit header. Photos are committed to the repo (`public/trips/*.jpg` + `src/data/tripPhotos.ts`); Vercel never talks to Unsplash and needs no key.
+- **A comment claiming a restriction is not a restriction.** All three bugs were migrations whose own comments asserted access was locked down while the actual `grant` said otherwise. Check the grants, not the prose.
+- **Postgres grants `EXECUTE` on new functions to `PUBLIC` by default**, and Supabase's `anon`/`authenticated` inherit it. A `revoke ... from anon, authenticated` without `public` silently accomplishes nothing.
+- **RLS cannot restrict columns** — only column-level `GRANT` can. An UPDATE policy with no `WITH CHECK` let a collaborator rewrite `user_id` and seize a plan.
+- `SUPABASE_SERVICE_ROLE_KEY` bypasses RLS entirely. Server-only, never `NEXT_PUBLIC_`, never imported by a client component — `src/lib/supabase/__tests__/service-boundary.test.ts` enforces this by scanning the source.
+- Rate limiting (`src/lib/rateLimit.ts`) is in-memory and therefore **per-instance and approximate on Vercel**. Fine at this scale; the upgrade path is documented in that file.
+- Still untested by Vitest, because it has no database: the RLS policies themselves. Verify those against a real instance as two different users.
 
-**4. Phases 13 & 14 research — paused by Parker's own rule** of checking in between batches, to keep usage cost bounded. Do not run the remaining batches in one shot without asking.
+**1. Phase 8 Part B — blocked upstream, not by us.** Travelpayouts' cached hotel pricing "requires special access" via a support request, separate from the flight token — unlike flights, it is not self-serve. Everything downstream is finished (migration `0006`, the route, store, `LiveHotelPrice.tsx`, Excel labels); `api/hotels/price/route.ts` honestly returns 502 "unavailable" (uncached, so it retries cleanly) until access exists. The city→Hotellook location-ID map was deliberately **not** built, since there is no working endpoint to validate it against. To unblock: request hotel-data access on the same account as the flight token, then expect a small tweak to the route's upstream URL/params.
+
+**2. Phase 12 photo fetch — mid-run.** 147/212 as of 2026-07-28. Blocked only on `UNSPLASH_ACCESS_KEY` being present in `.env.local`. Resume with `npm run fetch-photos` (which is `node --env-file=.env.local scripts/fetch-photos.mjs`) (plain Node does not auto-load `.env.local` — that is a Next.js convention). Unsplash's free demo tier is 50 req/hour at 2 requests per trip, so roughly 21 trips/hour; the script is resumable, rewrites its manifest after every trip, and stops itself cleanly on the rate-limit header. Photos are committed to the repo (`public/trips/*.jpg` + `src/data/tripPhotos.ts`); Vercel never talks to Unsplash and needs no key.
+
+**3. Phases 13 & 14 research — paused by Parker's own rule** of checking in between batches, to keep usage cost bounded. Do not run the remaining batches in one shot without asking.
 
 Known-blocked sources, each a distinct kind of gap rather than "couldn't find it":
 - **WHU** — `robots.txt` explicitly disallows this project's crawler. Treated as a policy boundary to respect, not routed around. Do not work around it.
@@ -118,9 +128,9 @@ Known-blocked sources, each a distinct kind of gap rather than "couldn't find it
 
 Unresolved UIUC "Illinois program center" entries: **Athens** (no host institution found at all), **Paris** (a genuine multi-institution consortium — no single calendar exists to cite), and **Pavia / Granada CLM / IAU College / Barcelona-El Vallès / Arles** (hosts identified or partly identified, dates still needed — worth a retry once search quota resets).
 
-**5. Browser-verification debt.** Phases 9, 12, and 13 each shipped with "not independently verified — no browser automation tool exists in this environment," so several click-throughs were never actually done. That disclaimer reflects the environment those sessions ran in, not a permanent fact: **check whether the current session has browser tooling before repeating it.** Outstanding click-throughs: the program search in Settings, Catalog plus two trip detail sheets, the same plan viewed in USD/EUR/GBP, and toggling the studying-in-Europe switch both directions.
+**4. Browser-verification debt.** Phases 9, 12, and 13 each shipped with "not independently verified — no browser automation tool exists in this environment," so several click-throughs were never actually done. That disclaimer reflects the environment those sessions ran in, not a permanent fact: **check whether the current session has browser tooling before repeating it.** Outstanding click-throughs: the program search in Settings, Catalog plus two trip detail sheets, the same plan viewed in USD/EUR/GBP, and toggling the studying-in-Europe switch both directions.
 
-**6. Two known cosmetic/data flags, deliberately left alone.** The static `<meta description>` still reads "Spring 2027, Prague" — same for every visitor, never part of any ask. And the AAU Prague date discrepancy is recorded under "Known simplifications" above.
+**5. Two known cosmetic/data flags, deliberately left alone.** The static `<meta description>` still reads "Spring 2027, Prague" — same for every visitor, never part of any ask. And the AAU Prague date discrepancy is recorded under "Known simplifications" above.
 
 ## Standing conventions (earned across phases — follow these)
 
