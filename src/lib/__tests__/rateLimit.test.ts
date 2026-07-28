@@ -5,6 +5,7 @@ import {
   GEOCODE_GLOBAL_LIMITER,
   GEOCODE_IP_LIMITER,
   PRICING_LIMITER,
+  REFRESH_LIMITER,
   clientIp,
   tooManyRequests,
 } from "../rateLimit";
@@ -150,6 +151,31 @@ describe("configured limits match what was agreed", () => {
     expect(GEOCODE_GLOBAL_LIMITER.limit).toBe(30);
     const perSecond = GEOCODE_GLOBAL_LIMITER.limit / (GEOCODE_GLOBAL_LIMITER.windowMs / 1000);
     expect(perSecond).toBeLessThanOrEqual(1);
+  });
+
+  // ?refresh=1 is the only path that spends real upstream quota. Signing in is
+  // a weak gate on its own because signup is open, so the refresh path is
+  // limited far more tightly than the route as a whole.
+  it("forced refreshes are limited far below the route's own limit", () => {
+    expect(REFRESH_LIMITER.limit).toBe(5);
+    expect(REFRESH_LIMITER.limit).toBeLessThan(PRICING_LIMITER.limit / 10);
+  });
+
+  it("a single account cannot spend more than 5 real upstream calls a minute", () => {
+    const limiter = new FixedWindowLimiter(REFRESH_LIMITER.limit, REFRESH_LIMITER.windowMs);
+    const t = 1_000_000;
+    let allowed = 0;
+    for (let i = 0; i < 60; i++) if (limiter.check("refresh:user-abc", t).allowed) allowed++;
+    expect(allowed).toBe(5);
+  });
+
+  // Keyed by user id, not IP -- so changing networks doesn't reset it.
+  it("keys refreshes per account, so two accounts don't share one budget", () => {
+    const limiter = new FixedWindowLimiter(5, MINUTE);
+    const t = 1_000_000;
+    for (let i = 0; i < 5; i++) limiter.check("refresh:user-a", t);
+    expect(limiter.check("refresh:user-a", t).allowed).toBe(false);
+    expect(limiter.check("refresh:user-b", t).allowed).toBe(true);
   });
 
   it("the global cap can still be reached by several IPs that are each within their own limit", () => {

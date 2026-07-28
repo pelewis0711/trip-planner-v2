@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient, hasServiceCredentials } from "@/lib/supabase/service";
-import { PRICING_LIMITER, clientIp, tooManyRequests } from "@/lib/rateLimit";
+import { PRICING_LIMITER, REFRESH_LIMITER, clientIp, tooManyRequests } from "@/lib/rateLimit";
 
 // Mirrors src/app/api/flights/price/route.ts's pattern exactly: check a 24h
 // Postgres cache before ever calling upstream; the upstream token never
@@ -74,10 +74,17 @@ export async function GET(request: NextRequest) {
   // path that bypasses the cache and spends real upstream quota. Anonymous
   // callers aren't rejected, the parameter is just ignored. getUser() rather
   // than getSession() because the latter trusts a forgeable cookie server-side.
+  //
+  // And rate-limited per account on top, since signup is open and being signed
+  // in is therefore a weak barrier on its own.
   let forceRefresh = false;
   if (refreshRequested) {
     const { data } = await supabase.auth.getUser();
-    forceRefresh = Boolean(data.user);
+    if (data.user) {
+      const refreshLimit = REFRESH_LIMITER.check(`refresh:${data.user.id}`);
+      if (!refreshLimit.allowed) return tooManyRequests(refreshLimit);
+      forceRefresh = true;
+    }
   }
 
   if (!forceRefresh) {

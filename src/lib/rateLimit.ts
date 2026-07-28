@@ -109,6 +109,20 @@ const MINUTE = 60_000;
  * protected by that cache plus the signed-in-only gate on ?refresh=1. */
 export const PRICING_LIMITER = new FixedWindowLimiter(60, MINUTE);
 
+/** Forced cache refreshes (?refresh=1), keyed by USER ID rather than IP.
+ *
+ * Signing in is a weak barrier on its own, because signup is open -- so the
+ * signed-in-only gate stops drive-by anonymous abuse but not someone willing to
+ * make an account. Without this, one account could spend 60 real upstream calls
+ * a minute (3,600/hour against a free tier), since every ?refresh=1 bypasses
+ * the 24h Postgres cache by design.
+ *
+ * Keyed per account, not per IP, so it can't be sidestepped by changing
+ * networks; the remaining way around it is registering more accounts, which at
+ * 5/min each is a far worse deal than the 60/min this replaces. Five a minute
+ * is well above what a human clicking a refresh button ever needs. */
+export const REFRESH_LIMITER = new FixedWindowLimiter(5, MINUTE);
+
 /** Geocode, per IP. Legitimate use is rare -- lookupCity() only reaches the
  * network for a city absent from the bundled 145-city dataset, and only on an
  * explicit button press -- so a tight cap costs real users nothing. */

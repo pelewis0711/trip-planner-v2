@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient, hasServiceCredentials } from "@/lib/supabase/service";
-import { PRICING_LIMITER, clientIp, tooManyRequests } from "@/lib/rateLimit";
+import { PRICING_LIMITER, REFRESH_LIMITER, clientIp, tooManyRequests } from "@/lib/rateLimit";
 
 // Server-only proxy to Travelpayouts (the API token never reaches the
 // browser). Prices are cached ~24h per origin+destination+date in Postgres
@@ -63,10 +63,18 @@ export async function GET(request: NextRequest) {
   // in the cookie and can be forged, while getUser() validates against the auth
   // server. Only called when a refresh was actually asked for, so the common
   // anonymous path costs no extra round trip.
+  //
+  // Being signed in is a weak barrier by itself (signup is open), so a granted
+  // refresh is additionally rate-limited per account -- otherwise one signed-up
+  // account could spend 60 real Travelpayouts calls a minute.
   let forceRefresh = false;
   if (refreshRequested) {
     const { data } = await supabase.auth.getUser();
-    forceRefresh = Boolean(data.user);
+    if (data.user) {
+      const refreshLimit = REFRESH_LIMITER.check(`refresh:${data.user.id}`);
+      if (!refreshLimit.allowed) return tooManyRequests(refreshLimit);
+      forceRefresh = true;
+    }
   }
 
   if (!forceRefresh) {
