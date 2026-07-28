@@ -1,4 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
+import {
+  GEOCODE_IP_LIMITER,
+  GEOCODE_GLOBAL_LIMITER,
+  GLOBAL_KEY,
+  clientIp,
+  tooManyRequests,
+} from "@/lib/rateLimit";
 
 // Server-only proxy to Nominatim (OpenStreetMap's free, keyless geocoder),
 // used by onboarding's "Other city..." host-city option. A proxy is
@@ -27,6 +34,19 @@ interface NominatimResult {
 }
 
 export async function GET(request: NextRequest) {
+  // Two limiters, and both are needed. Nominatim's usage policy limits *our
+  // server's* IP, not the visitor's -- so a per-IP cap alone wouldn't bound
+  // what Nominatim actually sees (twenty visitors at 6/min each is 120/min
+  // from one address, well over their ~1/second ceiling). The per-IP limiter
+  // stops one caller looping; the global one keeps our total outbound rate
+  // inside their policy. Per-IP is checked first so a single abuser is
+  // rejected without consuming the shared budget everyone else depends on.
+  const perIp = GEOCODE_IP_LIMITER.check(clientIp(request));
+  if (!perIp.allowed) return tooManyRequests(perIp);
+
+  const global = GEOCODE_GLOBAL_LIMITER.check(GLOBAL_KEY);
+  if (!global.allowed) return tooManyRequests(global);
+
   const q = new URL(request.url).searchParams.get("q")?.trim();
   if (!q) {
     return NextResponse.json({ error: "q (city name) is required" }, { status: 400 });
