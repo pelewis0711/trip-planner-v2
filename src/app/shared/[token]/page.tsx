@@ -4,7 +4,7 @@ import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getSharedPlan, joinPlanAsCollaborator } from "@/lib/supabase/sharing";
-import { fetchProfileEmails } from "@/lib/supabase/profiles";
+import { fetchSharedOwnerEmail } from "@/lib/supabase/profiles";
 import { usePlanStore, type Plan } from "@/lib/store/plan";
 import { useAuthStore } from "@/lib/store/auth";
 import { planGrandTotals, planSlotSummary } from "@/lib/planTotals";
@@ -34,9 +34,13 @@ export default function SharedPlanPage({ params }: { params: Promise<{ token: st
         return;
       }
       setPlan(p);
+      // Not fetchProfileEmails: since 0009_lock_down_profiles.sql the `profiles`
+      // policy hides the owner from a visitor who hasn't joined this plan yet,
+      // which is exactly who this page is for. The token-scoped RPC returns just
+      // the owner's email for this one plan instead.
       if (p.ownerId) {
-        const emails = await fetchProfileEmails(supabase, [p.ownerId]);
-        if (!cancelled) setOwnerEmail(emails.get(p.ownerId) ?? null);
+        const email = await fetchSharedOwnerEmail(supabase, token);
+        if (!cancelled) setOwnerEmail(email);
       }
       setStatus("ready");
     });
