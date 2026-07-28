@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient, hasServiceCredentials } from "@/lib/supabase/service";
 
 // Server-only proxy to Travelpayouts (the API token never reaches the
 // browser). Prices are cached ~24h per origin+destination+date in Postgres
@@ -64,7 +65,11 @@ export async function GET(request: NextRequest) {
   }
 
   const token = process.env.TRAVELPAYOUTS_API_TOKEN;
-  if (!token) {
+  // Checked together: without the service key the cache write below can't
+  // succeed either (0010_revoke_anon_cache_writes.sql removed the anon grant),
+  // so bailing out here keeps the "not configured" answer honest instead of
+  // calling Travelpayouts and then failing to save the result.
+  if (!token || !hasServiceCredentials()) {
     return NextResponse.json({ error: "Live prices aren't configured" }, { status: 503 });
   }
 
@@ -102,8 +107,15 @@ export async function GET(request: NextRequest) {
   }
 
   // cache a miss (price: null) too, so a route with no data doesn't get
-  // re-queried on every page view within the TTL window
-  const { data: saved, error } = await supabase.rpc("upsert_flight_price", {
+  // re-queried on every page view within the TTL window.
+  //
+  // Writes go through the service client, never the request-scoped one above:
+  // 0010_revoke_anon_cache_writes.sql revoked execute on this RPC from anon and
+  // authenticated, so that a visitor holding the public anon key can't write
+  // prices into a cache everyone reads. The read path above deliberately still
+  // uses the normal client -- the cache is meant to be world-readable.
+  const admin = createServiceClient();
+  const { data: saved, error } = await admin.rpc("upsert_flight_price", {
     p_origin: origin,
     p_destination: destination,
     p_depart_date: date,
