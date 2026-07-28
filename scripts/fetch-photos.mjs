@@ -154,7 +154,18 @@ async function main() {
     console.log(`${progress} ${trip.n}, ${trip.c} ...`);
 
     try {
-      const { photo, remaining: r1 } = await searchPhoto(`${trip.n} ${trip.c} cityscape landmark`);
+      let { photo, remaining: r1 } = await searchPhoto(`${trip.n} ${trip.c} cityscape landmark`);
+
+      // Smaller/scenic (non-city) destinations often have zero hits for the
+      // "cityscape landmark" phrase even though plenty of photos exist --
+      // e.g. Santorini, Zagreb, Madeira. Retry with a bare place-name query
+      // before giving up.
+      if (!photo) {
+        await sleep(DELAY_MS);
+        const fallback = await searchPhoto(`${trip.n} ${trip.c}`);
+        photo = fallback.photo;
+        r1 = fallback.remaining;
+      }
 
       if (!photo) {
         console.warn("  no Unsplash match -- will fall back to the app's placeholder");
