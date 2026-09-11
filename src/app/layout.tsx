@@ -1,12 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Poppins } from "next/font/google";
-import Header from "@/components/Header";
+import AppChrome from "@/components/AppChrome";
 import Footer from "@/components/Footer";
 import AuthSync from "@/components/AuthSync";
 import RegisterServiceWorker from "@/components/RegisterServiceWorker";
-import InstallPrompt from "@/components/InstallPrompt";
-import FoodFixNotice from "@/components/FoodFixNotice";
-import LocalSetupBanner from "@/components/onboarding/LocalSetupBanner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -59,10 +56,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col bg-bg text-ink">
         <RegisterServiceWorker />
         <AuthSync />
-        <Header />
-        <InstallPrompt />
-        <FoodFixNotice />
-        <LocalSetupBanner />
+        <AppChrome />
         <main className="flex flex-1 flex-col">{children}</main>
         <Footer />
       </body>

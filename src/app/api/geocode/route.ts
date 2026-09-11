@@ -1,4 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { SIGN_IN_REQUIRED } from "@/lib/auth/gate";
 import {
   GEOCODE_IP_LIMITER,
   GEOCODE_GLOBAL_LIMITER,
@@ -41,8 +43,21 @@ export async function GET(request: NextRequest) {
   // stops one caller looping; the global one keeps our total outbound rate
   // inside their policy. Per-IP is checked first so a single abuser is
   // rejected without consuming the shared budget everyone else depends on.
+  //
+  // (Per-IP could key off user.id now that every caller is signed in -- not
+  // simpler, so it stays on IP.)
   const perIp = GEOCODE_IP_LIMITER.check(clientIp(request));
   if (!perIp.allowed) return tooManyRequests(perIp);
+
+  // Signed-in only, checked here as well as in src/proxy.ts so an edit to the
+  // proxy's matcher can't quietly reopen this route. Before the global limiter
+  // on purpose: a caller who isn't signed in must not spend the shared budget.
+  // getUser(), not getSession() -- the latter trusts a forgeable cookie.
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: SIGN_IN_REQUIRED }, { status: 401 });
 
   const global = GEOCODE_GLOBAL_LIMITER.check(GLOBAL_KEY);
   if (!global.allowed) return tooManyRequests(global);

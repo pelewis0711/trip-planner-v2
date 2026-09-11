@@ -673,9 +673,15 @@ export const usePlanStore = create<PlanStoreState>()(
           return { plans };
         });
 
+        // A read-only plan (a friend's, added to Compare from a share link) is
+        // never among the account's own remote plans, so without the readOnly
+        // check it would look "local-only" here and get uploaded on every
+        // sign-in -- update_plan_data refuses it, and it then sat in the sync
+        // queue forever behind a permanent "Syncing 1 change…" pill.
         const remoteById = new Map(remotePlans.map((p) => [p.id, p]));
         return Object.values(get().plans)
           .filter((p) => {
+            if (p.readOnly) return false;
             const remote = remoteById.get(p.id);
             return !remote || p.updated > remote.updated;
           })

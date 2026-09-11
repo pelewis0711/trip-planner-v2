@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient, hasServiceCredentials } from "@/lib/supabase/service";
 import { PRICING_LIMITER, REFRESH_LIMITER, clientIp, tooManyRequests } from "@/lib/rateLimit";
+import { SIGN_IN_REQUIRED } from "@/lib/auth/gate";
 
 // Mirrors src/app/api/flights/price/route.ts's pattern exactly: check a 24h
 // Postgres cache before ever calling upstream; the upstream token never
@@ -43,8 +44,20 @@ function toResponse(row: HotelCacheRow, cached: boolean) {
 }
 
 export async function GET(request: NextRequest) {
+  // Per IP -- same note as the flight route: could key off user.id now that
+  // every caller is signed in, but that isn't simpler.
   const limit = PRICING_LIMITER.check(clientIp(request));
   if (!limit.allowed) return tooManyRequests(limit);
+
+  const supabase = await createClient();
+
+  // Signed-in only, checked here as well as in src/proxy.ts (see the flight
+  // route for why). getUser() rather than getSession() because the latter
+  // trusts a forgeable cookie server-side.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: SIGN_IN_REQUIRED }, { status: 401 });
 
   const { searchParams } = new URL(request.url);
   const city = searchParams.get("city") || "";
@@ -68,23 +81,14 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const supabase = await createClient();
-
-  // Signed-in only, same reasoning as the flight route: ?refresh=1 is the only
-  // path that bypasses the cache and spends real upstream quota. Anonymous
-  // callers aren't rejected, the parameter is just ignored. getUser() rather
-  // than getSession() because the latter trusts a forgeable cookie server-side.
-  //
-  // And rate-limited per account on top, since signup is open and being signed
-  // in is therefore a weak barrier on its own.
+  // ?refresh=1 is the only path that bypasses the cache and spends real
+  // upstream quota, so it's rate-limited per account on top: any university
+  // email can sign up, which makes being signed in a weak barrier on its own.
   let forceRefresh = false;
   if (refreshRequested) {
-    const { data } = await supabase.auth.getUser();
-    if (data.user) {
-      const refreshLimit = REFRESH_LIMITER.check(`refresh:${data.user.id}`);
-      if (!refreshLimit.allowed) return tooManyRequests(refreshLimit);
-      forceRefresh = true;
-    }
+    const refreshLimit = REFRESH_LIMITER.check(`refresh:${user.id}`);
+    if (!refreshLimit.allowed) return tooManyRequests(refreshLimit);
+    forceRefresh = true;
   }
 
   if (!forceRefresh) {

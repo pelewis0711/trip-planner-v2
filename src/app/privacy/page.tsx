@@ -12,24 +12,28 @@ export default function PrivacyPage() {
 
         <div className="mt-5 space-y-4 text-sm text-muted">
           <p>
-            <b className="text-ink">By default, everything stays on your device.</b> Your home city,
-            semester dates, trips, and budgets are saved only in your own browser (localStorage). No
-            account is required to use the planner, and nothing is sent to a server or shared with
-            anyone.
+            {/* Explicit {" "} after each </b>: the build drops a plain leading space
+                when the text that follows contains an HTML entity (&apos; etc.). */}
+            <b className="text-ink">You need an account to use Semesterly.</b>{" "}You sign in with an
+            email link or Google, and new accounts need a university email address. We store that
+            email address to identify your account.
           </p>
           <p>
-            <b className="text-ink">If you sign in</b> (email link or Google — optional; new accounts
-            need a university email address), your plans sync to a private database tied to your
-            account, so you can pick up where you left off on another device. We store your email address to identify your account, plus whatever plan
-            details you&apos;ve entered — nothing more.
+            <b className="text-ink">Your plans live on your device and in your account.</b>{" "}Your setup
+            answers (host city, universities, semester dates), trips, and budgets are saved in your
+            browser (so the app works offline) and synced to a private database tied to your account,
+            so you can pick up where you left off on another device. That&apos;s everything we keep, and
+            nobody else can see it unless you share a plan. Signing
+            out doesn&apos;t erase the copy saved in that browser, so be careful on a shared computer.
           </p>
           <p>
-            <b className="text-ink">If you share a plan</b> with a link, anyone who has that link can
-            view it (and, for a &ldquo;collaborate&rdquo; link, edit it and leave votes/comments). You
-            can turn sharing off anytime from a plan&apos;s card on the Plans tab.
+            <b className="text-ink">If you share a plan</b>{" "}with a view link, anyone who has that link
+            can see that plan — no account needed. A &ldquo;collaborate&rdquo; link lets people edit it
+            and leave votes/comments once they sign in. You can turn sharing off anytime from a
+            plan&apos;s card on the Plans tab.
           </p>
           <p>
-            <b className="text-ink">We don&apos;t sell or share your data</b> with third parties.
+            <b className="text-ink">We don&apos;t sell or share your data</b>{" "}with third parties.
             Booking links (flights, hotels, activities) take you to those sites directly — they have
             their own separate privacy policies.
           </p>

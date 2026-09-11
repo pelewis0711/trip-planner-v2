@@ -64,7 +64,7 @@ export default function PlansPage() {
       <div className="rounded-card border border-border bg-surface p-5">
         <h2 className="font-heading text-xl font-semibold text-ink">Plans &amp; Compare</h2>
         <p className="mt-1 text-sm text-muted">
-          Every change you make is saved automatically to this browser. Build multiple versions of
+          Every change you make is saved automatically, on this device and to your account. Build multiple versions of
           your semester — a budget one, a bucket-list one — then tick <b className="text-ink">compare</b>{" "}
           on two or more and see them side by side below. Share a plan as a .json to send it to a
           friend (import theirs to compare against yours).

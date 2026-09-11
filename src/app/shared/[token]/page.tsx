@@ -80,7 +80,9 @@ export default function SharedPlanPage({ params }: { params: Promise<{ token: st
 
   const handleAddToCompare = () => {
     usePlanStore.getState().addSharedPlan(plan);
-    router.push("/plans");
+    // Compare lives inside the app, which is signed-in only. The plan is
+    // already saved on this device, so it's waiting there after sign-in.
+    router.push(user ? "/plans" : `/login?${new URLSearchParams({ next: "/plans" })}`);
   };
 
   return (
@@ -123,7 +125,7 @@ export default function SharedPlanPage({ params }: { params: Promise<{ token: st
             </button>
           )}
           <button type="button" onClick={handleAddToCompare} className="btn btn-secondary btn-lg">
-            Add to my Compare (view only)
+            {user || authLoading ? "Add to my Compare (view only)" : "Sign in to add to my Compare"}
           </button>
         </div>
       </div>

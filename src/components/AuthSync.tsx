@@ -91,15 +91,17 @@ async function syncPlansUp(supabase: SupabaseClient, userId: string, plans: Plan
 /** Retries whatever's still queued in pendingSyncIds (edits made while
  * offline -- most commonly a booked actual typed in on a train). Plans that
  * got deleted locally before ever syncing just get dropped from the queue,
- * nothing to retry. */
+ * nothing to retry -- and so do read-only plans, which are never ours to
+ * upload (mergeRemote used to queue them by mistake; this clears any left
+ * stuck from before that fix). */
 async function flushPendingSync(supabase: SupabaseClient, userId: string) {
   const ids = usePlanStore.getState().pendingSyncIds;
   if (!ids.length) return;
 
   const plans = usePlanStore.getState().plans;
   const toRetry = ids.map((id) => plans[id]).filter((p): p is Plan => !!p && !p.readOnly);
-  const gone = ids.filter((id) => !plans[id]);
-  if (gone.length) usePlanStore.getState().clearPendingSync(gone);
+  const drop = ids.filter((id) => !plans[id] || plans[id].readOnly);
+  if (drop.length) usePlanStore.getState().clearPendingSync(drop);
   if (!toRetry.length) return;
 
   const { succeeded } = await syncPlansUp(supabase, userId, toRetry);

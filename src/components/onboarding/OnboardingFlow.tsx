@@ -411,8 +411,8 @@ export default function OnboardingFlow({
           {!privacyNoticeSeen && (
             <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-primary/30 bg-primary-soft px-3 py-2.5 text-xs text-ink">
               <span>
-                🔒 By default, everything you enter here stays only in your own browser — no account
-                needed. Sign in and it syncs to your own private account instead.{" "}
+                🔒 What you enter here is saved in this browser and synced to your own private
+                account — nobody else sees it unless you share a plan.{" "}
                 <Link href="/privacy" className="font-semibold text-primary underline">
                   Read more
                 </Link>

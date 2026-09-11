@@ -81,6 +81,28 @@ A student says their school isn't recognized. No code, no deploy:
 
 Works on their very next try. A typo (capitals, leading dot, an `@`) is refused on Save with an error naming the rule. To remove a school, delete its row. (Details: Phase 22 below.)
 
+## Who can use the app
+
+**Signed-in users only** (since Phase 23). Anyone with a university email can sign up and is in immediately — no approval queue, invite codes or roles; the `.edu` rule (Phase 22) is the whole gate on *who*.
+
+**Where the gate lives**: `src/proxy.ts`, applying the policy in `src/lib/auth/gate.ts` (`gateDecision`, tested in `gate.test.ts`). Signed-out page requests → redirect to `/welcome?next=<where they were going>`; signed-out API calls → JSON `401` (never a redirect). The three API routes also check `getUser()` themselves, so an edit to the proxy's matcher can't quietly reopen them; RLS guards the data under both. **It must stay `proxy.ts`** — Next 16 ignores `middleware.ts`, so a gate put there would silently never run.
+
+**The public allowlist** (`PUBLIC_ROUTES` in `gate.ts` — adding to it is a deliberate decision, not housekeeping; its test pins the exact list):
+- `/welcome` — the signed-out front door.
+- `/login` — where you sign in.
+- `/auth/callback` — magic links and Google land here before a session exists.
+- `/privacy` — readable before someone hands over an email.
+- `/shared/*` — public view-share links (Phase 2's Google-Docs model); collab links still require sign-in to join.
+- `/sw.js`, `/manifest.webmanifest`, `/icon`, `/apple-icon`, `/manifest-icon/*`, `/favicon.ico`, `/_next/*`, `/trips/*` — PWA files, build assets and trip photos, fetched without a page around them.
+
+**Deliberately not gated**: the installed PWA while offline — the service worker answers from cache without reaching the server, so a signed-in user on a train is never locked out (and a signed-out person on that same device could see cached screens offline; that's the accepted trade-off).
+
+**Managing access** (no admin UI — the Supabase dashboard is the admin panel):
+- **See who's signed up**: Authentication → Users (email, last sign-in).
+- **Kick someone out**: same screen → the row's menu → **Ban user** (reversible) or **Delete user** (permanent; `on delete cascade` removes their plans, settings, votes and comments).
+- **Close the door for a while**: Authentication → Sign In / Providers → switch off **Allow new users to sign up**. Existing users keep signing in; nobody new gets in. (Don't switch off the Email or Google *providers* for this — that locks existing users out of that sign-in method too.)
+- **Let in one school that isn't recognized**: "Adding a school domain" above.
+
 ## Phase 0 — complete
 
 Built in 9 stages per `/Users/pelewis0711/.claude/plans/glittery-waddling-storm.md`: scaffold+deploy → data extraction → calc engine → Overview/Catalog → Calendar → Itinerary → Plans/Compare → Excel export → mobile polish. Every stage committed, pushed, and verified live. All 5 v1 tabs are up at trip-planner-v2-gamma.vercel.app with feature parity, including the multi-plan system, Schengen tracker, seasonal pricing, and Excel export.
@@ -667,3 +689,30 @@ Committed directly to `main` (continuing the direct-push precedent). Migration: 
 **Known simplification**: a 2-label *suffix* pattern like `ac.uk` technically matches the address `x@ac.uk` itself. Nobody can receive mail at a registry suffix (so no magic link) or own it (so no Google Workspace account), so it can't be used to sign up.
 
 **Verified**: `tsc --noEmit` clean. `eslint` clean on the repo — run as `npx eslint --ignore-pattern '.claude/**'`, because plain `npx eslint` also lints the untracked `.claude/worktrees/phase1-accounts` copy's `.next` build output (9,416 problems, none in `src/`). Vitest 163/165 when likewise run with `--exclude '.claude/**'`: all 32 new academic-email tests pass; the 2 failures are pre-existing, date-dependent assertions in `launch-check.test.ts` (its own comment: "fall from 2026-07-24 lands in 2026" — no longer true once fall 2026 started), failing identically in the untouched worktree copy; not changed here. `next build` clean (22 routes). **Migration run against real Postgres** (PGlite in a scratch folder, not added to the repo; roles mirroring the live project — `postgres` non-owner with TRIGGER): runs and re-runs cleanly; `drop trigger` fails as predicted; a rejected insert raises P0001 + the token and leaves zero rows in `auth.users`/`profiles`; grandfathered updates (sign-in, email change) succeed; the hook returns the 403 JSON to `supabase_auth_admin` and isn't callable by `anon`; anon/authenticated can read `academic_domains` but not write it; the CHECK constraint rejects typos; the SQL and TS rules agree on 697 inputs; the undo line works and re-running restores the gate. Local production server: `/auth/callback` redirects checked with curl for all four cases; `/login`'s rejection box and blur warning checked in a real browser. **Not verified**: a real Google or magic-link signup against the live project — Parker's 6 manual checks in `EDU_EMAIL_GATE.md`.
+
+**Live status (Sep 11, 2026)**: SQL run and hook switched on. Confirmed from the database and Supabase's auth logs: 94 domains, trigger enabled, hook grants correct, and three Google signups with a non-school account rejected by the hook with the tagged message, no account created. Not seen in the logs: a gmail magic-link attempt, or a fresh (signed-out → signed-in) login by an existing account.
+
+## Phase 23 — Signed-in only (the sign-in gate)
+
+Committed directly to `main`. No migration, no env var. Spec: Parker's `SIGN_IN_GATE.md` (kept outside the repo). The standing rules live in "Who can use the app" near the top of this file.
+
+**Decisions (Parker's, from the spec — don't re-litigate)**: sign-in only, with no approval queue, invites or roles; public view-share links stay public; signed-out visitors get a short landing page (`/welcome`), not a bare login box; enforced in `src/proxy.ts` plus the API routes; existing accounts unaffected. **Confirmed this session (multiple-choice)**: signed-out visitors on the public pages get a slim header (logo + Sign in) instead of the full app chrome; fix the stuck "Syncing" pill in this same change.
+
+**What changed**:
+- **Gate**: `src/lib/auth/gate.ts` (`PUBLIC_ROUTES`, `isPublicPath`, `gateDecision`, `safeNext`) applied by `src/proxy.ts`. `updateSession` (`src/lib/supabase/proxy.ts`) now returns `{ response, user }` so the proxy reuses its one `getUser()` call instead of making a second; `withSessionCookies` copies refreshed cookies onto any redirect or 401 (refresh tokens are single-use, so dropping a rotated one would sign the user out). `?next=` drops Next's internal `_rsc` param.
+- **API routes** (`/api/flights/price`, `/api/hotels/price`, `/api/geocode`): each checks `getUser()` itself and answers JSON 401; the anonymous branches (where `?refresh=1` was silently ignored for anonymous callers) are gone. Rate limiters unchanged — still per IP; they could key off user id now (noted in comments), but that isn't simpler. **The unauthenticated quota-burn hole from launch prep is closed**: no anonymous caller can reach Travelpayouts or Nominatim at all. What remains is signed-in use, bounded by the existing per-IP and per-account-refresh limiters — and the limiter is per-instance/approximate on Vercel, as before.
+- **`/welcome`** (server component, dynamic because it reads `?next=`). **`src/components/AppChrome.tsx`** in the root layout picks the chrome: none on `/welcome`; the slim header for a signed-out visitor on a public page; the full Header + InstallPrompt + FoodFixNotice everywhere else (gated pages never wait on the browser's auth check). A pathname conditional rather than a route group: a group would have meant moving every page directory to exclude one page.
+- **`safeNext()`** now validates every `?next=` (`/welcome`, `/login`, `/auth/callback`). Before, `/login` would `router.replace()` any value, so `?next=//evil.com` was an open redirect — and the gate adds `?next=` to every redirect.
+- **Sign-out** → `window.location.assign("/welcome")` (a full load also drops the client router's cached pages).
+- **Share page**: signed-out "Add to my Compare" reads "Sign in to add to my Compare" and goes to `/login?next=/plans`; the plan is already saved locally and waiting after sign-in.
+- **Service worker** (`public/sw.js`): never caches a redirected response — a cached redirect served to an offline navigation is a network error, which would have broken offline mode for anyone who first visited signed out and signed in later. Cache renamed `trip-planner-shell-v2`.
+- **Sync-pill fix**: `mergeRemote` (`plan.ts`) no longer returns read-only (shared-to-view) plans for upload, and `flushPendingSync` (`AuthSync.tsx`) clears any already queued. Before: every reload tried to upload a friend's plan from Compare, `update_plan_data` refused it, and "🔄 Syncing 1 change…" never went away — this hit signed-in users too, not only the new sign-in path. `whenHydrated` untouched.
+- **Copy**: `/privacy` rewritten (account required; plans on the device and in your account; view links public; signing out doesn't erase the browser copy); onboarding's privacy notice; login subtitle; Plans intro. README is create-next-app boilerplate — nothing to change. Also fixed a rendering bug already live on `/privacy`: the build drops the plain space after `</b>` when the following text contains an HTML entity (the live page read "If you sign in</b>(email link…" and "share a plan</b>with…"), so those spaces are now explicit `{" "}`.
+
+**Anonymous paths after this**:
+- `localStorage` stays the offline cache and write path — unchanged.
+- `mergeOnSignIn` stays: anyone who used the app anonymously before today still gets those local plans merged on first sign-in.
+- **Newly unreachable, kept on purpose**: `LocalSetupBanner.tsx` is no longer mounted (its only audience was signed-out visitors), and with it the anonymous route into `SetupWizardModal`. `SetupWizardModal` itself is still used by the Calendar/Catalog/Itinerary/TripDetailSheet empty states for a signed-in user with an unconfigured plan (it saves locally only, as before). `AuthSync.checkOnboarding`'s "push local anonymous answers up" branch now only fires for a pre-gate anonymous user signing up for the first time.
+- `/settings` and `/onboarding` still redirect to `/login` client-side when the browser has no user — redundant with the proxy now; left alone.
+
+**Verified**: `tsc --noEmit` clean; `npx eslint --ignore-pattern '.claude/**'` clean; `npx vitest run --exclude '.claude/**'` 235/237 (71 new gate tests + 1 `mergeRemote` test; the 2 failures are the known date-dependent ones in `launch-check.test.ts`); `next build` clean (23 routes). Local production server, signed out, via curl: every app page and an unknown path → 307 `/welcome?next=…`; `/sharedsomething` gated; the public pages and PWA files 200; all three APIs → 401 JSON; a forged `sb-…-auth-token` cookie still gated (`getUser()` rejects it); an RSC client-navigation request redirected with `_rsc` stripped. In a browser at 375px: `/calendar` → `/welcome` fits one screen with no app header, its button carries `next=/calendar`, `/login` shows the slim header, and a share link's Sign in returns to that link. **Not verified here** (no real session in this environment): the signed-in paths on the live site, the installed PWA offline, and a real share link — Parker's manual checks in `SIGN_IN_GATE.md`.

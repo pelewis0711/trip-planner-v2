@@ -14,6 +14,7 @@ import {
   loadAcademicPatterns,
   type SignupRejection,
 } from "@/lib/auth/academicEmail";
+import { safeNext } from "@/lib/auth/gate";
 
 /** Reads the ?error= that /auth/callback sets after a refused Google sign-up. */
 function rejectionFromUrl(value: string | null): SignupRejection | null {
@@ -31,7 +32,8 @@ export default function LoginPage() {
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") || "/";
+  // Only ever a path on this site -- an unchecked ?next= is an open redirect.
+  const next = safeNext(searchParams.get("next"));
   const urlError = searchParams.get("error");
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
@@ -120,8 +122,8 @@ function LoginForm() {
       <div className="rounded-card border border-border bg-surface p-8">
         <h1 className="font-heading text-xl font-semibold text-ink">Sign in</h1>
         <p className="mt-1 text-sm text-muted">
-          Keep your plans synced across devices. New accounts need a university email address —
-          with Google, pick your school account.
+          Sign in to start planning. New accounts need a university email address — with Google,
+          pick your school account.
         </p>
 
         {sent ? (

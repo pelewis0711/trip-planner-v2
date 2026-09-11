@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient, hasServiceCredentials } from "@/lib/supabase/service";
 import { PRICING_LIMITER, REFRESH_LIMITER, clientIp, tooManyRequests } from "@/lib/rateLimit";
+import { SIGN_IN_REQUIRED } from "@/lib/auth/gate";
 
 // Server-only proxy to Travelpayouts (the API token never reaches the
 // browser). Prices are cached ~24h per origin+destination+date in Postgres
@@ -36,8 +37,23 @@ function toResponse(row: CacheRow, cached: boolean) {
 }
 
 export async function GET(request: NextRequest) {
+  // Per IP. Now that every caller is signed in this could key off user.id
+  // instead (fairer when a whole campus shares one Wi-Fi address); left on IP
+  // because that isn't simpler, and it bounds upstream quota either way.
   const limit = PRICING_LIMITER.check(clientIp(request));
   if (!limit.allowed) return tooManyRequests(limit);
+
+  const supabase = await createClient();
+
+  // Signed-in only. src/proxy.ts already turns signed-out callers away, but a
+  // route that trusted that alone would silently open up the day someone edits
+  // the proxy's matcher -- so it checks for itself. getUser(), not
+  // getSession(): on the server getSession() trusts whatever is in the cookie
+  // and can be forged, while getUser() validates against the auth server.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: SIGN_IN_REQUIRED }, { status: 401 });
 
   const { searchParams } = new URL(request.url);
   const origin = (searchParams.get("origin") || "").toUpperCase();
@@ -52,29 +68,15 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const supabase = await createClient();
-
   // ?refresh=1 is the only way to bypass the cache and spend real Travelpayouts
-  // quota, so it's restricted to signed-in users. An anonymous caller isn't
-  // rejected -- the parameter is simply ignored, and they get the cached value
-  // or an ordinary cache-miss lookup like any other request.
-  //
-  // getUser(), not getSession(): on the server getSession() trusts whatever is
-  // in the cookie and can be forged, while getUser() validates against the auth
-  // server. Only called when a refresh was actually asked for, so the common
-  // anonymous path costs no extra round trip.
-  //
-  // Being signed in is a weak barrier by itself (signup is open), so a granted
-  // refresh is additionally rate-limited per account -- otherwise one signed-up
-  // account could spend 60 real Travelpayouts calls a minute.
+  // quota. Being signed in is a weak barrier by itself (any university email
+  // can sign up), so a refresh is additionally rate-limited per account --
+  // otherwise one account could spend 60 real Travelpayouts calls a minute.
   let forceRefresh = false;
   if (refreshRequested) {
-    const { data } = await supabase.auth.getUser();
-    if (data.user) {
-      const refreshLimit = REFRESH_LIMITER.check(`refresh:${data.user.id}`);
-      if (!refreshLimit.allowed) return tooManyRequests(refreshLimit);
-      forceRefresh = true;
-    }
+    const refreshLimit = REFRESH_LIMITER.check(`refresh:${user.id}`);
+    if (!refreshLimit.allowed) return tooManyRequests(refreshLimit);
+    forceRefresh = true;
   }
 
   if (!forceRefresh) {

@@ -3,15 +3,30 @@
 // means: make sure the page shell (HTML/JS/CSS) is available without a
 // network round trip. Bump CACHE_NAME on any change to this file so old
 // caches get cleared on the next visit.
-const CACHE_NAME = "trip-planner-shell-v1";
+//
+// Sign-in gate (src/proxy.ts): for a signed-out visitor every app page is a
+// redirect to /welcome. A redirect must never be saved as if it were that page
+// -- served back offline to a navigation it's a network error, which would
+// break offline mode for someone who first visited signed out and signed in
+// later. So only a real, non-redirected 200 is ever cached. (Offline, the gate
+// itself never runs: this worker answers from cache without asking the server.)
+const CACHE_NAME = "trip-planner-shell-v2";
 const OFFLINE_ROUTES = ["/", "/calendar", "/itinerary", "/plans", "/catalog"];
+
+const cacheable = (res) => res.ok && !res.redirected;
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => Promise.all(OFFLINE_ROUTES.map((r) => cache.add(r).catch(() => {}))))
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.all(
+        OFFLINE_ROUTES.map((r) =>
+          fetch(r)
+            .then((res) => (cacheable(res) ? cache.put(r, res) : undefined))
+            .catch(() => {})
+        )
+      )
+    )
   );
 });
 
@@ -40,7 +55,7 @@ self.addEventListener("fetch", (event) => {
         const cached = await cache.match(request);
         if (cached) return cached;
         const res = await fetch(request);
-        if (res.ok) cache.put(request, res.clone());
+        if (cacheable(res)) cache.put(request, res.clone());
         return res;
       })
     );
@@ -53,7 +68,7 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(request)
       .then((res) => {
-        if (res.ok) {
+        if (cacheable(res)) {
           const copy = res.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
         }

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useActivePlan, usePlanStore } from "@/lib/store/plan";
 import { useAuthStore } from "@/lib/store/auth";
 import { createClient } from "@/lib/supabase/client";
@@ -28,7 +28,6 @@ const NAV = [
 
 export default function Header() {
   const pathname = usePathname();
-  const router = useRouter();
   const { id, home, bag, placements, defaultTravelers, semester } = useActivePlan();
   const setHome = usePlanStore((s) => s.setHome);
   const switchPlan = usePlanStore((s) => s.switchPlan);
@@ -85,7 +84,10 @@ export default function Header() {
   async function handleSignOut() {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.refresh();
+    // The app is signed-in only now, so there's nothing left to refresh into.
+    // A full load (not router.push) also drops the client router's cached
+    // pages, so Back can't flash app screens after signing out.
+    window.location.assign("/welcome");
   }
 
   const authControl = authLoading ? null : user ? (
