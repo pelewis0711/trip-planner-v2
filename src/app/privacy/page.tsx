@@ -18,9 +18,9 @@ export default function PrivacyPage() {
             anyone.
           </p>
           <p>
-            <b className="text-ink">If you sign in</b> (email link or Google — optional), your plans
-            sync to a private database tied to your account, so you can pick up where you left off on
-            another device. We store your email address to identify your account, plus whatever plan
+            <b className="text-ink">If you sign in</b> (email link or Google — optional; new accounts
+            need a university email address), your plans sync to a private database tied to your
+            account, so you can pick up where you left off on another device. We store your email address to identify your account, plus whatever plan
             details you&apos;ve entered — nothing more.
           </p>
           <p>

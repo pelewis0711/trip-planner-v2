@@ -3,6 +3,22 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import {
+  ACADEMIC_DOMAIN_PATTERNS,
+  NOT_ACADEMIC_MESSAGE,
+  SIGNUP_FAILED_MESSAGE,
+  SUPPORT_EMAIL,
+  classifySignupError,
+  emailDomain,
+  isAcademicEmail,
+  loadAcademicPatterns,
+  type SignupRejection,
+} from "@/lib/auth/academicEmail";
+
+/** Reads the ?error= that /auth/callback sets after a refused Google sign-up. */
+function rejectionFromUrl(value: string | null): SignupRejection | null {
+  return value === "not_academic" || value === "signup_failed" ? value : null;
+}
 
 export default function LoginPage() {
   return (
@@ -16,10 +32,16 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") || "/";
+  const urlError = searchParams.get("error");
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState<"email" | "google" | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    urlError === "auth" ? "Sign-in didn't finish. Please try again." : null
+  );
+  const [rejection, setRejection] = useState<SignupRejection | null>(() => rejectionFromUrl(urlError));
+  const [notAcademicHint, setNotAcademicHint] = useState(false);
+  const [patterns, setPatterns] = useState<readonly string[]>(ACADEMIC_DOMAIN_PATTERNS);
 
   useEffect(() => {
     const supabase = createClient();
@@ -27,6 +49,15 @@ function LoginForm() {
       if (data.session) router.replace(next);
     });
   }, [router, next]);
+
+  useEffect(() => {
+    loadAcademicPatterns().then(setPatterns);
+  }, []);
+
+  function handleEmailBlur() {
+    // Only once it's a whole address -- no warning halfway through typing one.
+    setNotAcademicHint(emailDomain(email) !== null && !isAcademicEmail(email, patterns));
+  }
 
   function callbackUrl() {
     const url = new URL("/auth/callback", window.location.origin);
@@ -37,15 +68,36 @@ function LoginForm() {
   async function handleMagicLink(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setRejection(null);
+    const address = email.trim();
+    const academic = isAcademicEmail(address, patterns);
     setLoading("email");
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: callbackUrl() },
+      email: address,
+      options: {
+        emailRedirectTo: callbackUrl(),
+        // A non-school address may still SIGN IN -- accounts from before the
+        // university-email rule are grandfathered -- but may not create an account.
+        // With no matching account, Supabase refuses: "Signups not allowed for otp".
+        shouldCreateUser: academic,
+      },
     });
     setLoading(null);
-    if (error) setError(error.message);
-    else setSent(true);
+    if (!error) {
+      setSent(true);
+      return;
+    }
+    const reason =
+      !academic && (error.code === "otp_disabled" || error.message.includes("Signups not allowed"))
+        ? "not_academic"
+        : classifySignupError(error.message);
+    if (reason) {
+      setNotAcademicHint(false);
+      setRejection(reason);
+    } else {
+      setError(error.message);
+    }
   }
 
   async function handleGoogle() {
@@ -68,7 +120,8 @@ function LoginForm() {
       <div className="rounded-card border border-border bg-surface p-8">
         <h1 className="font-heading text-xl font-semibold text-ink">Sign in</h1>
         <p className="mt-1 text-sm text-muted">
-          Keep your plans synced across devices.
+          Keep your plans synced across devices. New accounts need a university email address —
+          with Google, pick your school account.
         </p>
 
         {sent ? (
@@ -116,14 +169,50 @@ function LoginForm() {
                 required
                 placeholder="you@school.edu"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setNotAcademicHint(false);
+                  setRejection(null);
+                  setError(null);
+                }}
+                onBlur={handleEmailBlur}
                 className="w-full rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-muted focus:border-primary focus:outline-none"
               />
+              {notAcademicHint && !rejection && (
+                <div className="rounded-lg border border-warning/30 bg-warning/10 px-3.5 py-2.5 text-xs text-warning">
+                  <p>{NOT_ACADEMIC_MESSAGE}</p>
+                  <p className="mt-1 text-muted">
+                    Already have an account with this address? Send the link anyway — existing
+                    accounts still sign in.
+                  </p>
+                </div>
+              )}
               <button type="submit" disabled={loading !== null} className="btn btn-primary btn-lg w-full">
                 {loading === "email" ? "Sending…" : "Send me a sign-in link"}
               </button>
             </form>
           </>
+        )}
+
+        {rejection && (
+          <div
+            role="alert"
+            className="mt-4 rounded-lg border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger"
+          >
+            <p>{rejection === "not_academic" ? NOT_ACADEMIC_MESSAGE : SIGNUP_FAILED_MESSAGE}</p>
+            <p className="mt-2 text-ink">
+              {rejection === "not_academic"
+                ? "School not recognized? Email Parker at "
+                : "Used your university email and still seeing this? Email Parker at "}
+              <a
+                href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("Add my school to Semesterly")}`}
+                className="font-medium text-primary underline"
+              >
+                {SUPPORT_EMAIL}
+              </a>
+              {rejection === "not_academic" ? " and your school's domain will be added." : "."}
+            </p>
+          </div>
         )}
 
         {error && <p className="mt-4 text-sm text-danger">{error}</p>}
