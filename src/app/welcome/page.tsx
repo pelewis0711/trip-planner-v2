@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import BrandIcon from "@/components/BrandIcon";
 import { safeNext } from "@/lib/auth/gate";
 
 // The signed-out front door. src/proxy.ts sends every signed-out page request
@@ -7,7 +8,7 @@ import { safeNext } from "@/lib/auth/gate";
 // straight on into the app, so this page only ever renders for someone who
 // isn't signed in: no Header, no plan store, nothing that assumes an account.
 export const metadata: Metadata = {
-  title: "Semesterly — plan your semester abroad",
+  title: "WhereNext — plan your semester abroad",
 };
 
 const POINTS: [emoji: string, strong: string, rest: string][] = [
@@ -29,17 +30,15 @@ export default async function WelcomePage({
   return (
     <div className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-4 py-10 sm:px-6">
       <div className="flex items-center gap-2">
-        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary font-heading text-base font-bold text-white">
-          S
-        </span>
-        <span className="font-heading text-xl leading-none font-bold text-ink">Semesterly</span>
+        <BrandIcon size={32} />
+        <span className="font-heading text-2xl leading-none font-semibold text-ink">WhereNext</span>
       </div>
 
       <h1 className="mt-6 font-heading text-2xl leading-tight font-bold text-ink sm:text-3xl">
         Plan every weekend of your semester abroad.
       </h1>
       <p className="mt-3 text-sm text-muted sm:text-base">
-        Semesterly is a trip planner for study-abroad students. It lays out your real academic
+        WhereNext is a trip planner for study-abroad students. It lays out your real academic
         calendar, prices each weekend trip, and checks live flight fares — so you can see what the
         whole semester costs before you book anything.
       </p>
@@ -60,7 +59,7 @@ export default async function WelcomePage({
         Sign in with your school email
       </Link>
       <p className="mt-3 text-center text-xs text-muted">
-        Semesterly is for students, so signing up needs a university email address — usually one
+        WhereNext is for students, so signing up needs a university email address — usually one
         ending in .edu.{" "}
         <Link href="/privacy" className="font-medium text-primary hover:underline">
           What we store

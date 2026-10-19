@@ -4,10 +4,10 @@ import { usePlanStore } from "@/lib/store/plan";
 import { formatMoney } from "@/lib/calc/currency";
 
 const SEGMENTS: { key: "travel" | "lodg" | "food" | "act"; label: string; color: string }[] = [
-  { key: "travel", label: "Travel", color: "#4bc4ff" },
-  { key: "lodg", label: "Lodging", color: "#c48cff" },
-  { key: "food", label: "Food", color: "#ffb547" },
-  { key: "act", label: "Activities", color: "#39d0a8" },
+  { key: "travel", label: "Travel", color: "#3b6e9c" },
+  { key: "lodg", label: "Lodging", color: "#b85c38" },
+  { key: "food", label: "Food", color: "#d9a43a" },
+  { key: "act", label: "Activities", color: "#7fa889" },
 ];
 
 export default function SummaryBar({

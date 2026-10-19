@@ -20,15 +20,15 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
             onClick={reset}
             style={{
               marginTop: "1.25rem",
-              borderRadius: "9999px",
-              background: "#5a4ad1",
+              borderRadius: "12px",
+              background: "#2e4a3b",
               color: "#fff",
               padding: "0.65rem 1.35rem",
               fontSize: "0.875rem",
               fontWeight: 700,
               border: "none",
               cursor: "pointer",
-              boxShadow: "0 2px 0 #4a3bb8, 0 4px 10px rgba(90,74,209,0.2)",
+              boxShadow: "0 2px 0 #213a2d, 0 4px 10px rgba(46,74,59,0.2)",
             }}
           >
             Try again

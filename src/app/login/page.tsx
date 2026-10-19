@@ -207,7 +207,7 @@ function LoginForm() {
                 ? "School not recognized? Email Parker at "
                 : "Used your university email and still seeing this? Email Parker at "}
               <a
-                href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("Add my school to Semesterly")}`}
+                href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("Add my school to WhereNext")}`}
                 className="font-medium text-primary underline"
               >
                 {SUPPORT_EMAIL}

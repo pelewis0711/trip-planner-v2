@@ -1,30 +1,31 @@
 @import "tailwindcss";
 
-/* Semesterly design tokens -- light theme, indigo/violet primary + coral
-   accent, roomy/rounded "clean + playful college" look. One primary, one
-   accent, kept disciplined; semantic colors (success/warning/danger) are a
-   separate set since they carry meaning (budget/Schengen/live-price status),
-   not brand decoration. */
+/* WhereNext design tokens (Phase 24) -- warm cream ground, deep forest-green
+   primary, a restrained terracotta accent, white rounded cards, serif
+   wordmark/headings over a clean sans body. One primary, one accent, kept
+   disciplined; semantic colors (success/warning/danger) are a separate set
+   since they carry meaning (budget/Schengen/live-price status), not brand
+   decoration. */
 :root {
-  --color-bg: #faf9fc; /* page background -- soft, faint violet tint, not stark white */
+  --color-bg: #f6f3ec; /* page background -- warm cream, not stark white */
   --color-surface: #ffffff; /* cards */
-  --color-surface-muted: #f4f2fa; /* subtle recessed panels, e.g. inputs, code-like blocks */
-  --color-border: #e6e1f2;
-  --color-ink: #211d35; /* primary text -- near-black with a violet cast, not pure black */
-  --color-muted: #6f6a85; /* secondary text */
+  --color-surface-muted: #f2efe7; /* subtle recessed panels, e.g. inputs, code-like blocks */
+  --color-border: #e4dfd3;
+  --color-ink: #1f2a23; /* primary text -- near-black with a green cast */
+  --color-muted: #5b635d; /* secondary text */
 
-  --color-primary: #5a4ad1;
-  --color-primary-hover: #4a3bb8;
-  --color-primary-soft: #efecfb; /* tint for badges/backgrounds on light surfaces */
-  --color-accent: #ff6b5b;
-  --color-accent-hover: #e85847;
-  --color-accent-soft: #ffe9e5;
+  --color-primary: #2e4a3b; /* forest green */
+  --color-primary-hover: #213a2d;
+  --color-primary-soft: #e7efe8; /* tint for badges/backgrounds on light surfaces */
+  --color-accent: #b85c38; /* terracotta */
+  --color-accent-hover: #9c4a2a;
+  --color-accent-soft: #f6e6dc;
 
-  --color-success: #1a9d6f;
-  --color-warning: #b8860b;
-  --color-danger: #d1435a;
+  --color-success: #1d7f57;
+  --color-warning: #a8740a;
+  --color-danger: #c03f4d;
 
-  --radius-card: 14px;
+  --radius-card: 16px;
 }
 
 @theme inline {
@@ -45,9 +46,9 @@
   --color-danger: var(--color-danger);
   --radius-card: var(--radius-card);
 
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-dm-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-poppins);
+  --font-heading: var(--font-fraunces);
 }
 
 body {
@@ -55,8 +56,16 @@ body {
   color: var(--color-ink);
 }
 
+/* Room for the phone bottom tab bar (MobileTabBar.tsx) so it never covers the
+   last bit of a page or the footer. Matches its `xl:hidden` breakpoint. */
+@media (max-width: 79.999rem) {
+  body:has(.mobile-tabbar) {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom));
+  }
+}
+
 /* Shared button + pill-select language -- replaces ~24 places that each
-   hand-picked their own radius/padding/shadow. One consistent pill shape,
+   hand-picked their own radius/padding/shadow. One consistent rounded-rect shape (12px since Phase 24; was a pill),
    a soft "pressed" shadow on the primary variant with a hover lift, same
    palette as everywhere else in the app (no new colors). */
 .btn {
@@ -64,7 +73,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.4em;
-  border-radius: 9999px;
+  border-radius: 12px;
   font-weight: 600;
   white-space: nowrap;
   line-height: 1.2;
@@ -89,13 +98,13 @@ body {
   border: none;
   box-shadow:
     0 2px 0 var(--color-primary-hover),
-    0 4px 10px rgba(90, 74, 209, 0.2);
+    0 4px 10px rgba(46, 74, 59, 0.2);
 }
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow:
     0 3px 0 var(--color-primary-hover),
-    0 6px 14px rgba(90, 74, 209, 0.25);
+    0 6px 14px rgba(46, 74, 59, 0.25);
 }
 .btn-primary:active:not(:disabled) {
   transform: translateY(0);
@@ -188,8 +197,8 @@ body {
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   box-shadow:
-    0 10px 15px -3px rgba(33, 29, 53, 0.1),
-    0 4px 6px -4px rgba(33, 29, 53, 0.1);
+    0 10px 15px -3px rgba(31, 42, 35, 0.1),
+    0 4px 6px -4px rgba(31, 42, 35, 0.1);
   padding: 0.5rem;
 }
 .combobox-search {

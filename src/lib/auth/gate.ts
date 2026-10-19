@@ -35,7 +35,7 @@ export const PUBLIC_ROUTES = [
 ] as const;
 
 /** JSON body for a signed-out API call (proxy and the routes themselves). */
-export const SIGN_IN_REQUIRED = "Sign in to use Semesterly.";
+export const SIGN_IN_REQUIRED = "Sign in to use WhereNext.";
 
 export function isPublicPath(pathname: string): boolean {
   return PUBLIC_ROUTES.some((route) => pathname === route || pathname.startsWith(route + "/"));

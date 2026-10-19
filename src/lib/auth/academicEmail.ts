@@ -114,7 +114,7 @@ export function classifySignupError(message: string | null | undefined): SignupR
 export const SUPPORT_EMAIL = "pel4@illinois.edu";
 
 export const NOT_ACADEMIC_MESSAGE =
-  "Semesterly is for students. Use your university email address — usually the one ending in .edu, or your school's equivalent.";
+  "WhereNext is for students. Use your university email address — usually the one ending in .edu, or your school's equivalent.";
 
 export const SIGNUP_FAILED_MESSAGE =
-  "We couldn't create your account. New Semesterly accounts need a university email address — usually the one ending in .edu, or your school's equivalent.";
+  "We couldn't create your account. New WhereNext accounts need a university email address — usually the one ending in .edu, or your school's equivalent.";

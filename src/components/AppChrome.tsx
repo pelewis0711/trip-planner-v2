@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Header from "@/components/Header";
 import InstallPrompt from "@/components/InstallPrompt";
+import MobileTabBar from "@/components/MobileTabBar";
+import BrandIcon from "@/components/BrandIcon";
 import FoodFixNotice from "@/components/FoodFixNotice";
 import { useAuthStore } from "@/lib/store/auth";
 import { isPublicPath } from "@/lib/auth/gate";
@@ -33,6 +35,7 @@ export default function AppChrome() {
   return (
     <>
       <Header />
+      <MobileTabBar />
       <InstallPrompt />
       <FoodFixNotice />
     </>
@@ -49,10 +52,8 @@ function SlimHeader({ pathname }: { pathname: string }) {
     <header className="border-b border-border bg-surface/95">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
         <Link href="/welcome" className="flex shrink-0 items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary font-heading text-sm font-bold text-white">
-            S
-          </span>
-          <span className="font-heading text-lg leading-none font-bold text-ink">Semesterly</span>
+          <BrandIcon size={28} />
+          <span className="font-heading text-xl leading-none font-semibold text-ink">WhereNext</span>
         </Link>
         {pathname !== "/login" && (
           <Link href={signInHref} className="btn btn-primary btn-sm shrink-0">

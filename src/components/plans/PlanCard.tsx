@@ -63,7 +63,7 @@ export default function PlanCard({
 
   return (
     <div
-      className={`rounded-card border bg-surface p-4 shadow-sm ${isActive ? "border-primary shadow-[0_0_0_1px_rgba(90,74,209,0.3)]" : "border-border"}`}
+      className={`rounded-card border bg-surface p-4 shadow-sm ${isActive ? "border-primary shadow-[0_0_0_1px_rgba(46,74,59,0.3)]" : "border-border"}`}
     >
       <div className="flex items-start justify-between gap-2">
         {renaming ? (

@@ -15,6 +15,7 @@ import { grandTotals } from "@/lib/calc/costs";
 import { describeTerm } from "@/lib/calc/semester";
 import { formatMoney, RATES_AS_OF } from "@/lib/calc/currency";
 import OfflineIndicator from "./OfflineIndicator";
+import BrandIcon from "./BrandIcon";
 import Combobox from "./Combobox";
 
 const NAV = [
@@ -212,11 +213,9 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b border-border bg-surface/95 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:px-6">
         <Link href="/" className="flex shrink-0 items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary font-heading text-sm font-bold text-white">
-            S
-          </span>
+          <BrandIcon size={28} />
           <div>
-            <div className="font-heading text-lg leading-none font-bold text-ink">Semesterly</div>
+            <div className="font-heading text-xl leading-none font-semibold text-ink">WhereNext</div>
             <div className="text-[10.5px] leading-tight font-medium tracking-wide text-muted">
               {term ? `${term.season.toUpperCase()} ${term.year} · ` : ""}PER PERSON {currency}
               {currency !== "USD" && (
@@ -256,10 +255,13 @@ export default function Header() {
         <button
           type="button"
           onClick={() => setMenuOpen((o) => !o)}
-          className="ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-surface text-ink xl:hidden"
+          className="ml-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-ink hover:bg-primary-soft xl:hidden"
           aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={menuOpen}
         >
-          {menuOpen ? "✕" : "☰"}
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" aria-hidden="true">
+            {menuOpen ? <path d="M6 6l12 12M18 6 6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+          </svg>
         </button>
       </div>
 

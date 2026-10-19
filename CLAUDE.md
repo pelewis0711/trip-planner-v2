@@ -1,4 +1,6 @@
-# Semesterly (formerly "Trip Planner v2") — Project Memory (CLAUDE.md)
+# WhereNext (formerly "Semesterly", originally "Trip Planner v2") — Project Memory (CLAUDE.md)
+
+> **Renamed to WhereNext in Phase 24 (Oct 19, 2026)** — the green/cream look below supersedes Phase 10's indigo/coral + Poppins. Older sections still say "Semesterly"; read them as WhereNext.
 
 ## Who you're working with
 
@@ -716,3 +718,17 @@ Committed directly to `main`. No migration, no env var. Spec: Parker's `SIGN_IN_
 - `/settings` and `/onboarding` still redirect to `/login` client-side when the browser has no user — redundant with the proxy now; left alone.
 
 **Verified**: `tsc --noEmit` clean; `npx eslint --ignore-pattern '.claude/**'` clean; `npx vitest run --exclude '.claude/**'` 235/237 (71 new gate tests + 1 `mergeRemote` test; the 2 failures are the known date-dependent ones in `launch-check.test.ts`); `next build` clean (23 routes). Local production server, signed out, via curl: every app page and an unknown path → 307 `/welcome?next=…`; `/sharedsomething` gated; the public pages and PWA files 200; all three APIs → 401 JSON; a forged `sb-…-auth-token` cookie still gated (`getUser()` rejects it); an RSC client-navigation request redirected with `_rsc` stripped. In a browser at 375px: `/calendar` → `/welcome` fits one screen with no app header, its button carries `next=/calendar`, `/login` shows the slim header, and a share link's Sign in returns to that link. **Not verified here** (no real session in this environment): the signed-in paths on the live site, the installed PWA offline, and a real share link — Parker's manual checks in `SIGN_IN_GATE.md`.
+
+## Phase 24 — Rename to "WhereNext" + green/cream restyle (committed straight to main)
+
+**Confirmed with Parker (AskUserQuestion)**: restyle only — no new features/screens; commit straight to `main` (no PR); "WhereNext" is his own concept name. Reference: his six-screen phone mockup (Profile / Availability / Discover / Itinerary / Connect / Book) and a matching Design canvas built from it.
+
+**Look**: tokens in `src/app/globals.css` — cream ground `#f6f3ec`, white cards, forest-green primary `#2e4a3b`, terracotta accent `#b85c38`, card radius 16px; buttons are 12px rounded-rects (were pills). Fonts in `layout.tsx`: **Fraunces** (serif) for headings/wordmark via `--font-fraunces`, **DM Sans** for body via `--font-dm-sans` (Geist Sans + Poppins removed; Geist Mono kept). Itinerary `SummaryBar` segment colors retuned to the palette.
+
+**Brand**: new `src/components/BrandIcon.tsx` (line compass) + serif "WhereNext" wordmark in `Header`, `AppChrome`'s slim header and `/welcome`. `appIcon.tsx` now draws the cream compass on forest green (favicon, apple-icon, manifest icons). Manifest name/colors, page titles, privacy/login/welcome copy, `SIGN_IN_REQUIRED` and the academic-email error messages say WhereNext.
+
+**Deliberately NOT renamed** (functional identifiers — changing them breaks things): the DB functions/trigger in migration `0012` (`semesterly_*`) and the `SEMESTERLY_NOT_ACADEMIC_EMAIL` token the client matches on (`NOT_ACADEMIC_TOKEN`); `SAFE_BASE` (`semesterly.invalid`, internal URL parsing only); Unsplash `utm_source=semesterly` in `tripPhotos.ts` / `fetch-photos.mjs` / `Footer.tsx` — that must match the app name registered on Unsplash; change it only after renaming the Unsplash app; the repo / Vercel project / Supabase project names.
+
+**New on phones**: `src/components/MobileTabBar.tsx` — a bottom tab bar below `xl` (Home, Catalog, Calendar, Itinerary, Plans), mounted from `AppChrome` for signed-in chrome only. This reverses Phase 10's "keep the top nav, no bottom tab bar" call, per the mockup; the hamburger menu still holds Settings, the Home/Plan pickers, sign-out and the total. `globals.css` pads `body:has(.mobile-tabbar)` so it never covers content.
+
+**Verified here**: `tsc --noEmit` clean, lint clean, vitest 235/237 (same 2 known date-dependent `launch-check.test.ts` failures as before the change). `next build` can't complete in the sandbox (Google Fonts unreachable — even the pre-existing Geist Mono fails), so the Vercel build is the real build check. Sandbox `npm ci` also can't reach `cdn.sheetjs.com` (the `xlsx` tarball); checks ran with a temporary registry `xlsx@0.18.5`, package files restored before commit.

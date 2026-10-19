@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { updateSession, withSessionCookies } from "@/lib/supabase/proxy";
 import { gateDecision, SIGN_IN_REQUIRED } from "@/lib/auth/gate";
 
-// THE SIGN-IN GATE. Semesterly is signed-in only: every request this proxy
+// THE SIGN-IN GATE. WhereNext is signed-in only: every request this proxy
 // sees either has a verified user, is on the public allowlist
 // (PUBLIC_ROUTES in src/lib/auth/gate.ts), or is turned away -- pages get
 // redirected to /welcome?next=..., API calls get a JSON 401. See CLAUDE.md,

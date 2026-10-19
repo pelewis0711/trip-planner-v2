@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy — Semesterly",
+  title: "Privacy — WhereNext",
 };
 
 export default function PrivacyPage() {
@@ -14,7 +14,7 @@ export default function PrivacyPage() {
           <p>
             {/* Explicit {" "} after each </b>: the build drops a plain leading space
                 when the text that follows contains an HTML entity (&apos; etc.). */}
-            <b className="text-ink">You need an account to use Semesterly.</b>{" "}You sign in with an
+            <b className="text-ink">You need an account to use WhereNext.</b>{" "}You sign in with an
             email link or Google, and new accounts need a university email address. We store that
             email address to identify your account.
           </p>
