@@ -134,7 +134,7 @@ export default function SharedPlanPage({ params }: { params: Promise<{ token: st
       <div className="space-y-2">
         {slots.length ? (
           slots.map((s) => (
-            <div key={s.id} className="rounded-xl border border-border bg-surface p-3 text-sm">
+            <div key={s.id} id={`slot-${s.id}`} className="scroll-mt-24 rounded-xl border border-border bg-surface p-3 text-sm">
               <div className="text-xs text-muted">
                 {s.label} · {s.date}
               </div>

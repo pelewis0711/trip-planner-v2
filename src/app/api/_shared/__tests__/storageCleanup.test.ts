@@ -8,6 +8,10 @@ const U = "11111111-1111-1111-1111-111111111111";
 
 describe("isSafeCleanupPath", () => {
   it.each<[string, string, boolean]>([
+    ["chat-photos", `${U}/`, true],
+    ["chat-photos", `${U}/${U}.webp`, true],
+    ["chat-photos", `${U}/avatar.webp`, false],
+    ["chat-photos", `${U}/../x.webp`, false],
     ["avatars", `${U}/`, true],
     ["avatars", `${U}/avatar-lq3x.webp`, true],
     ["avatars", `${U}/avatar.jpg`, true],

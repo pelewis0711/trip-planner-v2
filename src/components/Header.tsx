@@ -15,6 +15,7 @@ import { grandTotals } from "@/lib/calc/costs";
 import { describeTerm } from "@/lib/calc/semester";
 import { formatMoney, RATES_AS_OF } from "@/lib/calc/currency";
 import OfflineIndicator from "./OfflineIndicator";
+import MessageBadge from "./social/MessageBadge";
 import BrandIcon from "./BrandIcon";
 import Combobox from "./Combobox";
 
@@ -254,11 +255,13 @@ export default function Header() {
           {totalPill}
         </div>
 
+        <div className="ml-auto xl:ml-0"><MessageBadge /></div>
+
         {/* mobile: hamburger toggle */}
         <button
           type="button"
           onClick={() => setMenuOpen((o) => !o)}
-          className="ml-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-ink hover:bg-primary-soft xl:hidden"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-ink hover:bg-primary-soft xl:hidden"
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
         >

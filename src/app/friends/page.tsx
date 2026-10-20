@@ -7,6 +7,7 @@ import { useAuthStore } from '@/lib/store/auth';
 import { useActivePlan } from '@/lib/store/plan';
 import { freeWeekends,overlaps,weekendLabel,schoolLine,type Connection,type FreeWeekend } from '@/lib/social/friends';
 import Avatar from '@/components/social/Avatar';
+import MessageButton from '@/components/social/MessageButton';
 import FriendActions from '@/components/social/FriendActions';
 import { Chip,cardClass } from '@/components/social/controls';
 
@@ -43,7 +44,7 @@ export default function FriendsPage() {
     {(tab==='friends'?friends:[...requests,...sent]).map(r=><article key={r.id} className={`${cardClass} flex flex-wrap items-center gap-3`}>
       <Avatar path={r.profile?.avatar_path} name={r.profile?.display_name??'Private profile'} size={48}/>
       <div className="flex-1"><Link className="font-bold" href={r.profile?`/u/${r.profile.username}`:'/people'}>{r.profile?.display_name??'Private profile'}</Link><p className="text-xs text-muted">{r.profile?schoolLine(r.profile):'Identity stays private until you become friends.'}</p></div>
-      {r.friendship_status==='friends'&&r.profile&&<Link href={`/u/${r.profile.username}`} aria-label={`View ${r.profile.display_name} to message`} className="btn btn-ghost btn-md">✉</Link>}
+      {r.friendship_status==='friends'&&r.profile&&<MessageButton id={r.id} compact/>}
       <FriendActions id={r.id} status={r.friendship_status} onChange={refresh}/>
     </article>)}
   </div>;
