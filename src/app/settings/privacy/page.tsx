@@ -13,6 +13,7 @@ import {
   type SettingsToggle,
   type SocialSettingsRow,
 } from "@/lib/social/profile";
+import BlockedPeople from "@/components/social/BlockedPeople";
 import { Segmented, Switch, cardClass } from "@/components/social/controls";
 
 // Phase 26: Privacy & settings (mockup screen 2). Every choice is a toggle;
@@ -46,6 +47,7 @@ export default function PrivacySettingsPage() {
     if (seq !== latest.current) return; // a newer change is in flight; it decides the status
     if (ok) {
       setStatus({ kind: "saved" });
+      window.dispatchEvent(new Event("wherenext-social-settings"));
     } else {
       setSettings(prev);
       setStatus({ kind: "error" });
@@ -117,6 +119,8 @@ export default function PrivacySettingsPage() {
           Push notifications start working once the app can send them (coming soon). Your choices
           here are saved now so they apply from day one.
         </p>
+
+        <BlockedPeople key={user?.id} />
 
         <Link
           href="/settings/delete-account"

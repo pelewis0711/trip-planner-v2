@@ -12,6 +12,9 @@ import { fetchProfileEmails } from "@/lib/supabase/profiles";
 import { planToInsertRow, rowToPlan, savePlanData, type PlanRow } from "@/lib/supabase/sharing";
 import { fetchUserSettings, saveUserSettings, rowToOnboardingValues } from "@/lib/supabase/settings";
 
+import { freeWeekends } from "@/lib/social/friends";
+import { syncFreeWeekends } from "@/lib/supabase/friends";
+
 interface SyncResult {
   succeeded: string[];
   failed: string[];
@@ -331,6 +334,46 @@ export default function AuthSync() {
     return () => {
       window.removeEventListener("online", tryFlush);
       clearInterval(interval);
+    };
+  }, []);
+
+  // Publish dates only, after hydration AND the signed-in plan merge.
+  // Keep work serialized and derive each payload from the latest active plan.
+  useEffect(() => {
+    const supabase = createClient();
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let chain = Promise.resolve();
+    function schedule() {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        chain = chain.then(async () => {
+          if (stopped || !usePlanStore.persist.hasHydrated()) return;
+          const state = usePlanStore.getState();
+          const id = useAuthStore.getState().user?.id;
+          if (!id || id !== state.userId) return;
+          try { await syncFreeWeekends(supabase, id, freeWeekends(state.plans[state.activeId])); }
+          catch { /* Offline: retry on reconnect/focus and the periodic sweep. */ }
+        });
+      }, 300);
+    }
+    const offPlans = usePlanStore.subscribe((state, prev) => {
+      if (state.activeId !== prev.activeId || state.plans !== prev.plans || state.userId !== prev.userId) schedule();
+    });
+    const offAuth = useAuthStore.subscribe(schedule);
+    const offHydrated = usePlanStore.persist.onFinishHydration(schedule);
+    if (usePlanStore.persist.hasHydrated()) schedule();
+    window.addEventListener("wherenext-social-settings", schedule);
+    window.addEventListener("online", schedule);
+    window.addEventListener("focus", schedule);
+    const retry = setInterval(schedule, 30_000);
+    return () => {
+      stopped = true; offPlans(); offAuth(); offHydrated();
+      if (timer) clearTimeout(timer);
+      clearInterval(retry);
+      window.removeEventListener("wherenext-social-settings", schedule);
+      window.removeEventListener("online", schedule);
+      window.removeEventListener("focus", schedule);
     };
   }, []);
 
