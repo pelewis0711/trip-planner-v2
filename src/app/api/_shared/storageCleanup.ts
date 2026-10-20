@@ -6,7 +6,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 // so the database queues them (supabase/migrations/0014_account_cleanup_and_verified.sql)
 // and this does the actual removal through the Storage API.
 
-const BUCKETS = new Set(["avatars"]);
+const BUCKETS = new Set(["avatars", "chat-photos"]);
 const UUID_FOLDER = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/$/;
 const FILE_PATH = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/[a-z0-9-]{1,40}\.(jpg|png|webp)$/;
 
@@ -14,7 +14,9 @@ const FILE_PATH = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}
  * ("<uuid>/") or one avatar file inside it -- never a bucket root or anything
  * with ".." in it, whatever ends up in the queue. */
 export function isSafeCleanupPath(bucket: string, path: string): boolean {
-  return BUCKETS.has(bucket) && (UUID_FOLDER.test(path) || FILE_PATH.test(path));
+  return BUCKETS.has(bucket) && (UUID_FOLDER.test(path) || (bucket === "chat-photos"
+    ? /^[0-9a-f-]{36}\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.(jpg|png|webp)$/.test(path) && UUID_FOLDER.test(path.split("/")[0] + "/")
+    : FILE_PATH.test(path)));
 }
 
 /** Delete every file in one user's folder. Returns false on any error. */
