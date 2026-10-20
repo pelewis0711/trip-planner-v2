@@ -12,6 +12,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { loadTagSources, validateTags } from "./activity-tags.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -94,6 +95,17 @@ for (const [tripId, suffixes] of Object.entries(legacy)) {
     }
   }
 }
+
+// Phase 26 step 2: activity tags (category, duration, when, flags,
+// description) -- rules in scripts/activity-tags.mjs. Checked against the
+// expansions as they are now, so run this before extract-trips.mjs.
+const tripsForTags = Object.entries(expansions).map(([id, a]) => ({ id, n: nameById.get(id) ?? id, a }));
+const tagCheck = validateTags(tripsForTags, loadTagSources(root));
+for (const e of tagCheck.errors) console.error(`ERROR tags ${e}`);
+for (const w of tagCheck.warnings) console.warn(`WARN  tags ${w}`);
+errors += tagCheck.errors.length;
+warnings += tagCheck.warnings.length;
+console.log(`\nactivity tags: ${tagCheck.taggedTrips} of ${Object.keys(expansions).length} trips tagged`);
 
 console.log(`\n${Object.keys(expansions).length} trips checked, ${errors} errors, ${warnings} warnings.`);
 if (errors > 0) process.exit(1);

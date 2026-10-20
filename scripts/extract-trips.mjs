@@ -4,6 +4,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { loadTagSources, validateTags, compileTags, stringifyByTrip } from "./activity-tags.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -80,6 +81,18 @@ writeFileSync(
   JSON.stringify(legacyMap, null, 1) + "\n"
 );
 
+// Phase 26 step 2: compile the hand-written activity tags (see
+// scripts/activity-tags.mjs) into the two files the app reads. Refuses to
+// write anything if the tags don't validate.
+const tagSources = loadTagSources(root);
+const tagCheck = validateTags(TRIPS, tagSources);
+if (tagCheck.errors.length) {
+  throw new Error(`activity tags have ${tagCheck.errors.length} error(s) -- run node scripts/validate-activity-expansions.mjs\n` + tagCheck.errors.slice(0, 10).join("\n"));
+}
+const { meta: activityMeta, descriptions: activityDescriptions } = compileTags(TRIPS, tagSources);
+writeFileSync(path.join(root, "src/data/activityMeta.json"), stringifyByTrip(activityMeta));
+writeFileSync(path.join(root, "src/data/activityDescriptions.json"), stringifyByTrip(activityDescriptions));
+
 if (TRIPS.length !== 212) {
   throw new Error(`expected 212 trips, got ${TRIPS.length}`);
 }
@@ -130,6 +143,7 @@ console.log(`TRIPS: ${TRIPS.length} (${expanded} with expanded activities from a
 console.log(`SLOTS: ${SLOTS.length}`);
 console.log(`HOMES: ${Object.keys(HOMES).length}`);
 console.log(`legacyActivityMap: ${Object.keys(legacyMap).length} trips with a changed activity order`);
+console.log(`activity tags: ${Object.keys(activityMeta).length} of ${TRIPS.length} trips tagged`);
 console.log("\nSpot-check:");
 for (const id of ["rome", "paris", "dublin", "marrakech", "florence"]) {
   const t = TRIPS.find((x) => x.id === id);
