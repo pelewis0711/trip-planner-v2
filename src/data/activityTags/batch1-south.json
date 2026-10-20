@@ -119,6 +119,7 @@
     "aegina-island-day-trip": ["daytrips", "full", "day", "", "Closest island: pistachios, beaches and a temple"]
   },
   "santorini": {
+    "fira-cable-car-to-the-old-port": ["views", "short", "day", "", "Cable car down the caldera cliff; the kinder way to the port"],
     "oia-sunset-and-caldera-walk": ["views", "short", "night", "must", "The famous sunset; arrive an hour early for a spot"],
     "catamaran-cruise-and-hot-springs": ["water", "half", "any", "must book", "Sail the caldera, swim at hot springs, dinner on board"],
     "wine-tasting-tour": ["drink", "half", "any", "", "Volcanic Assyrtiko wines at clifftop wineries"],
@@ -130,7 +131,6 @@
     "cooking-class": ["classes", "short", "any", "", "Cook Santorini dishes with tomatoes and fava"],
     "perissa-black-sand-beach-day": ["water", "full", "day", "", "Free long volcanic black-sand beach"],
     "thirassia-island-boat-trip": ["water", "half", "day", "", "Boat to the quiet island across the caldera"],
-    "donkey-ride-fira-port": ["walks", "short", "day", "", "Donkey up the port steps; walking or the cable car are kinder"],
     "vlychada-black-sand-beach-day": ["water", "full", "day", "", "Free beach under wind-carved cliffs"],
     "caldera-swim-boat": ["water", "half", "day", "", "Boat trip with swims in the caldera"],
     "emporio-medieval-village-walk": ["walks", "short", "day", "", "Free maze of a fortified medieval village"]

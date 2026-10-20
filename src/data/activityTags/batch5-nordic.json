@@ -51,12 +51,12 @@
     "amusement-park-evening-pass": ["adventure", "short", "night", "", "Evening rides pass"]
   },
   "oslo": {
+    "akershus-fortress-and-castle": ["landmarks", "short", "day", "", "Medieval fortress over the harbor; grounds are free"],
     "vigeland-sculpture-park": ["museums", "short", "day", "must", "Free park of 200 granite and bronze figures"],
     "munch-museum-the-scream": ["museums", "short", "day", "must", "The Scream and Munch's work by the fjord"],
     "opera-house-rooftop": ["views", "short", "any", "must", "Free walk up the sloping marble roof"],
     "oslofjord-island-ferry": ["water", "half", "day", "", "Public ferry to fjord islands"],
     "holmenkollen-ski-jump": ["views", "short", "day", "", "Ski jump with a museum and view"],
-    "viking-ship-museum": ["museums", "short", "day", "", "Viking ships and grave finds"],
     "craft-beer-crawl": ["drink", "short", "night", "", "Oslo craft beer"],
     "aker-brygge-waterfront-walk": ["walks", "short", "any", "", "Free harbor promenade"],
     "street-food-market": ["food", "short", "any", "", "Mathallen food hall"],

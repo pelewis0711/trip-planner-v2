@@ -215,7 +215,7 @@
     ["Grotte di Castellana cave tour",14,"bari.grotte-di-castellana-cave-tour"]
   ],
   "bologna": [
-    ["Asinelli Tower climb",6,"bologna.asinelli-tower-climb"],
+    ["Santo Stefano 'seven churches' complex",0,"bologna.santo-stefano-seven-churches-complex"],
     ["Quadrilatero market walk",0,"bologna.quadrilatero-market-walk"],
     ["Piazza Maggiore + basilica",0,"bologna.piazza-maggiore-and-basilica"],
     ["Parma/Modena food day trip",60,"bologna.parma-modena-food-day-trip"],
@@ -579,7 +579,7 @@
     ["Tisa Rocks scramble",0,"bohemianswiss.tisa-rocks-scramble"],
     ["Sunrise viewpoint hike",0,"bohemianswiss.sunrise-viewpoint-hike"],
     ["Mezni Louka forest trail",0,"bohemianswiss.mezni-louka-forest-trail"],
-    ["Kamenice river-gorge boat",8,"bohemianswiss.kamenice-river-gorge-boat"],
+    ["Jetrichovice rock-lookouts hike",0,"bohemianswiss.jetrichovice-rock-lookouts-hike"],
     ["Rock castle Saunstejn",5,"bohemianswiss.rock-castle-saunstejn"],
     ["Panska skala basalt columns day trip",8,"bohemianswiss.panska-skala-basalt-columns-day-trip"],
     ["Decin Castle + rose garden",6,"bohemianswiss.decin-castle-and-rose-garden"],
@@ -591,8 +591,8 @@
     ["Bad Schandau day trip",10,"bohemianswiss.bad-schandau-day-trip"]
   ],
   "budapest": [
-    ["Szechenyi thermal baths",25,"budapest.szechenyi-thermal-baths"],
-    ["Parliament interior tour",22,"budapest.parliament-interior-tour"],
+    ["Szechenyi thermal baths",36,"budapest.szechenyi-thermal-baths"],
+    ["Parliament interior tour",34,"budapest.parliament-interior-tour"],
     ["Buda Castle + Fisherman's Bastion",0,"budapest.buda-castle-and-fishermans-bastion"],
     ["Danube evening cruise",18,"budapest.danube-evening-cruise"],
     ["Ruin-bar crawl",20,"budapest.ruin-bar-crawl"],
@@ -781,7 +781,7 @@
     ["Reichstag dome (free)",0,"berlin.reichstag-dome-free"],
     ["East Side Gallery",0,"berlin.east-side-gallery"],
     ["Topography of Terror",0,"berlin.topography-of-terror"],
-    ["Museum Island / Pergamon",14,"berlin.museum-island-pergamon"],
+    ["Museum Island (Neues + Altes Museum)",15,"berlin.museum-island-pergamon"],
     ["Sachsenhausen memorial",20,"berlin.sachsenhausen-memorial"],
     ["Spree boat tour",18,"berlin.spree-boat-tour"],
     ["Berlin Wall Memorial",0,"berlin.berlin-wall-memorial"],
@@ -914,11 +914,11 @@
     ["Hinterzarten village walk",0,"blackforest.hinterzarten-village-walk"]
   ],
   "lauterbrunnen": [
-    ["Schilthorn/Piz Gloria cable car",75,"lauterbrunnen.schilthorn-piz-gloria-cable-car"],
+    ["Schilthorn/Piz Gloria cable car",115,"lauterbrunnen.schilthorn-piz-gloria-cable-car"],
     ["Murren cliff walk",0,"lauterbrunnen.murren-cliff-walk"],
     ["Trummelbach Falls",12,"lauterbrunnen.trummelbach-falls"],
     ["Grindelwald First cliff walk",65,"lauterbrunnen.grindelwald-first-cliff-walk"],
-    ["Jungfraujoch 'Top of Europe'",120,"lauterbrunnen.jungfraujoch-top-of-europe"],
+    ["Jungfraujoch 'Top of Europe'",230,"lauterbrunnen.jungfraujoch-top-of-europe"],
     ["Staubbach Falls viewpoint",0,"lauterbrunnen.staubbach-falls-viewpoint"],
     ["Valley-floor walk",0,"lauterbrunnen.valley-floor-walk"],
     ["Gimmelwald car-free village walk",0,"lauterbrunnen.gimmelwald-car-free-village-walk"],
@@ -948,8 +948,8 @@
     ["Local heritage museum",15,"interlaken.local-heritage-museum"]
   ],
   "zermatt": [
-    ["Gornergrat cog railway",90,"zermatt.gornergrat-cog-railway"],
-    ["Matterhorn Glacier Paradise",95,"zermatt.matterhorn-glacier-paradise"],
+    ["Gornergrat cog railway",145,"zermatt.gornergrat-cog-railway"],
+    ["Matterhorn Glacier Paradise",135,"zermatt.matterhorn-glacier-paradise"],
     ["5-Lakes walk",0,"zermatt.5-lakes-walk"],
     ["Sunnegga funicular",35,"zermatt.sunnegga-funicular"],
     ["Car-free old-town walk",0,"zermatt.car-free-old-town-walk"],
@@ -999,7 +999,7 @@
     ["Celerina village walk",0,"stmoritz.celerina-village-walk"]
   ],
   "grindelwald": [
-    ["First Cliff Walk + zipline",65,"grindelwald.first-cliff-walk-and-zipline"],
+    ["First Cliff Walk + zipline",115,"grindelwald.first-cliff-walk-and-zipline"],
     ["Pfingstegg toboggan",18,"grindelwald.pfingstegg-toboggan"],
     ["Bachalpsee hike",0,"grindelwald.bachalpsee-hike"],
     ["Glacier gorge walk",12,"grindelwald.glacier-gorge-walk"],
@@ -1008,7 +1008,7 @@
     ["Eiger Trail hike",0,"grindelwald.eiger-trail-hike"],
     ["Grosse Scheidegg post-bus ride",20,"grindelwald.grosse-scheidegg-post-bus-ride"],
     ["Kleine Scheidegg + Eiger viewpoint",25,"grindelwald.kleine-scheidegg-and-eiger-viewpoint"],
-    ["Jungfraujoch day trip",120,"grindelwald.jungfraujoch-day-trip"],
+    ["Jungfraujoch day trip",230,"grindelwald.jungfraujoch-day-trip"],
     ["Pfingstegg mountain-restaurant lunch",20,"grindelwald.pfingstegg-mountain-restaurant-lunch"],
     ["Cheese-dairy tour",15,"grindelwald.cheese-dairy-tour"],
     ["Glacier Canyon suspension bridges",15,"grindelwald.glacier-canyon-suspension-bridges"],
@@ -1119,7 +1119,7 @@
   ],
   "paris": [
     ["Louvre",22,"paris.louvre"],
-    ["Eiffel Tower summit",30,"paris.eiffel-tower-summit"],
+    ["Eiffel Tower summit",40,"paris.eiffel-tower-summit"],
     ["Musee d'Orsay",18,"paris.musee-dorsay"],
     ["Versailles day trip",32,"paris.versailles-day-trip"],
     ["Giverny gardens",28,"paris.giverny-gardens"],
@@ -1286,7 +1286,7 @@
     ["Delft day trip",12,"rotterdam.delft-day-trip"],
     ["Nightlife-district crawl",15,"rotterdam.nightlife-district-crawl"],
     ["Erasmus Bridge sunset viewpoint",0,"rotterdam.erasmus-bridge-sunset-viewpoint"],
-    ["Museum Boijmans classic wing",20,"rotterdam.museum-boijmans-classic-wing"],
+    ["SS Rotterdam ocean-liner tour",16,"rotterdam.ss-rotterdam-ocean-liner-tour"],
     ["Kinderdijk windmills day trip",15,"rotterdam.kinderdijk-windmills-day-trip"],
     ["Witte de Withstraat art-district walk",0,"rotterdam.witte-de-withstraat-art-district-walk"],
     ["Rotterdam Zoo (Diergaarde Blijdorp)",25,"rotterdam.rotterdam-zoo-diergaarde-blijdorp"]
@@ -1457,7 +1457,7 @@
     ["Shakespeare's Globe theatre",25,"london.shakespeares-globe-theatre"],
     ["Notting Hill/Portobello Market walk",0,"london.notting-hill-portobello-market-walk"],
     ["Sky Garden viewpoint (free ticket)",0,"london.sky-garden-viewpoint-free-ticket"],
-    ["Warner Bros Harry Potter Studio Tour",55,"london.warner-bros-harry-potter-studio-tour"],
+    ["Warner Bros Harry Potter Studio Tour",85,"london.warner-bros-harry-potter-studio-tour"],
     ["Greenwich + Cutty Sark day trip",20,"london.greenwich-and-cutty-sark-day-trip"],
     ["London afternoon tea",45,"london.london-afternoon-tea"]
   ],
@@ -1468,7 +1468,7 @@
     ["Punting on the Cherwell",22,"oxford.punting-on-the-cherwell"],
     ["Radcliffe Camera + Bridge of Sighs walk",0,"oxford.radcliffe-camera-and-bridge-of-sighs-walk"],
     ["Covered Market crawl",0,"oxford.covered-market-crawl"],
-    ["Blenheim Palace day trip",30,"oxford.blenheim-palace-day-trip"],
+    ["Blenheim Palace day trip",50,"oxford.blenheim-palace-day-trip"],
     ["Oxford ghost-tour walk",15,"oxford.oxford-ghost-tour-walk"],
     ["University Church tower climb",5,"oxford.university-church-tower-climb"],
     ["Pitt Rivers Museum (free)",0,"oxford.pitt-rivers-museum-free"],
@@ -1496,10 +1496,10 @@
     ["Cream-tea tasting",12,"cambridge.cream-tea-tasting"]
   ],
   "bath": [
-    ["Roman Baths",26,"bath.roman-baths"],
+    ["Roman Baths",38,"bath.roman-baths"],
     ["Thermae Bath Spa rooftop pool",45,"bath.thermae-bath-spa-rooftop-pool"],
     ["Royal Crescent + Circus walk",0,"bath.royal-crescent-and-circus-walk"],
-    ["Stonehenge day trip",30,"bath.stonehenge-day-trip"],
+    ["Stonehenge day trip",55,"bath.stonehenge-day-trip"],
     ["Bath Abbey tower climb",10,"bath.bath-abbey-tower-climb"],
     ["Jane Austen Centre",14,"bath.jane-austen-centre"],
     ["Pulteney Bridge + weir walk",0,"bath.pulteney-bridge-and-weir-walk"],
@@ -1585,7 +1585,7 @@
     ["Albaicin + Sacromonte walk",0,"granada.albaicin-and-sacromonte-walk"],
     ["Arab baths (hammam)",35,"granada.arab-baths-hammam"],
     ["Flamenco cave show",22,"granada.flamenco-cave-show"],
-    ["Sierra Nevada spring ski",45,"granada.sierra-nevada-spring-ski"],
+    ["Sierra Nevada spring ski",65,"granada.sierra-nevada-spring-ski"],
     ["Granada Cathedral + Royal Chapel",8,"granada.granada-cathedral-and-royal-chapel"],
     ["Mirador San Nicolas sunset",0,"granada.mirador-san-nicolas-sunset"],
     ["Free-tapas bar crawl",0,"granada.free-tapas-bar-crawl"],
@@ -1921,7 +1921,7 @@
     ["Rakovica cave day trip",12,"plitvice.rakovica-cave-day-trip"]
   ],
   "dubrovnik": [
-    ["City Walls walk",35,"dubrovnik.city-walls-walk"],
+    ["City Walls walk",45,"dubrovnik.city-walls-walk"],
     ["Cable car to Mount Srd",27,"dubrovnik.cable-car-to-mount-srd"],
     ["Sea-kayak around old town",40,"dubrovnik.sea-kayak-around-old-town"],
     ["Lokrum island ferry",8,"dubrovnik.lokrum-island-ferry"],
@@ -1989,7 +1989,7 @@
     ["Baredine cave day trip",12,"rovinj.baredine-cave-day-trip"]
   ],
   "kotor": [
-    ["City walls / fortress climb",8,"kotor.city-walls-fortress-climb"],
+    ["City walls / fortress climb",17,"kotor.city-walls-fortress-climb"],
     ["Bay of Kotor boat tour",25,"kotor.bay-of-kotor-boat-tour"],
     ["Our Lady of the Rocks",5,"kotor.our-lady-of-the-rocks"],
     ["Lovcen NP viewpoint",15,"kotor.lovcen-np-viewpoint"],
@@ -2068,7 +2068,7 @@
     ["Bridge-diving show (seasonal)",0,"mostar.bridge-diving-show-seasonal"],
     ["Herzegovina wine-region day trip",25,"mostar.herzegovina-wine-region-day-trip"],
     ["Blagaj riverside lunch",15,"mostar.blagaj-riverside-lunch"],
-    ["Sniper-tower urban exploration",0,"mostar.sniper-tower-urban-exploration"],
+    ["Crooked Bridge (Kriva Cuprija) walk",0,"mostar.crooked-bridge-kriva-cuprija-walk"],
     ["Old Bridge sunset photography walk",0,"mostar.old-bridge-sunset-photography-walk"],
     ["Buna River spring boat",12,"mostar.buna-river-spring-boat"],
     ["Medjugorje pilgrimage day trip",10,"mostar.medjugorje-pilgrimage-day-trip"]
@@ -2244,7 +2244,7 @@
     ["Summer festival concert (seasonal)",15,"ohrid.summer-festival-concert-seasonal"]
   ],
   "athens": [
-    ["Acropolis + Parthenon",23,"athens.acropolis-and-parthenon"],
+    ["Acropolis + Parthenon",33,"athens.acropolis-and-parthenon"],
     ["Acropolis Museum",13,"athens.acropolis-museum"],
     ["Ancient Agora",11,"athens.ancient-agora"],
     ["Delphi day trip",65,"athens.delphi-day-trip"],
@@ -2272,7 +2272,7 @@
     ["Cooking class",60,"santorini.cooking-class"],
     ["Perissa black-sand beach day",0,"santorini.perissa-black-sand-beach-day"],
     ["Thirassia island boat trip",45,"santorini.thirassia-island-boat-trip"],
-    ["Donkey ride (Fira port)",20,"santorini.donkey-ride-fira-port"],
+    ["Fira cable car to the old port",13,"santorini.fira-cable-car-to-the-old-port"],
     ["Vlychada black-sand beach day",0,"santorini.vlychada-black-sand-beach-day"],
     ["Caldera swim boat",55,"santorini.caldera-swim-boat"],
     ["Emporio medieval village walk",0,"santorini.emporio-medieval-village-walk"]
@@ -2349,7 +2349,7 @@
     ["Samaria Gorge trek",8,"crete.samaria-gorge-trek"],
     ["Elafonisi pink-sand lagoon",0,"crete.elafonisi-pink-sand-lagoon"],
     ["Balos lagoon boat",30,"crete.balos-lagoon-boat"],
-    ["Knossos Minoan palace",15,"crete.knossos-minoan-palace"],
+    ["Knossos Minoan palace",22,"crete.knossos-minoan-palace"],
     ["Cretan cooking class",45,"crete.cretan-cooking-class"],
     ["Chania old-town + harbor walk",0,"crete.chania-old-town-and-harbor-walk"],
     ["Raki-tasting crawl",15,"crete.raki-tasting-crawl"],
@@ -2466,15 +2466,15 @@
   ],
   "istanbul": [
     ["Hagia Sophia + Blue Mosque",25,"istanbul.hagia-sophia-and-blue-mosque"],
-    ["Topkapi Palace + Harem",30,"istanbul.topkapi-palace-and-harem"],
+    ["Topkapi Palace + Harem",60,"istanbul.topkapi-palace-and-harem"],
     ["Grand + Spice Bazaar",0,"istanbul.grand-and-spice-bazaar"],
     ["Bosphorus ferry cruise",15,"istanbul.bosphorus-ferry-cruise"],
-    ["Basilica Cistern",20,"istanbul.basilica-cistern"],
+    ["Basilica Cistern",32,"istanbul.basilica-cistern"],
     ["Turkish hammam",35,"istanbul.turkish-hammam"],
-    ["Galata Tower + Karakoy walk",12,"istanbul.galata-tower-and-karakoy-walk"],
+    ["Galata Tower + Karakoy walk",32,"istanbul.galata-tower-and-karakoy-walk"],
     ["Street-food crawl",15,"istanbul.street-food-crawl"],
     ["Istiklal Street evening walk",0,"istanbul.istiklal-street-evening-walk"],
-    ["Chora Church (Kariye)",10,"istanbul.chora-church-kariye"],
+    ["Chora Church (Kariye)",18,"istanbul.chora-church-kariye"],
     ["Suleymaniye Mosque",0,"istanbul.suleymaniye-mosque"],
     ["Princes' Islands ferry day trip",15,"istanbul.princes-islands-ferry-day-trip"],
     ["Turkish-coffee & baklava tasting",12,"istanbul.turkish-coffee-and-baklava-tasting"],
@@ -2482,9 +2482,9 @@
     ["Rooftop-bar evening",20,"istanbul.rooftop-bar-evening"]
   ],
   "cappadocia": [
-    ["Sunrise hot-air balloon flight",180,"cappadocia.sunrise-hot-air-balloon-flight"],
-    ["Goreme open-air museum",12,"cappadocia.goreme-open-air-museum"],
-    ["Underground city (Derinkuyu)",8,"cappadocia.underground-city-derinkuyu"],
+    ["Sunrise hot-air balloon flight",250,"cappadocia.sunrise-hot-air-balloon-flight"],
+    ["Goreme open-air museum",27,"cappadocia.goreme-open-air-museum"],
+    ["Underground city (Derinkuyu)",16,"cappadocia.underground-city-derinkuyu"],
     ["Red Valley sunset hike",0,"cappadocia.red-valley-sunset-hike"],
     ["ATV tour of the valleys",35,"cappadocia.atv-tour-of-the-valleys"],
     ["Cave-hotel evening tea",0,"cappadocia.cave-hotel-evening-tea"],
@@ -2502,7 +2502,7 @@
     ["Valletta + St. John's Co-Cathedral",15,"malta.valletta-and-st-johns-co-cathedral"],
     ["Blue Lagoon (Comino) boat",35,"malta.blue-lagoon-comino-boat"],
     ["Mdina silent-city walk",0,"malta.mdina-silent-city-walk"],
-    ["Hypogeum/megalithic temples",25,"malta.hypogeum-megalithic-temples"],
+    ["Hypogeum/megalithic temples",38,"malta.hypogeum-megalithic-temples"],
     ["Gozo island day trip",20,"malta.gozo-island-day-trip"],
     ["Scuba diving",55,"malta.scuba-diving"],
     ["Beach-club day",25,"malta.beach-club-day"],
@@ -2546,7 +2546,7 @@
     ["Bike-tour city",20,"copenhagen.bike-tour-city"],
     ["Christianshavn canal walk",0,"copenhagen.christianshavn-canal-walk"],
     ["Design-district shopping walk",0,"copenhagen.design-district-shopping-walk"],
-    ["National Museum of Denmark (free)",0,"copenhagen.national-museum-of-denmark-free"],
+    ["National Museum of Denmark",20,"copenhagen.national-museum-of-denmark-free"],
     ["CopenHill ski/hike rooftop",15,"copenhagen.copenhill-ski-hike-rooftop"]
   ],
   "aarhus": [
@@ -2606,7 +2606,7 @@
     ["Opera House rooftop",0,"oslo.opera-house-rooftop"],
     ["Oslofjord island ferry",8,"oslo.oslofjord-island-ferry"],
     ["Holmenkollen ski jump",15,"oslo.holmenkollen-ski-jump"],
-    ["Viking Ship Museum",14,"oslo.viking-ship-museum"],
+    ["Akershus Fortress + castle",12,"oslo.akershus-fortress-and-castle"],
     ["Craft-beer crawl",18,"oslo.craft-beer-crawl"],
     ["Aker Brygge waterfront walk",0,"oslo.aker-brygge-waterfront-walk"],
     ["Street-food market",15,"oslo.street-food-market"],
@@ -2825,7 +2825,7 @@
     ["Ramparts + medina walk",0,"essaouira.ramparts-and-medina-walk"],
     ["Windsurf/kitesurf lesson",45,"essaouira.windsurf-kitesurf-lesson"],
     ["Camel ride on the beach",25,"essaouira.camel-ride-on-the-beach"],
-    ["Fishing-port seafood grill",0,"essaouira.fishing-port-seafood-grill"],
+    ["Fishing-port seafood grill",12,"essaouira.fishing-port-seafood-grill"],
     ["Medina shopping walk",0,"essaouira.medina-shopping-walk"],
     ["Argan-oil cooperative visit",15,"essaouira.argan-oil-cooperative-visit"],
     ["Thuya-wood workshop",15,"essaouira.thuya-wood-workshop"],
@@ -3145,7 +3145,7 @@
     ["Roquebrune-Cap-Martin village day trip",8,"monaco.roquebrune-cap-martin-village-day-trip"]
   ],
   "reims": [
-    ["Champagne house cellar tour",28,"reims.champagne-house-cellar-tour"],
+    ["Champagne house cellar tour",50,"reims.champagne-house-cellar-tour"],
     ["Reims Cathedral",0,"reims.reims-cathedral"],
     ["Epernay Avenue de Champagne",15,"reims.epernay-avenue-de-champagne"],
     ["Old-town walking tour",0,"reims.old-town-walking-tour"],
@@ -3232,7 +3232,7 @@
   "cotswolds": [
     ["Bibury + Arlington Row",0,"cotswolds.bibury-and-arlington-row"],
     ["Cotswold Way village walk",0,"cotswolds.cotswold-way-village-walk"],
-    ["Blenheim Palace",30,"cotswolds.blenheim-palace"],
+    ["Blenheim Palace",50,"cotswolds.blenheim-palace"],
     ["Bourton-on-the-Water",0,"cotswolds.bourton-on-the-water"],
     ["Cream-tea tasting",15,"cotswolds.cream-tea-tasting"],
     ["Chipping Campden village walk",0,"cotswolds.chipping-campden-village-walk"],
@@ -3281,7 +3281,7 @@
     ["Cuevas del Drach cave tour",20,"mallorca.cuevas-del-drach-cave-tour"]
   ],
   "ibiza": [
-    ["Superclub night (Pacha/Ushuaia)",60,"ibiza.superclub-night-pacha-ushuaia"],
+    ["Superclub night (Pacha/Ushuaia)",90,"ibiza.superclub-night-pacha-ushuaia"],
     ["Es Vedra sunset viewpoint",0,"ibiza.es-vedra-sunset-viewpoint"],
     ["Boat party / cove cruise",70,"ibiza.boat-party-cove-cruise"],
     ["Formentera beach day",40,"ibiza.formentera-beach-day"],
@@ -3479,7 +3479,7 @@
     ["Gelato/loukoumades tasting",8,"nafplio.gelato-loukoumades-tasting"],
     ["Scuba diving",50,"nafplio.scuba-diving"],
     ["Epidaurus theatre concert (seasonal)",25,"nafplio.epidaurus-theatre-concert-seasonal"],
-    ["Arachova mountain-village day trip",15,"nafplio.arachova-mountain-village-day-trip"],
+    ["Ancient Corinth + canal day trip",15,"nafplio.ancient-corinth-and-canal-day-trip"],
     ["Seafood-taverna dinner",20,"nafplio.seafood-taverna-dinner"],
     ["Palamidi alternative-route hike",0,"nafplio.palamidi-alternative-route-hike"],
     ["Tolo beach day trip",10,"nafplio.tolo-beach-day-trip"]
@@ -3487,7 +3487,7 @@
   "hydra": [
     ["Harbor + mansion walk",0,"hydra.harbor-and-mansion-walk"],
     ["Coastal path to Vlychos beach",0,"hydra.coastal-path-to-vlychos-beach"],
-    ["Donkey ride up the hill",15,"hydra.donkey-ride-up-the-hill"],
+    ["Kamini fishing-harbor walk",0,"hydra.kamini-fishing-harbor-walk"],
     ["Cliff-jump swim spots",0,"hydra.cliff-jump-swim-spots"],
     ["Old-town shopping walk",0,"hydra.old-town-shopping-walk"],
     ["Historical Archives Museum",4,"hydra.historical-archives-museum"],
@@ -3502,9 +3502,9 @@
     ["Cooking class",40,"hydra.cooking-class"]
   ],
   "pamukkale": [
-    ["Pamukkale travertines + Hierapolis",25,"pamukkale.pamukkale-travertines-and-hierapolis"],
+    ["Pamukkale travertines + Hierapolis",33,"pamukkale.pamukkale-travertines-and-hierapolis"],
     ["Cleopatra's antique pool swim",15,"pamukkale.cleopatras-antique-pool-swim"],
-    ["Ephesus ancient city",25,"pamukkale.ephesus-ancient-city"],
+    ["Ephesus ancient city",45,"pamukkale.ephesus-ancient-city"],
     ["Hot-air balloon over the terraces",120,"pamukkale.hot-air-balloon-over-the-terraces"],
     ["Necropolis walk",0,"pamukkale.necropolis-walk"],
     ["Local-wine tasting",15,"pamukkale.local-wine-tasting"],

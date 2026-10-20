@@ -102,6 +102,7 @@
     "fontevraud-abbey-day-trip": ["daytrips", "half", "day", "", "Royal abbey with Plantagenet tombs"]
   },
   "rotterdam": {
+    "ss-rotterdam-ocean-liner-tour": ["museums", "short", "day", "", "Tour a 1959 ocean liner moored in the harbor"],
     "markthal-and-cube-houses": ["landmarks", "short", "day", "must", "Free arched market hall and tilted yellow cube homes"],
     "depot-boijmans-art-depot": ["museums", "short", "day", "", "Mirrored bowl where you see art in storage"],
     "euromast-observation-tower": ["views", "short", "day", "", "Tower view over the port city"],
@@ -113,7 +114,6 @@
     "delft-day-trip": ["daytrips", "half", "day", "", "Canal town of blue pottery"],
     "nightlife-district-crawl": ["nightlife", "short", "night", "", "Bars on Witte de With and the Oude Haven"],
     "erasmus-bridge-sunset-viewpoint": ["views", "short", "night", "", "Free sunset at the swan-shaped bridge"],
-    "museum-boijmans-classic-wing": ["museums", "short", "day", "", "Old Masters to Surrealism"],
     "kinderdijk-windmills-day-trip": ["daytrips", "half", "day", "must", "Nineteen 18th-century windmills"],
     "witte-de-withstraat-art-district-walk": ["walks", "short", "day", "", "Free walk through galleries"],
     "rotterdam-zoo-diergaarde-blijdorp": ["nature", "half", "day", "", "Big zoo and oceanarium"]

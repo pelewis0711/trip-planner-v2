@@ -815,7 +815,9 @@ Verified: `tsc --noEmit` clean, eslint clean, vitest 265/267 (8 new in `src/lib/
 
 Verified after batch 6: `tsc --noEmit` clean, eslint clean, vitest 328/330 (same 2 known date failures; Phase 27's PGlite tests need `npm install` for its new `@electric-sql/pglite` devDependency), `next build --webpack` with the font mock passes.
 
-**Next**: Parker decides on the flag lists (fix prices/remove items, or leave), then step 3 — the activity browser in the slot editor, with a before/after preview for his approval first.
+- **Flag fixes (Oct 20, 2026 — Parker chose "fix them all")**: 34 prices raised to current levels (e.g. Jungfraujoch $120→$230, Gornergrat $90→$145, Ephesus $25→$45, Topkapı $30→$60, Blenheim $30→$50); two renames that keep their ids ("National Museum of Denmark" now $20; "Museum Island (Neues + Altes Museum)"); 8 activities retired (`RETIRED_IDS` in the validator) — Santorini and Hydra donkey rides, Mostar sniper tower, Bologna's Asinelli tower (closed since 2023, no reopening date), Rotterdam's Boijmans classic wing (closed to ~2029), Oslo's Viking Ship Museum (reopens ~Nov 2027 as the Museum of the Viking Age), Bohemian Switzerland's duplicate gorge boat, Nafplio's Arachova trip — each replaced by a nearby activity in the same position (Fira cable car, Kamini harbor walk, Crooked Bridge, Santo Stefano, SS Rotterdam, Akershus, Jetřichovice lookouts, Ancient Corinth), so every trip keeps 15. **Two flags were wrong and left alone**: Berat's coast trips (the trip is "Berat & Albanian Riviera") and Edmund's Gorge (reopened 2025 after the 2022 fire). `legacyActivityMap.json` is no longer empty: it lists the 8 trips whose order changed; old picks of a retired activity show "no longer listed" at $0. Tests: the "map is empty" test became a real-data check that every old position still lands on the same activity, plus a retired-pick test.
+
+**Next**: step 3 — the activity browser in the slot editor, with a before/after preview for Parker's approval first.
 
 ## Phase 27 — Friends, people search, blocking and free weekends (branch `codex/phase27-social-friends`)
 

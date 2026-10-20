@@ -52,14 +52,39 @@ describe("activity ids in the catalog", () => {
     expect(seen.size).toBe(3197);
   });
 
-  it("the frozen legacy order matches today's catalog order, so the shipped map is empty", () => {
-    // True on the day ids shipped. Once the catalog is reordered (Phase 26
-    // step 2+) this stops being true, which is fine -- the snapshot plus the
-    // generated map are what migrations read. Delete this test then.
+  it("the shipped map sends every old position to the same activity (or marks it retired)", () => {
+    // The map only lists trips whose order changed since ids shipped (the
+    // Oct 20, 2026 flag fixes retired 8 activities). Every other trip must
+    // still match the frozen order exactly.
+    const map = LEGACY_MAP as Record<string, (number | string)[]>;
     for (const t of TRIPS) {
-      expect(LEGACY[t.id]).toEqual(t.a.map(([, , id]) => id.slice(t.id.length + 1)));
+      const legacyIds = LEGACY[t.id].map((s) => `${t.id}.${s}`);
+      const current = t.a.map(([, , id]) => id);
+      const entries = map[t.id];
+      if (!entries) {
+        expect(current).toEqual(legacyIds);
+        continue;
+      }
+      expect(entries).toHaveLength(legacyIds.length);
+      entries.forEach((e, i) => {
+        if (typeof e === "number") expect(current[e]).toBe(legacyIds[i]);
+        else {
+          expect(e).toBe(legacyIds[i]);
+          expect(current).not.toContain(e);
+        }
+      });
     }
-    expect(LEGACY_MAP).toEqual({});
+  });
+
+  it("an old pick of a retired activity is kept, shown as no longer listed, and costs $0", () => {
+    const bologna = TRIPS.find((t) => t.id === "bologna")!;
+    const old = LEGACY.bologna.map((_, i) => i === 0); // old-format: Asinelli tower picked
+    const ids = migrateAct("bologna", old);
+    expect(ids).toEqual(["bologna.asinelli-tower-climb"]);
+    const picked = pickedActivities(bologna, ids);
+    expect(picked).toEqual([
+      expect.objectContaining({ id: "bologna.asinelli-tower-climb", listed: false, price: 0 }),
+    ]);
   });
 
   it("old positions still resolve correctly after the catalog is reordered and trimmed", () => {

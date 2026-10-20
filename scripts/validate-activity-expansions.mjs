@@ -22,7 +22,19 @@ const legacy = JSON.parse(readFileSync(path.join(root, "scripts/data/legacyActiv
 
 // Activity ids deliberately removed from the catalog. Saved plans that picked
 // one keep it (shown as "no longer listed", counted at $0).
-const RETIRED_IDS = new Set([]);
+const RETIRED_IDS = new Set([
+  // Oct 20, 2026 — Parker approved fixing the tagging flags: animal-welfare and
+  // safety removals, sites closed through spring 2027, one duplicate, one
+  // day trip ~3 h away. Each was replaced with a nearby activity.
+  "santorini.donkey-ride-fira-port",
+  "hydra.donkey-ride-up-the-hill",
+  "mostar.sniper-tower-urban-exploration",
+  "nafplio.arachova-mountain-village-day-trip",
+  "rotterdam.museum-boijmans-classic-wing",
+  "oslo.viking-ship-museum",
+  "bohemianswiss.kamenice-river-gorge-boat",
+  "bologna.asinelli-tower-climb",
+]);
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 // pull ci straight out of the generated trips.ts (already reflects the

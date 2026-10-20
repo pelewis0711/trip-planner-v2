@@ -107,7 +107,7 @@
     "reichstag-dome-free": ["views", "short", "any", "must book", "Free glass dome over Parliament; register online days ahead"],
     "east-side-gallery": ["walks", "short", "any", "must", "Free mile of Berlin Wall covered in murals"],
     "topography-of-terror": ["museums", "short", "day", "", "Free exhibit on the old Gestapo and SS headquarters site"],
-    "museum-island-pergamon": ["museums", "half", "day", "", "Five museums on one island; Pergamon wing partly closed for works"],
+    "museum-island-pergamon": ["museums", "half", "day", "", "Five museums on one island; the Pergamon is closed for works until about 2027"],
     "sachsenhausen-memorial": ["daytrips", "half", "day", "", "Concentration camp memorial outside the city, best with a guide"],
     "spree-boat-tour": ["water", "short", "any", "", "River cruise past the government quarter and Museum Island"],
     "berlin-wall-memorial": ["landmarks", "short", "day", "must", "Free preserved stretch of wall and death strip on Bernauer Strasse"],
@@ -168,7 +168,7 @@
     "bike-tour-city": ["walks", "half", "day", "", "Ride the world's best bike city on a guided tour"],
     "christianshavn-canal-walk": ["walks", "short", "any", "", "Free walk along houseboats and canals"],
     "design-district-shopping-walk": ["shopping", "short", "day", "", "Danish design stores along Strøget and side streets"],
-    "national-museum-of-denmark-free": ["museums", "short", "day", "", "Vikings to modern Denmark in one big museum"],
+    "national-museum-of-denmark-free": ["museums", "short", "day", "", "Vikings to modern Denmark in one big museum; free under 18"],
     "copenhill-ski-hike-rooftop": ["adventure", "short", "day", "", "Ski slope and hiking trail on top of a power plant"]
   }
 }

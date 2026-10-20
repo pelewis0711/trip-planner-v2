@@ -1532,9 +1532,9 @@ export const TRIPS: Trip[] = [
     "w": "Italy's food capital and oldest university town — porticoes, tortellini, and cheap student nights.",
     "a": [
       [
-        "Asinelli Tower climb",
-        6,
-        "bologna.asinelli-tower-climb"
+        "Santo Stefano 'seven churches' complex",
+        0,
+        "bologna.santo-stefano-seven-churches-complex"
       ],
       [
         "Quadrilatero market walk",
@@ -4062,9 +4062,9 @@ export const TRIPS: Trip[] = [
         "bohemianswiss.mezni-louka-forest-trail"
       ],
       [
-        "Kamenice river-gorge boat",
-        8,
-        "bohemianswiss.kamenice-river-gorge-boat"
+        "Jetrichovice rock-lookouts hike",
+        0,
+        "bohemianswiss.jetrichovice-rock-lookouts-hike"
       ],
       [
         "Rock castle Saunstejn",
@@ -4154,12 +4154,12 @@ export const TRIPS: Trip[] = [
     "a": [
       [
         "Szechenyi thermal baths",
-        25,
+        36,
         "budapest.szechenyi-thermal-baths"
       ],
       [
         "Parliament interior tour",
-        22,
+        34,
         "budapest.parliament-interior-tour"
       ],
       [
@@ -5455,8 +5455,8 @@ export const TRIPS: Trip[] = [
         "berlin.topography-of-terror"
       ],
       [
-        "Museum Island / Pergamon",
-        14,
+        "Museum Island (Neues + Altes Museum)",
+        15,
         "berlin.museum-island-pergamon"
       ],
       [
@@ -6370,7 +6370,7 @@ export const TRIPS: Trip[] = [
     "a": [
       [
         "Schilthorn/Piz Gloria cable car",
-        75,
+        115,
         "lauterbrunnen.schilthorn-piz-gloria-cable-car"
       ],
       [
@@ -6390,7 +6390,7 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Jungfraujoch 'Top of Europe'",
-        120,
+        230,
         "lauterbrunnen.jungfraujoch-top-of-europe"
       ],
       [
@@ -6604,12 +6604,12 @@ export const TRIPS: Trip[] = [
     "a": [
       [
         "Gornergrat cog railway",
-        90,
+        145,
         "zermatt.gornergrat-cog-railway"
       ],
       [
         "Matterhorn Glacier Paradise",
-        95,
+        135,
         "zermatt.matterhorn-glacier-paradise"
       ],
       [
@@ -6945,7 +6945,7 @@ export const TRIPS: Trip[] = [
     "a": [
       [
         "First Cliff Walk + zipline",
-        65,
+        115,
         "grindelwald.first-cliff-walk-and-zipline"
       ],
       [
@@ -6990,7 +6990,7 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Jungfraujoch day trip",
-        120,
+        230,
         "grindelwald.jungfraujoch-day-trip"
       ],
       [
@@ -7745,7 +7745,7 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Eiffel Tower summit",
-        30,
+        40,
         "paris.eiffel-tower-summit"
       ],
       [
@@ -8866,9 +8866,9 @@ export const TRIPS: Trip[] = [
         "rotterdam.erasmus-bridge-sunset-viewpoint"
       ],
       [
-        "Museum Boijmans classic wing",
-        20,
-        "rotterdam.museum-boijmans-classic-wing"
+        "SS Rotterdam ocean-liner tour",
+        16,
+        "rotterdam.ss-rotterdam-ocean-liner-tour"
       ],
       [
         "Kinderdijk windmills day trip",
@@ -10033,7 +10033,7 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Warner Bros Harry Potter Studio Tour",
-        55,
+        85,
         "london.warner-bros-harry-potter-studio-tour"
       ],
       [
@@ -10121,7 +10121,7 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Blenheim Palace day trip",
-        30,
+        50,
         "oxford.blenheim-palace-day-trip"
       ],
       [
@@ -10320,7 +10320,7 @@ export const TRIPS: Trip[] = [
     "a": [
       [
         "Roman Baths",
-        26,
+        38,
         "bath.roman-baths"
       ],
       [
@@ -10335,7 +10335,7 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Stonehenge day trip",
-        30,
+        55,
         "bath.stonehenge-day-trip"
       ],
       [
@@ -10928,7 +10928,7 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Sierra Nevada spring ski",
-        45,
+        65,
         "granada.sierra-nevada-spring-ski"
       ],
       [
@@ -13222,7 +13222,7 @@ export const TRIPS: Trip[] = [
     "a": [
       [
         "City Walls walk",
-        35,
+        45,
         "dubrovnik.city-walls-walk"
       ],
       [
@@ -13679,7 +13679,7 @@ export const TRIPS: Trip[] = [
     "a": [
       [
         "City walls / fortress climb",
-        8,
+        17,
         "kotor.city-walls-fortress-climb"
       ],
       [
@@ -14189,9 +14189,9 @@ export const TRIPS: Trip[] = [
         "mostar.blagaj-riverside-lunch"
       ],
       [
-        "Sniper-tower urban exploration",
+        "Crooked Bridge (Kriva Cuprija) walk",
         0,
-        "mostar.sniper-tower-urban-exploration"
+        "mostar.crooked-bridge-kriva-cuprija-walk"
       ],
       [
         "Old Bridge sunset photography walk",
@@ -15397,7 +15397,7 @@ export const TRIPS: Trip[] = [
     "a": [
       [
         "Acropolis + Parthenon",
-        23,
+        33,
         "athens.acropolis-and-parthenon"
       ],
       [
@@ -15569,9 +15569,9 @@ export const TRIPS: Trip[] = [
         "santorini.thirassia-island-boat-trip"
       ],
       [
-        "Donkey ride (Fira port)",
-        20,
-        "santorini.donkey-ride-fira-port"
+        "Fira cable car to the old port",
+        13,
+        "santorini.fira-cable-car-to-the-old-port"
       ],
       [
         "Vlychada black-sand beach day",
@@ -16103,7 +16103,7 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Knossos Minoan palace",
-        15,
+        22,
         "crete.knossos-minoan-palace"
       ],
       [
@@ -16897,7 +16897,7 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Topkapi Palace + Harem",
-        30,
+        60,
         "istanbul.topkapi-palace-and-harem"
       ],
       [
@@ -16912,7 +16912,7 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Basilica Cistern",
-        20,
+        32,
         "istanbul.basilica-cistern"
       ],
       [
@@ -16922,7 +16922,7 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Galata Tower + Karakoy walk",
-        12,
+        32,
         "istanbul.galata-tower-and-karakoy-walk"
       ],
       [
@@ -16937,7 +16937,7 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Chora Church (Kariye)",
-        10,
+        18,
         "istanbul.chora-church-kariye"
       ],
       [
@@ -17011,17 +17011,17 @@ export const TRIPS: Trip[] = [
     "a": [
       [
         "Sunrise hot-air balloon flight",
-        180,
+        250,
         "cappadocia.sunrise-hot-air-balloon-flight"
       ],
       [
         "Goreme open-air museum",
-        12,
+        27,
         "cappadocia.goreme-open-air-museum"
       ],
       [
         "Underground city (Derinkuyu)",
-        8,
+        16,
         "cappadocia.underground-city-derinkuyu"
       ],
       [
@@ -17141,7 +17141,7 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Hypogeum/megalithic temples",
-        25,
+        38,
         "malta.hypogeum-megalithic-temples"
       ],
       [
@@ -17419,8 +17419,8 @@ export const TRIPS: Trip[] = [
         "copenhagen.design-district-shopping-walk"
       ],
       [
-        "National Museum of Denmark (free)",
-        0,
+        "National Museum of Denmark",
+        20,
         "copenhagen.national-museum-of-denmark-free"
       ],
       [
@@ -17839,9 +17839,9 @@ export const TRIPS: Trip[] = [
         "oslo.holmenkollen-ski-jump"
       ],
       [
-        "Viking Ship Museum",
-        14,
-        "oslo.viking-ship-museum"
+        "Akershus Fortress + castle",
+        12,
+        "oslo.akershus-fortress-and-castle"
       ],
       [
         "Craft-beer crawl",
@@ -19328,7 +19328,7 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Fishing-port seafood grill",
-        0,
+        12,
         "essaouira.fishing-port-seafood-grill"
       ],
       [
@@ -21491,7 +21491,7 @@ export const TRIPS: Trip[] = [
     "a": [
       [
         "Champagne house cellar tour",
-        28,
+        50,
         "reims.champagne-house-cellar-tour"
       ],
       [
@@ -22075,7 +22075,7 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Blenheim Palace",
-        30,
+        50,
         "cotswolds.blenheim-palace"
       ],
       [
@@ -22406,7 +22406,7 @@ export const TRIPS: Trip[] = [
     "a": [
       [
         "Superclub night (Pacha/Ushuaia)",
-        60,
+        90,
         "ibiza.superclub-night-pacha-ushuaia"
       ],
       [
@@ -23718,9 +23718,9 @@ export const TRIPS: Trip[] = [
         "nafplio.epidaurus-theatre-concert-seasonal"
       ],
       [
-        "Arachova mountain-village day trip",
+        "Ancient Corinth + canal day trip",
         15,
-        "nafplio.arachova-mountain-village-day-trip"
+        "nafplio.ancient-corinth-and-canal-day-trip"
       ],
       [
         "Seafood-taverna dinner",
@@ -23788,9 +23788,9 @@ export const TRIPS: Trip[] = [
         "hydra.coastal-path-to-vlychos-beach"
       ],
       [
-        "Donkey ride up the hill",
-        15,
-        "hydra.donkey-ride-up-the-hill"
+        "Kamini fishing-harbor walk",
+        0,
+        "hydra.kamini-fishing-harbor-walk"
       ],
       [
         "Cliff-jump swim spots",
@@ -23894,7 +23894,7 @@ export const TRIPS: Trip[] = [
     "a": [
       [
         "Pamukkale travertines + Hierapolis",
-        25,
+        33,
         "pamukkale.pamukkale-travertines-and-hierapolis"
       ],
       [
@@ -23904,7 +23904,7 @@ export const TRIPS: Trip[] = [
       ],
       [
         "Ephesus ancient city",
-        25,
+        45,
         "pamukkale.ephesus-ancient-city"
       ],
       [

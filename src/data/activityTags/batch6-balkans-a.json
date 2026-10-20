@@ -153,6 +153,7 @@
     "craft-market-walk": ["shopping", "short", "day", "", "Free copper-smiths' street"]
   },
   "mostar": {
+    "crooked-bridge-kriva-cuprija-walk": ["landmarks", "short", "day", "", "Free walk to the small stone bridge said to be the Old Bridge's model"],
     "stari-most-and-old-bazaar": ["landmarks", "short", "any", "must", "Free walk over the rebuilt Ottoman bridge"],
     "kravice-waterfalls-day-trip": ["daytrips", "half", "day", "must", "Swim below a wide horseshoe of waterfalls"],
     "blagaj-tekke-dervish-house": ["sacred", "short", "day", "must", "Dervish house at a cliff-foot river spring"],
@@ -164,7 +165,6 @@
     "bridge-diving-show-seasonal": ["adventure", "short", "day", "", "Free summer show of divers jumping 21 m"],
     "herzegovina-wine-region-day-trip": ["daytrips", "full", "day", "", "Žilavka and Blatina wines"],
     "blagaj-riverside-lunch": ["food", "short", "day", "", "Trout by the river"],
-    "sniper-tower-urban-exploration": ["landmarks", "short", "day", "", "Ruined bank used by snipers in the war"],
     "old-bridge-sunset-photography-walk": ["views", "short", "night", "", "Free sunset at the bridge"],
     "buna-river-spring-boat": ["water", "short", "day", "", "Boat into the spring cave"],
     "medjugorje-pilgrimage-day-trip": ["daytrips", "half", "day", "", "Marian pilgrimage town"]

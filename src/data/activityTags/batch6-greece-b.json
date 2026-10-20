@@ -85,6 +85,7 @@
     "cliff-jumping-cove-tour": ["adventure", "half", "day", "", "Guided cliff jumping"]
   },
   "nafplio": {
+    "ancient-corinth-and-canal-day-trip": ["daytrips", "full", "day", "", "Ancient city ruins and the narrow Corinth Canal"],
     "palamidi-fortress-999-steps": ["views", "short", "day", "must", "Climb the steps to a hilltop Venetian fortress"],
     "bourtzi-island-castle-boat": ["water", "short", "day", "", "Boat to a castle in the harbor"],
     "mycenae-and-epidaurus-day-trip": ["daytrips", "full", "day", "must", "Agamemnon's citadel and a perfect ancient theater"],
@@ -96,15 +97,14 @@
     "gelato-loukoumades-tasting": ["food", "short", "any", "", "Gelato and honey doughnuts"],
     "scuba-diving": ["water", "half", "day", "book", "Diving in the gulf"],
     "epidaurus-theatre-concert-seasonal": ["nightlife", "short", "night", "book", "Summer drama in the ancient theater"],
-    "arachova-mountain-village-day-trip": ["daytrips", "full", "day", "", "Mountain village near Delphi"],
     "seafood-taverna-dinner": ["food", "short", "night", "", "Seafood dinner"],
     "palamidi-alternative-route-hike": ["nature", "short", "day", "", "Free back route up the fortress hill"],
     "tolo-beach-day-trip": ["daytrips", "full", "day", "", "Beach village nearby"]
   },
   "hydra": {
+    "kamini-fishing-harbor-walk": ["walks", "short", "any", "", "Free coastal walk to a tiny fishing harbor west of town"],
     "harbor-and-mansion-walk": ["walks", "short", "any", "must", "Free walk on a car-free island of stone mansions"],
     "coastal-path-to-vlychos-beach": ["nature", "short", "day", "must", "Free seaside path to a pebble beach"],
-    "donkey-ride-up-the-hill": ["adventure", "short", "day", "", "Donkeys are the island's only transport"],
     "cliff-jump-swim-spots": ["water", "short", "day", "", "Free swimming off the rocks"],
     "old-town-shopping-walk": ["shopping", "short", "day", "", "Free browse of shops"],
     "historical-archives-museum": ["museums", "short", "day", "", "Naval history"],
