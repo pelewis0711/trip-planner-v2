@@ -427,6 +427,9 @@ export interface ProfileView {
   username: string;
   display_name: string;
   access: ViewerAccess;
+  /** Signed up with a university email (0014). Always present, whatever the
+   * privacy settings -- it's a fact about the account, not a profile field. */
+  verified?: boolean;
   avatar_path?: string | null;
   bio?: string;
   gender?: Gender | null;

@@ -117,6 +117,13 @@ export default function PrivacySettingsPage() {
           Push notifications start working once the app can send them (coming soon). Your choices
           here are saved now so they apply from day one.
         </p>
+
+        <Link
+          href="/settings/delete-account"
+          className="flex min-h-12 items-center rounded-card border border-border bg-surface px-4 text-sm font-semibold text-danger hover:border-danger"
+        >
+          Delete account
+        </Link>
       </div>
     </div>
   );

@@ -146,6 +146,7 @@ describe("PUBLIC_ROUTES", () => {
         "/favicon.ico",
         "/_next",
         "/trips",
+        "/api/cron",
       ].sort()
     );
   });

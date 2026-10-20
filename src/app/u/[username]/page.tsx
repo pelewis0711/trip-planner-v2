@@ -16,6 +16,7 @@ import {
 } from "@/lib/social/profile";
 import { interestLabel } from "@/data/interests";
 import Avatar from "@/components/social/Avatar";
+import VerifiedBadge from "@/components/social/VerifiedBadge";
 import { cardClass } from "@/components/social/controls";
 
 // Phase 26: a profile as the viewer is allowed to see it (mockup screen 3).
@@ -45,7 +46,13 @@ const FIELD_PROPS: Record<ProfileFieldKey, (keyof ProfileView)[]> = {
 
 /** Your own full view, trimmed to what a friend would get. */
 function asFriend(view: ProfileView, settings: SocialSettingsRow): ProfileView {
-  const out: ProfileView = { id: view.id, username: view.username, display_name: view.display_name, access: "friend" };
+  const out: ProfileView = {
+    id: view.id,
+    username: view.username,
+    display_name: view.display_name,
+    access: "friend",
+    verified: view.verified,
+  };
   for (const f of settings.visible_fields) {
     for (const k of FIELD_PROPS[f]) (out as unknown as Record<string, unknown>)[k] = view[k];
   }
@@ -126,7 +133,10 @@ export default function ProfilePage() {
 
       <section className="flex flex-col items-center gap-2 text-center">
         <Avatar path={v.avatar_path} name={v.display_name} size={92} />
-        <h1 className="text-xl font-bold">{v.display_name}</h1>
+        <div className="flex items-center gap-1.5">
+          <h1 className="text-xl font-bold">{v.display_name}</h1>
+          {v.verified && <VerifiedBadge />}
+        </div>
         <div className="text-sm text-muted">@{v.username}</div>
         {school && <div className="text-[13px] text-muted">{school}</div>}
       </section>
