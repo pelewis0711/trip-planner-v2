@@ -16,16 +16,6 @@ const TABS = [
     icon: <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" />,
   },
   {
-    href: "/catalog",
-    label: "Catalog",
-    icon: (
-      <>
-        <circle cx="11" cy="11" r="7" />
-        <path d="M20 20l-3.5-3.5" />
-      </>
-    ),
-  },
-  {
     href: "/calendar",
     label: "Calendar",
     icon: (
@@ -36,14 +26,8 @@ const TABS = [
     ),
   },
   {
-    href: "/itinerary",
-    label: "Itinerary",
-    icon: (
-      <>
-        <rect x="3" y="7" width="18" height="13" rx="2" />
-        <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
-      </>
-    ),
+    href: "/friends", label: "Friends",
+    icon: <><circle cx="8" cy="8" r="3" /><circle cx="17" cy="8" r="3" /><path d="M2 21v-2a6 6 0 0 1 12 0v2M15 14a5 5 0 0 1 7 5v2" /></>,
   },
   {
     href: "/plans",
@@ -54,6 +38,10 @@ const TABS = [
         <path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6" />
       </>
     ),
+  },
+  {
+    href: "/profile", label: "Profile",
+    icon: <><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></>,
   },
 ];
 
@@ -67,7 +55,7 @@ export default function MobileTabBar() {
     >
       <div className="mx-auto flex max-w-xl items-stretch justify-around">
         {TABS.map((tab) => {
-          const active = tab.href === "/" ? pathname === "/" : pathname.startsWith(tab.href);
+          const active = tab.href === "/" ? pathname === "/" : (pathname.startsWith(tab.href) || (tab.href === "/profile" && pathname.startsWith("/u/")) || (tab.href === "/friends" && pathname.startsWith("/people")));
           return (
             <Link
               key={tab.href}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -15,6 +15,7 @@ import {
   type SocialSettingsRow,
 } from "@/lib/social/profile";
 import { interestLabel } from "@/data/interests";
+import ProfileConnections from "@/components/social/ProfileConnections";
 import Avatar from "@/components/social/Avatar";
 import VerifiedBadge from "@/components/social/VerifiedBadge";
 import { cardClass } from "@/components/social/controls";
@@ -66,13 +67,16 @@ export default function ProfilePage() {
   const authLoading = useAuthStore((s) => s.loading);
   const [state, setState] = useState<State>({ kind: "loading" });
   const [settings, setSettings] = useState<SocialSettingsRow | null>(null);
+  const [relationshipVersion, setRelationshipVersion] = useState(0);
   const [preview, setPreview] = useState<"self" | "friend">("self");
 
   useEffect(() => {
     if (authLoading || !user) return;
+    let live = true;
     (async () => {
       const supabase = createClient();
       const view = await fetchProfileView(supabase, username);
+      if (!live) return;
       if (!view) {
         setState({ kind: "missing" });
         return;
@@ -80,7 +84,11 @@ export default function ProfilePage() {
       setState({ kind: "ok", view });
       if (view.access === "self") setSettings(await fetchSocialSettings(supabase, user.id));
     })();
-  }, [authLoading, user, username]);
+    return () => { live = false; };
+  }, [authLoading, user, username, relationshipVersion]);
+
+  const refreshRelationship = useCallback(() => setRelationshipVersion(v => v + 1), []);
+  const markMissing = useCallback(() => setState({ kind: "missing" }), []);
 
   if (state.kind === "loading") {
     return <div className="mx-auto max-w-xl px-4 py-16 text-center text-sm text-muted">Loading…</div>;
@@ -147,6 +155,8 @@ export default function ProfilePage() {
           <Link href="/settings/privacy" className="btn btn-secondary btn-md">Privacy</Link>
         </div>
       )}
+
+      {!isSelf && <ProfileConnections key={state.view.id} id={state.view.id} onBlocked={markMissing} onRefresh={refreshRelationship} />}
 
       <div className="mt-4 flex flex-col gap-3.5">
         {v.bio && <p className="text-sm leading-relaxed">{v.bio}</p>}
