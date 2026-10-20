@@ -5,6 +5,7 @@ import type { PlannerCtx } from "./context";
 import { CI_BASE, daysOf, foodTiers, lodgingTiers } from "./cost";
 import { legEstimate, routeLegs } from "./routing";
 import { pricedLegs, type PricedLeg } from "./pricing";
+import { pickedActivityTotal } from "./activities";
 
 export interface SlotCosts {
   act: number;
@@ -34,9 +35,7 @@ export function slotCosts(slotId: string, stops: Stop[], ctx: PlannerCtx, travel
   stops.forEach((st) => {
     const t = ctx.tripOf(st.tripId);
     if (!t) return;
-    t.a.forEach(([, price], i) => {
-      if (st.act[i]) act += price;
-    });
+    act += pickedActivityTotal(t, st.act);
     // Signature dishes are a $0 bucket list (Phase 7) -- the food tier below
     // is already the whole day's eating budget, so a checked dish doesn't
     // add anything on top of it. See CLAUDE.md's Phase 7 section.
@@ -95,9 +94,7 @@ export function stopCurrentEstimate(t: Trip, st: Stop, ctx: PlannerCtx, traveler
   s += 2 * legEstimate(ctx.homeCoord, ctx.coordsOf(t.id)).cost;
   s += foodTiers(t.ci)[st.fd][1] * daysOf(st.nights);
   s += lodgingTiers(t.ci, travelers)[st.l][1] * st.nights;
-  t.a.forEach(([, price], i) => {
-    if (st.act[i]) s += price;
-  });
+  s += pickedActivityTotal(t, st.act);
   return s;
 }
 

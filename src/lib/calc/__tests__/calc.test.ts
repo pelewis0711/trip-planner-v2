@@ -6,7 +6,7 @@ import { generateSlots, getSlotsForPlan, DEFAULT_SEMESTER, describeTerm, planWit
 import { smartDefaultSemester, postFinalsBreak } from "../onboarding";
 import type { Placements, Stop } from "../types";
 import type { Plan } from "@/lib/store/plan";
-import { usePlanStore, presetActivityChecks, migratePlanToSlots, slotsToBeLost } from "@/lib/store/plan";
+import { usePlanStore, presetActivityIds, migratePlanToSlots, slotsToBeLost } from "@/lib/store/plan";
 import { useCustomHomesStore } from "@/lib/store/customHomes";
 import { resolveHome, isKnownCity } from "@/lib/resolveHome";
 import { HOMES } from "@/data/homes";
@@ -544,21 +544,26 @@ describe("Phase 7: trip price range", () => {
 });
 
 describe("Phase 7: activity presets", () => {
-  it("highlights/balanced/everything/none produce the right checked-index counts", () => {
-    expect(presetActivityChecks(20, "none").filter(Boolean).length).toBe(0);
-    expect(presetActivityChecks(20, "highlights").filter(Boolean).length).toBe(3);
-    expect(presetActivityChecks(20, "balanced").filter(Boolean).length).toBe(10);
-    expect(presetActivityChecks(20, "everything").filter(Boolean).length).toBe(20);
+  // Phase 26: presets return picked activity ids, not booleans by position.
+  const trip = (n: number) => ({
+    ...TRIPS.find((t) => t.id === "rome")!,
+    a: Array.from({ length: n }, (_, i) => [`A${i}`, 10, `rome.a${i}`] as [string, number, string]),
+  });
+
+  it("highlights/balanced/everything/none pick the right number of activities", () => {
+    expect(presetActivityIds(trip(20), "none")).toHaveLength(0);
+    expect(presetActivityIds(trip(20), "highlights")).toHaveLength(3);
+    expect(presetActivityIds(trip(20), "balanced")).toHaveLength(10);
+    expect(presetActivityIds(trip(20), "everything")).toHaveLength(20);
   });
 
   it("highlights never exceeds the actual activity count for a short list", () => {
-    expect(presetActivityChecks(2, "highlights").filter(Boolean).length).toBe(2);
-    expect(presetActivityChecks(0, "highlights").filter(Boolean).length).toBe(0);
+    expect(presetActivityIds(trip(2), "highlights")).toHaveLength(2);
+    expect(presetActivityIds(trip(0), "highlights")).toHaveLength(0);
   });
 
-  it("presets check the first N in authored order (priority order), not an arbitrary subset", () => {
-    const checks = presetActivityChecks(6, "balanced");
-    expect(checks).toEqual([true, true, true, false, false, false]);
+  it("presets pick the first N in authored order (priority order), not an arbitrary subset", () => {
+    expect(presetActivityIds(trip(6), "balanced")).toEqual(["rome.a0", "rome.a1", "rome.a2"]);
   });
 });
 
@@ -773,7 +778,10 @@ describe("Hardening: safe plan import (untrusted JSON files)", () => {
     expect(imported.home).toBe("Prague");
     expect(imported.bag).toBe("checked");
     expect(imported.budget).toBe(2000);
-    expect(imported.placements!.w1.stops[0]).toEqual({ tripId: "rome", nights: 2, act: [true, false], sig: [true], l: 1, fd: 1 });
+    // a pre-Phase-26 export's position-based pick comes back as an activity id
+    expect(imported.placements!.w1.stops[0]).toEqual({
+      tripId: "rome", nights: 2, act: ["rome.colosseum-and-forum-and-palatine"], sig: [true], l: 1, fd: 1,
+    });
     expect(imported.placements!.w1.travelers).toBe(2);
   });
 

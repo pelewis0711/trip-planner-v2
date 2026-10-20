@@ -10,6 +10,7 @@ import { stopDates, iso } from "@/lib/calc/dates";
 import LiveHotelPrice from "@/components/itinerary/LiveHotelPrice";
 import SlotCollab from "./SlotCollab";
 import { formatMoney } from "@/lib/calc/currency";
+import { pickedActivities } from "@/lib/calc/activities";
 import type { Currency } from "@/components/onboarding/OnboardingFlow";
 
 const PRESETS: [ActivityPreset, string][] = [
@@ -100,6 +101,9 @@ export default function EditModal({
             const days = daysOf(st.nights);
             const range = tripPriceRange(t, ctx);
             const current = stopCurrentEstimate(t, st, ctx, travelers);
+            const picked = pickedActivities(t, st.act);
+            const pickedIds = new Set(picked.map((a) => a.id));
+            const unlisted = picked.filter((a) => !a.listed);
 
             return (
               <div key={i} className="rounded-card border border-border bg-surface-muted p-3.5">
@@ -227,12 +231,31 @@ export default function EditModal({
                     </div>
                     <CheckList
                       label="🎟️ Activities"
-                      items={t.a}
-                      checked={st.act}
-                      onToggle={(idx) => toggleAct(slot.id, i, idx)}
+                      items={t.a.map(([name, price]) => [name, price])}
+                      checked={t.a.map(([, , id]) => pickedIds.has(id))}
+                      onToggle={(idx) => toggleAct(slot.id, i, t.a[idx][2])}
                       currency={currency}
                     />
                   </>
+                )}
+                {/* Picks whose activity has left the catalog: kept, not
+                    counted, removable by hand (Phase 26). */}
+                {unlisted.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {unlisted.map((a) => (
+                      <div key={a.id} className="flex items-center gap-2 px-2 text-xs text-muted">
+                        <span className="flex-1 italic">{a.name} (no longer listed, not counted)</span>
+                        <button
+                          type="button"
+                          onClick={() => toggleAct(slot.id, i, a.id)}
+                          className="text-muted hover:text-danger"
+                          aria-label={`Remove ${a.name}`}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 )}
                 {t.f.length > 0 && (
                   <CheckList

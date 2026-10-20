@@ -8,6 +8,7 @@
 // strips dangerous object keys before any of it reaches real app state.
 import type { Plan } from "@/lib/store/plan";
 import type { Placement, Placements, SlotActuals, Stop } from "@/lib/calc/types";
+import { migrateAct } from "@/lib/calc/activities";
 
 export function downloadPlanJson(plan: Plan) {
   const text = JSON.stringify({ kind: "study-abroad-plan", version: 2, plan }, null, 2);
@@ -52,7 +53,10 @@ function sanitizeStop(v: unknown): Stop | null {
   if (!isPlainObject(v)) return null;
   if (typeof v.tripId !== "string" || !v.tripId || v.tripId.length > 200) return null;
   if (typeof v.nights !== "number" || !Number.isFinite(v.nights) || v.nights < 0 || v.nights > 30) return null;
-  const act = Array.isArray(v.act) ? v.act.filter((x): x is boolean => typeof x === "boolean").slice(0, 100) : [];
+  // Picked activities: ids in a current export, booleans by list position in
+  // one made before Phase 26 -- migrateAct takes either, drops anything that
+  // isn't a well-formed id, and caps the count.
+  const act = migrateAct(v.tripId, Array.isArray(v.act) ? v.act.slice(0, 200) : []);
   const sig = Array.isArray(v.sig) ? v.sig.filter((x): x is boolean => typeof x === "boolean").slice(0, 100) : [];
   const l = typeof v.l === "number" && Number.isFinite(v.l) ? Math.max(0, Math.min(3, Math.trunc(v.l))) : 0;
   const fd = typeof v.fd === "number" && Number.isFinite(v.fd) ? Math.max(0, Math.min(2, Math.trunc(v.fd))) : 0;

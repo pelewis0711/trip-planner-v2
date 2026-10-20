@@ -3,14 +3,27 @@
 // trip, no duplicate names (case-insensitive) within a trip, and prices
 // within sane bounds scaled by that trip's cost index. Run after authoring
 // each batch, before moving on to the next.
+//
+// Phase 26: also checks every activity's permanent id -- present, shaped
+// "<tripId>.<slug>", unique across the catalog -- and that no id from the
+// frozen scripts/data/legacyActivityOrder.json snapshot has gone missing (saved
+// plans can reference any of them). Removing one on purpose means adding it
+// to RETIRED_IDS below, so it's a decision, not an accident.
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { loadTagSources, validateTags } from "./activity-tags.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 
 const expansions = JSON.parse(readFileSync(path.join(root, "src/data/activityExpansions.json"), "utf8"));
+const legacy = JSON.parse(readFileSync(path.join(root, "scripts/data/legacyActivityOrder.json"), "utf8"));
+
+// Activity ids deliberately removed from the catalog. Saved plans that picked
+// one keep it (shown as "no longer listed", counted at $0).
+const RETIRED_IDS = new Set([]);
+const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 // pull ci straight out of the generated trips.ts (already reflects the
 // original HTML-extracted data -- ci itself is never touched by this overlay)
@@ -26,6 +39,7 @@ const CI_CEILING = { 1: 70, 2: 90, 3: 110, 4: 150, 5: 300 };
 
 let errors = 0;
 let warnings = 0;
+const allIds = new Set();
 
 for (const [id, activities] of Object.entries(expansions)) {
   const ci = ciById.get(id);
@@ -42,7 +56,16 @@ for (const [id, activities] of Object.entries(expansions)) {
   }
 
   const seen = new Set();
-  for (const [actName, price] of activities) {
+  for (const [actName, price, actId] of activities) {
+    if (typeof actId !== "string" || !actId.startsWith(`${id}.`) || !SLUG.test(actId.slice(id.length + 1))) {
+      console.error(`ERROR ${name} (${id}): "${actName}" has a missing or malformed id: ${actId}`);
+      errors++;
+    } else if (allIds.has(actId)) {
+      console.error(`ERROR ${name} (${id}): duplicate activity id ${actId}`);
+      errors++;
+    }
+    allIds.add(actId);
+
     const key = actName.trim().toLowerCase();
     if (seen.has(key)) {
       console.error(`ERROR ${name} (${id}): duplicate activity name "${actName}"`);
@@ -62,6 +85,27 @@ for (const [id, activities] of Object.entries(expansions)) {
     }
   }
 }
+
+for (const [tripId, suffixes] of Object.entries(legacy)) {
+  for (const suffix of suffixes) {
+    const legacyId = `${tripId}.${suffix}`;
+    if (!allIds.has(legacyId) && !RETIRED_IDS.has(legacyId)) {
+      console.error(`ERROR ${tripId}: activity id ${legacyId} disappeared -- saved plans may reference it. Restore it, or add it to RETIRED_IDS on purpose.`);
+      errors++;
+    }
+  }
+}
+
+// Phase 26 step 2: activity tags (category, duration, when, flags,
+// description) -- rules in scripts/activity-tags.mjs. Checked against the
+// expansions as they are now, so run this before extract-trips.mjs.
+const tripsForTags = Object.entries(expansions).map(([id, a]) => ({ id, n: nameById.get(id) ?? id, a }));
+const tagCheck = validateTags(tripsForTags, loadTagSources(root));
+for (const e of tagCheck.errors) console.error(`ERROR tags ${e}`);
+for (const w of tagCheck.warnings) console.warn(`WARN  tags ${w}`);
+errors += tagCheck.errors.length;
+warnings += tagCheck.warnings.length;
+console.log(`\nactivity tags: ${tagCheck.taggedTrips} of ${Object.keys(expansions).length} trips tagged`);
 
 console.log(`\n${Object.keys(expansions).length} trips checked, ${errors} errors, ${warnings} warnings.`);
 if (errors > 0) process.exit(1);
