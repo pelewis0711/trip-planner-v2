@@ -4,6 +4,7 @@ import type { Slot } from "@/data/slots";
 import type { Placement } from "@/lib/calc/types";
 import type { PlannerCtx } from "@/lib/calc/context";
 import { slotCosts } from "@/lib/calc/costs";
+import { pickedActivities } from "@/lib/calc/activities";
 import { slotWarnings } from "@/lib/calc/warnings";
 import { daysOf, foodTiers, lodgingTiers } from "@/lib/calc/cost";
 import { iso, legDateFor, nice, stopDates } from "@/lib/calc/dates";
@@ -212,7 +213,7 @@ export default function SlotItinerary({
           if (!t) return null;
           const ft = foodTiers(t.ci)[st.fd];
           const dys = daysOf(st.nights);
-          const checkedActs = t.a.filter((_, idx) => st.act[idx]);
+          const checkedActs = pickedActivities(t, st.act);
           const checkedSig = t.f.filter((_, idx) => st.sig[idx]);
           const range = tripPriceRange(t, ctx);
           const current = stopCurrentEstimate(t, st, ctx, travelers);
@@ -234,10 +235,13 @@ export default function SlotItinerary({
                     🎟️ Activities
                   </b>
                   {checkedActs.length ? (
-                    checkedActs.map(([name, price]) => (
-                      <div key={name} className="flex justify-between text-muted">
-                        <span>{name}</span>
-                        <span>{price ? money(price) : "free"}</span>
+                    checkedActs.map(({ id, name, price, listed }) => (
+                      <div key={id} className="flex justify-between gap-2 text-muted">
+                        <span>
+                          {name}
+                          {!listed && <span className="italic"> (no longer listed)</span>}
+                        </span>
+                        <span>{price ? money(price) : listed ? "free" : "—"}</span>
                       </div>
                     ))
                   ) : (

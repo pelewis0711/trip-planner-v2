@@ -24,6 +24,7 @@ import { SCHENGEN, schengenDays } from "@/lib/calc/schengen";
 import { resolveHome } from "@/lib/resolveHome";
 import { convert, formatMoney, SYMBOLS, RATES_AS_OF } from "@/lib/calc/currency";
 import { slotWarnings } from "@/lib/calc/warnings";
+import { pickedActivities } from "@/lib/calc/activities";
 import { iso, nice, stopDates, legDateFor } from "@/lib/calc/dates";
 import { BAGS } from "@/lib/calc/pricing";
 import {
@@ -234,7 +235,9 @@ export function buildXlsxSheets(
       // Bucket list -- reference price only, already covered by the Food
       // tier row above; not summed into SLOT TOTAL (see costs.ts slotCosts).
       t.f.forEach(([name, price], i) => { if (st.sig[i]) tp.push(["", "", "Bucket list (ref, not counted)", name, XM(price)]); });
-      t.a.forEach(([name, price], i) => { if (st.act[i]) tp.push(["", "", "Activity", name, price ? XM(price) : "free"]); });
+      pickedActivities(t, st.act).forEach(({ name, price, listed }) => {
+        tp.push(["", "", "Activity", listed ? name : `${name} (no longer listed)`, price ? XM(price) : listed ? "free" : "not counted"]);
+      });
     });
     tp.push([
       "", "SLOT TOTAL (per person)", "", "", "", "", XM(c.total),
@@ -369,8 +372,8 @@ export function buildXlsxSheets(
       const t = ctx.tripOf(st.tripId);
       if (!t) return;
       lk.push([s.label, t.n, `(all ${t.n} activities & tickets)`, "", XL("GetYourGuide", getYourGuideUrl(t.n))]);
-      t.a.forEach(([name, price], i) => {
-        if (st.act[i]) lk.push([s.label, t.n, name, price ? XM(price) : "free", XL("Find tickets", getYourGuideUrl(`${name} ${t.n}`))]);
+      pickedActivities(t, st.act).forEach(({ name, price, listed }) => {
+        if (listed) lk.push([s.label, t.n, name, price ? XM(price) : "free", XL("Find tickets", getYourGuideUrl(`${name} ${t.n}`))]);
       });
     });
   });

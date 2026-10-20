@@ -48,6 +48,38 @@ const SLOTS = extractValue(
 );
 const HOMES = extractValue("const HOMES={", "let HOME=", "const HOMES=");
 
+// Phase 26: every activity must carry its permanent id (assigned by
+// scripts/assign-activity-ids.mjs). Fail loudly rather than ship a trip whose
+// activities can't be picked by id.
+for (const t of TRIPS) {
+  for (const a of t.a) {
+    if (typeof a[2] !== "string" || !a[2].startsWith(`${t.id}.`)) {
+      throw new Error(`${t.id}: activity "${a[0]}" has no valid id -- run node scripts/assign-activity-ids.mjs`);
+    }
+  }
+}
+
+// Phase 26: the map the app uses to convert old position-based picks into
+// ids. scripts/data/legacyActivityOrder.json is the full frozen snapshot of
+// each trip's activity order before ids existed; shipping all of it would add
+// ~30 KB (compressed) to every first page load. So only trips whose current
+// list differs from that snapshot get an entry here: for each old position,
+// the activity's CURRENT index in trip.a, or its full id if it has since been
+// removed from the catalog. A trip with no entry still has its original
+// order, so old position i is simply trip.a[i]. Regenerated on every run.
+const legacyOrder = JSON.parse(readFileSync(path.join(root, "scripts/data/legacyActivityOrder.json"), "utf8"));
+const legacyMap = {};
+for (const t of TRIPS) {
+  const old = (legacyOrder[t.id] ?? []).map((suffix) => `${t.id}.${suffix}`);
+  const current = t.a.map((a) => a[2]);
+  const same = old.length === current.length && old.every((id, i) => id === current[i]);
+  if (!same) legacyMap[t.id] = old.map((id) => (current.includes(id) ? current.indexOf(id) : id));
+}
+writeFileSync(
+  path.join(root, "src/data/legacyActivityMap.json"),
+  JSON.stringify(legacyMap, null, 1) + "\n"
+);
+
 if (TRIPS.length !== 212) {
   throw new Error(`expected 212 trips, got ${TRIPS.length}`);
 }
@@ -65,25 +97,14 @@ const TRIP_TYPE = `export interface Trip {
   ci: number;
   wx: string;
   w: string;
-  a: [string, number][];
+  // [name, price (USD per person), id]. The id is permanent ("<tripId>.<slug>",
+  // Phase 26) -- saved plans store picked activity ids, so never change one.
+  a: [string, number, string][];
   f: [string, number][];
 }
 
 export const TRIPS: Trip[] = `;
 
-const SLOT_TYPE = `export type SlotKind = "weekend" | "special" | "break" | "post";
-
-export interface Slot {
-  id: string;
-  label: string;
-  date: string;
-  s: [number, number];
-  e: [number, number];
-  kind: SlotKind;
-  note?: string;
-}
-
-export const SLOTS: Slot[] = `;
 
 const HOMES_TYPE = `export const HOMES: Record<string, [number, number]> = `;
 
@@ -95,10 +116,11 @@ writeFileSync(
   path.join(root, "src/data/trips.ts"),
   banner + TRIP_TYPE + JSON.stringify(TRIPS, null, 2) + ";\n"
 );
-writeFileSync(
-  path.join(root, "src/data/slots.ts"),
-  banner + SLOT_TYPE + JSON.stringify(SLOTS, null, 2) + ";\n"
-);
+// src/data/slots.ts is NOT written any more: since Phase 9 step 4 it's a
+// hand-maintained file (Slot types + LEGACY_SLOTS for the one-time
+// migration), and overwriting it with v1's hardcoded calendar would break the
+// app. SLOTS is still extracted above only so the count check below keeps
+// confirming the v1 source parses.
 writeFileSync(
   path.join(root, "src/data/homes.ts"),
   banner + HOMES_TYPE + JSON.stringify(HOMES, null, 2) + ";\n"
@@ -107,6 +129,7 @@ writeFileSync(
 console.log(`TRIPS: ${TRIPS.length} (${expanded} with expanded activities from activityExpansions.json)`);
 console.log(`SLOTS: ${SLOTS.length}`);
 console.log(`HOMES: ${Object.keys(HOMES).length}`);
+console.log(`legacyActivityMap: ${Object.keys(legacyMap).length} trips with a changed activity order`);
 console.log("\nSpot-check:");
 for (const id of ["rome", "paris", "dublin", "marrakech", "florence"]) {
   const t = TRIPS.find((x) => x.id === id);

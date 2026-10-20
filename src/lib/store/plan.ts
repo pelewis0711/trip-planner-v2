@@ -21,6 +21,7 @@ import {
 import type { Currency } from "@/components/onboarding/OnboardingFlow";
 import { LEGACY_SLOTS, type Slot, type SlotKind } from "@/data/slots";
 import { sanitizePlacements } from "@/lib/planIO";
+import { migrateAct, placementsWithActivityIds } from "@/lib/calc/activities";
 
 const isKnownHome = isKnownCity;
 
@@ -82,7 +83,7 @@ function defaultStop(t: Trip): Stop {
   return {
     tripId: t.id,
     nights: t.g,
-    act: t.a.map(() => false),
+    act: [],
     sig: t.f.map(() => true),
     l: 0,
     fd: 0,
@@ -92,15 +93,17 @@ function defaultStop(t: Trip): Stop {
 export type ActivityPreset = "none" | "highlights" | "balanced" | "everything";
 
 // Highlights/Balanced both read as "top N in authored priority order" -- city
-// activity lists are authored must-do-first, so this needs no extra
-// per-activity metadata and automatically covers future AI-discovered trips.
-export function presetActivityChecks(count: number, preset: ActivityPreset): boolean[] {
+// activity lists are authored must-do-first. Returns the picked activity ids
+// (Phase 26). Temporary: the presets are replaced by the activity browser in
+// Phase 26 step 3.
+export function presetActivityIds(t: Trip, preset: ActivityPreset): string[] {
+  const count = t.a.length;
   const n =
     preset === "none" ? 0
     : preset === "highlights" ? Math.min(3, count)
     : preset === "balanced" ? Math.ceil(count / 2)
     : count;
-  return Array.from({ length: count }, (_, i) => i < n);
+  return t.a.slice(0, n).map(([, , id]) => id);
 }
 
 const DEFAULT_ID = "p_default";
@@ -166,7 +169,7 @@ interface PlanStoreState {
   addStop: (slotId: string, tripId: string) => void;
   removeStop: (slotId: string, stopIndex: number) => void;
   updateStop: (slotId: string, stopIndex: number, patch: Partial<Stop>) => void;
-  toggleAct: (slotId: string, stopIndex: number, actIndex: number) => void;
+  toggleAct: (slotId: string, stopIndex: number, actId: string) => void;
   toggleSig: (slotId: string, stopIndex: number, sigIndex: number) => void;
   applyActivityPreset: (slotId: string, stopIndex: number, preset: ActivityPreset) => void;
   moveStop: (slotId: string, from: number, to: number) => void;
@@ -400,13 +403,14 @@ export const usePlanStore = create<PlanStoreState>()(
           }))
         ),
 
-      toggleAct: (slotId, stopIndex, actIndex) =>
+      toggleAct: (slotId, stopIndex, actId) =>
         set((state) =>
           withActive(state, (p) => ({
             placements: withStop(p.placements, slotId, stopIndex, (s) => {
-              const act = [...s.act];
-              act[actIndex] = !act[actIndex];
-              return { ...s, act };
+              // migrateAct also cleans up a stop still in the old
+              // position-based shape before the toggle is applied
+              const act = migrateAct(s.tripId, s.act);
+              return { ...s, act: act.includes(actId) ? act.filter((x) => x !== actId) : [...act, actId] };
             }),
           }))
         ),
@@ -425,10 +429,10 @@ export const usePlanStore = create<PlanStoreState>()(
       applyActivityPreset: (slotId, stopIndex, preset) =>
         set((state) =>
           withActive(state, (p) => ({
-            placements: withStop(p.placements, slotId, stopIndex, (s) => ({
-              ...s,
-              act: presetActivityChecks(s.act.length, preset),
-            })),
+            placements: withStop(p.placements, slotId, stopIndex, (s) => {
+              const t = TRIP_BY_ID.get(s.tripId);
+              return t ? { ...s, act: presetActivityIds(t, preset) } : s;
+            }),
           }))
         ),
 
@@ -780,7 +784,7 @@ export const usePlanStore = create<PlanStoreState>()(
     }),
     {
       name: "activePlan",
-      version: 3,
+      version: 4,
       partialize: (state) => ({
         plans: state.plans,
         activeId: state.activeId,
@@ -799,10 +803,28 @@ export const usePlanStore = create<PlanStoreState>()(
       // to be added automatically -- from every saved plan (only where it's
       // empty) and from the defaults new plans are seeded from. Runs after
       // the older steps, so it covers every starting version.
-      migrate: (persisted, version) => removeAutoStPatricks(migrateToV2(persisted, version)),
+      //
+      // version 3 -> 4 (Phase 26): picked activities move from booleans by
+      // list position to permanent activity ids. Also runs after the older
+      // steps, so it covers every starting version.
+      migrate: (persisted, version) => migratePersistedPlans(persisted, version),
     }
   )
 );
+
+/** The persist migration, exported so tests run exactly what the app runs
+ * (Zustand's persist API isn't attached without browser storage). */
+export function migratePersistedPlans(persisted: unknown, version: number): PlanStoreState {
+  return withActivityIds(removeAutoStPatricks(migrateToV2(persisted, version)));
+}
+
+function withActivityIds(state: PlanStoreState): PlanStoreState {
+  const plans: Record<string, Plan> = {};
+  for (const [id, p] of Object.entries(state.plans ?? {})) {
+    plans[id] = { ...p, placements: placementsWithActivityIds(p.placements) };
+  }
+  return { ...state, plans };
+}
 
 function removeAutoStPatricks(state: PlanStoreState): PlanStoreState {
   const plans: Record<string, Plan> = {};

@@ -3,7 +3,10 @@
 export interface Stop {
   tripId: string;
   nights: number;
-  act: boolean[]; // which activities are checked, parallel to Trip.a
+  // Picked activity ids ("rome.borghese-gallery"), Phase 26. Was a boolean[]
+  // parallel to Trip.a -- read it through pickedActivities()/migrateAct() in
+  // ./activities.ts, which still understand that old shape.
+  act: string[];
   sig: boolean[]; // which signature foods are checked, parallel to Trip.f
   l: number; // lodging tier index (0-3)
   fd: number; // food tier index (0-2)

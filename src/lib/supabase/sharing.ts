@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Plan } from "@/lib/store/plan";
 import { generateSlots, planWithoutStPatricks } from "@/lib/calc/semester";
 import { fetchProfileEmails } from "./profiles";
+import { placementsWithActivityIds } from "@/lib/calc/activities";
 
 export interface PlanRow {
   id: string;
@@ -34,6 +35,10 @@ export function rowToPlan(row: PlanRow, emails: Map<string, string>): Plan {
     // captured server-side), but a full edge-to-edge weekend list is far
     // better than a blank one.
     slots: row.data.slots ?? (row.data.semester ? generateSlots(row.data.semester) : []),
+    // Phase 26: a row synced before activity ids stores picks as booleans by
+    // list position -- convert them, or a remote copy winning a merge would
+    // bring the old shape back.
+    placements: placementsWithActivityIds(row.data.placements),
     ownerId: row.user_id,
     shareViewToken: row.share_view_token,
     shareCollabToken: row.share_collab_token,
