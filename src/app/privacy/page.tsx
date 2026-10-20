@@ -33,6 +33,13 @@ export default function PrivacyPage() {
             plan&apos;s card on the Plans tab.
           </p>
           <p>
+            <b className="text-ink">Your profile is private until you change that.</b>{" "}If you create
+            a profile (you must be 18 or older), your friends see your name and username. Every other
+            detail &mdash; photo, bio, universities, interests and the rest &mdash; stays hidden until
+            you turn it on in Privacy &amp; settings, where you also choose who sees it. Your email
+            address is never shown to anyone.
+          </p>
+          <p>
             <b className="text-ink">We don&apos;t sell or share your data</b>{" "}with third parties.
             Booking links (flights, hotels, activities) take you to those sites directly — they have
             their own separate privacy policies.
