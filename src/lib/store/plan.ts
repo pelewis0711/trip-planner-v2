@@ -9,7 +9,15 @@ import { TRIPS, type Trip } from "@/data/trips";
 import { isKnownCity } from "@/lib/resolveHome";
 import type { BagOption } from "@/lib/calc/pricing";
 import type { Placement, Placements, SlotActuals, Stop } from "@/lib/calc/types";
-import { generateSlots, DEFAULT_SEMESTER, fmtMonthDay, type SemesterConfig } from "@/lib/calc/semester";
+import {
+  generateSlots,
+  DEFAULT_SEMESTER,
+  fmtMonthDay,
+  planWithoutStPatricks,
+  slotsWithoutStPatricks,
+  withoutStPatricks,
+  type SemesterConfig,
+} from "@/lib/calc/semester";
 import type { Currency } from "@/components/onboarding/OnboardingFlow";
 import { LEGACY_SLOTS, type Slot, type SlotKind } from "@/data/slots";
 import { sanitizePlacements } from "@/lib/planIO";
@@ -324,15 +332,20 @@ export function migratePlanToSlots(plan: Plan): Plan {
   // migrate to an explicit semester and remap old static-file ids (s01,
   // sSP, ...) to whichever new slot covers the same dates
   const newSlots = generateSlots(DEFAULT_SEMESTER);
+  const keptLegacySlots: Slot[] = [];
   const placements: Placements = {};
   Object.entries(plan.placements).forEach(([oldId, p]) => {
     const oldSlot = LEGACY_SLOTS.find((s) => s.id === oldId);
     const match = oldSlot && newSlots.find((s) => s.s[0] === oldSlot.s[0] && s.s[1] === oldSlot.s[1] && s.e[0] === oldSlot.e[0] && s.e[1] === oldSlot.e[1]);
     // never drop a placement -- fall back to keeping it under its original
-    // id if (unexpectedly) no matching new slot is found
+    // id if no matching new slot is found. Since Phase 25 the old St.
+    // Patrick's window (sSP) is no longer generated, so a trip placed there
+    // keeps its legacy slot too, or it would be invisible.
+    if (!match && oldSlot && p.stops.length > 0) keptLegacySlots.push({ ...oldSlot });
     placements[match ? match.id : oldId] = p;
   });
-  return { ...plan, semester: DEFAULT_SEMESTER, slots: newSlots, placements };
+  const slots = [...newSlots, ...keptLegacySlots].sort((a, b) => a.s[0] - b.s[0] || a.s[1] - b.s[1]);
+  return { ...plan, semester: DEFAULT_SEMESTER, slots, placements };
 }
 
 export const usePlanStore = create<PlanStoreState>()(
@@ -767,7 +780,7 @@ export const usePlanStore = create<PlanStoreState>()(
     }),
     {
       name: "activePlan",
-      version: 2,
+      version: 3,
       partialize: (state) => ({
         plans: state.plans,
         activeId: state.activeId,
@@ -782,49 +795,66 @@ export const usePlanStore = create<PlanStoreState>()(
         setupPromptDismissed: state.setupPromptDismissed,
         privacyNoticeSeen: state.privacyNoticeSeen,
       }),
-      migrate: (persisted, version) => {
-        const state = (persisted ?? {}) as Record<string, unknown>;
-        if (version >= 2 && state.plans) return state as unknown as PlanStoreState;
-
-        // version 1 -> 2: real multi-plan shape already, just needs every
-        // plan given real, correctly-remapped slots (see migratePlanToSlots
-        // for why this can't just be "start from an empty calendar" --
-        // Parker's own real placed trips depend on this being right).
-        if (version >= 1 && state.plans) {
-          const plans = state.plans as Record<string, Plan>;
-          const migratedPlans: Record<string, Plan> = {};
-          for (const [id, p] of Object.entries(plans)) migratedPlans[id] = migratePlanToSlots(p);
-          return { ...state, plans: migratedPlans } as unknown as PlanStoreState;
-        }
-
-        // pre-Stage-6 shape: a single flat {placements, bag, budget}. Carry it
-        // forward as a real plan instead of silently dropping it. This branch
-        // only runs for truly ancient (version 0, no `plans`) localStorage --
-        // anyone already on version 1+ hits the branch above instead.
-        let home = NO_HOME;
-        try {
-          const raw = window.localStorage.getItem("homeBase");
-          if (raw) home = JSON.parse(raw)?.state?.home || NO_HOME;
-        } catch {
-          // ignore — leave home unset
-        }
-        const id = uid();
-        const now = Date.now();
-        const migrated: Plan = migratePlanToSlots({
-          id,
-          name: "My semester plan",
-          home,
-          bag: (state.bag as BagOption) || "cabin",
-          budget: (state.budget as number | null) ?? null,
-          placements: (state.placements as Placements) || {},
-          created: now,
-          updated: now,
-        });
-        return { plans: { [id]: migrated }, activeId: id, compareIds: [] } as unknown as PlanStoreState;
-      },
+      // version 2 -> 3 (Phase 25): strip the St. Patrick's window that used
+      // to be added automatically -- from every saved plan (only where it's
+      // empty) and from the defaults new plans are seeded from. Runs after
+      // the older steps, so it covers every starting version.
+      migrate: (persisted, version) => removeAutoStPatricks(migrateToV2(persisted, version)),
     }
   )
 );
+
+function removeAutoStPatricks(state: PlanStoreState): PlanStoreState {
+  const plans: Record<string, Plan> = {};
+  for (const [id, p] of Object.entries(state.plans ?? {})) plans[id] = planWithoutStPatricks(p);
+  return {
+    ...state,
+    plans,
+    defaultSemester: withoutStPatricks(state.defaultSemester),
+    defaultSlots: state.defaultSlots ? slotsWithoutStPatricks(state.defaultSlots) : state.defaultSlots,
+  };
+}
+
+function migrateToV2(persisted: unknown, version: number): PlanStoreState {
+  const state = (persisted ?? {}) as Record<string, unknown>;
+  if (version >= 2 && state.plans) return state as unknown as PlanStoreState;
+
+  // version 1 -> 2: real multi-plan shape already, just needs every
+  // plan given real, correctly-remapped slots (see migratePlanToSlots
+  // for why this can't just be "start from an empty calendar" --
+  // Parker's own real placed trips depend on this being right).
+  if (version >= 1 && state.plans) {
+    const plans = state.plans as Record<string, Plan>;
+    const migratedPlans: Record<string, Plan> = {};
+    for (const [id, p] of Object.entries(plans)) migratedPlans[id] = migratePlanToSlots(p);
+    return { ...state, plans: migratedPlans } as unknown as PlanStoreState;
+  }
+
+  // pre-Stage-6 shape: a single flat {placements, bag, budget}. Carry it
+  // forward as a real plan instead of silently dropping it. This branch
+  // only runs for truly ancient (version 0, no `plans`) localStorage --
+  // anyone already on version 1+ hits the branch above instead.
+  let home = NO_HOME;
+  try {
+    const raw = window.localStorage.getItem("homeBase");
+    if (raw) home = JSON.parse(raw)?.state?.home || NO_HOME;
+  } catch {
+    // ignore — leave home unset
+  }
+  const id = uid();
+  const now = Date.now();
+  const migrated: Plan = migratePlanToSlots({
+    id,
+    name: "My semester plan",
+    home,
+    bag: (state.bag as BagOption) || "cabin",
+    budget: (state.budget as number | null) ?? null,
+    placements: (state.placements as Placements) || {},
+    created: now,
+    updated: now,
+  });
+  return { plans: { [id]: migrated }, activeId: id, compareIds: [] } as unknown as PlanStoreState;
+}
 
 export function useActivePlan(): Plan {
   return usePlanStore((s) => s.plans[s.activeId] ?? DEFAULT_PLAN);

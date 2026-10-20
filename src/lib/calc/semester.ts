@@ -28,12 +28,63 @@ export interface SemesterConfig {
 export const DEFAULT_SEMESTER: SemesterConfig = {
   start: "2027-01-24",
   end: "2027-05-24",
+  // Phase 25: no automatic St. Patrick's midweek window anymore -- a
+  // student who wants one adds it as a break themselves.
   breaks: [
-    { id: "sp", label: "St. Patrick's ☘", start: "2027-03-16", end: "2027-03-18", kind: "special" },
     { id: "brk", label: "SPRING BREAK", start: "2027-03-26", end: "2027-04-04", kind: "break" },
     { id: "post", label: "POST-FINALS", start: "2027-05-15", end: "2027-05-24", kind: "post" },
   ],
 };
+
+// Phase 25: cleanup for the St. Patrick's window that used to be added
+// automatically (DEFAULT_SEMESTER, and the old AAU onboarding defaults), so
+// it stops showing up in plans, in new plans seeded from saved settings, and
+// in exports. Only ever removes an EMPTY window -- one with a trip placed in
+// it is left exactly as it is (warnings never delete user choices).
+const ST_PATRICKS = /^st\.?\s*patrick/i;
+
+export function isAutoStPatricksBreak(b: CustomBreak): boolean {
+  return b.kind === "special" && (b.id === "sp" || ST_PATRICKS.test(b.label));
+}
+
+function isAutoStPatricksSlot(s: Slot): boolean {
+  return s.kind === "special" && s.id.startsWith("cb_") && (s.id === "cb_sp" || ST_PATRICKS.test(s.label));
+}
+
+export function withoutStPatricks(semester: SemesterConfig): SemesterConfig;
+export function withoutStPatricks(semester: SemesterConfig | undefined): SemesterConfig | undefined;
+export function withoutStPatricks(semester: SemesterConfig | undefined): SemesterConfig | undefined {
+  if (!semester || !semester.breaks.some(isAutoStPatricksBreak)) return semester;
+  return { ...semester, breaks: semester.breaks.filter((b) => !isAutoStPatricksBreak(b)) };
+}
+
+export function slotsWithoutStPatricks(slots: Slot[]): Slot[] {
+  return slots.some(isAutoStPatricksSlot) ? slots.filter((s) => !isAutoStPatricksSlot(s)) : slots;
+}
+
+/** Returns the same object when there's nothing to remove, so callers can
+ * cheaply tell whether anything changed. */
+export function planWithoutStPatricks(plan: Plan): Plan {
+  const hasTrips = (slotId: string) => (plan.placements[slotId]?.stops.length ?? 0) > 0;
+  const dropBreakIds = new Set(
+    (plan.semester?.breaks ?? []).filter((b) => isAutoStPatricksBreak(b) && !hasTrips(`cb_${b.id}`)).map((b) => b.id)
+  );
+  const dropSlotIds = new Set(
+    (plan.slots ?? [])
+      .filter((s) => !hasTrips(s.id) && ((s.id.startsWith("cb_") && dropBreakIds.has(s.id.slice(3))) || isAutoStPatricksSlot(s)))
+      .map((s) => s.id)
+  );
+  if (dropBreakIds.size === 0 && dropSlotIds.size === 0) return plan;
+
+  const placements = { ...plan.placements };
+  dropSlotIds.forEach((id) => delete placements[id]);
+  return {
+    ...plan,
+    semester: plan.semester && { ...plan.semester, breaks: plan.semester.breaks.filter((b) => !dropBreakIds.has(b.id)) },
+    slots: plan.slots?.filter((s) => !dropSlotIds.has(s.id)),
+    placements,
+  };
+}
 
 // exported for reuse by the Calendar page's slot-date-editing UI
 export const MONTH_ABBR = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];

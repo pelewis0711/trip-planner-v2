@@ -1,25 +1,22 @@
 "use client";
 
-// Phase 6: 5-step onboarding wizard (host city -> host university -> home
-// university -> term -> confirm dates), the order and skip rules Parker
-// picked explicitly. Reused by both /onboarding (first sign-in, step-by-step)
-// and /settings (edit anytime, single page) via the `layout` prop.
+// Onboarding wizard: host city -> term -> confirm dates. Reused by both
+// /onboarding (first sign-in, step-by-step) and /settings (edit anytime,
+// single page) via the `layout` prop.
 //
-// Phase 12: Step 5's date auto-fill now comes from a single searchable
-// picker (src/data/programCalendars.ts) covering BOTH study-abroad
-// providers (CEA CAPA, IES Abroad, ...) and host universities -- merged
-// with the earlier Phase 6 host-university auto-fill rather than running
-// alongside it, so there's one dataset and one mechanism, not two. Step 2
-// ("Host university") is now a plain free-text field (still with a
-// typing-assist datalist) that no longer has the side effect of changing
-// dates -- picking a result in Step 5's search box is the one explicit
-// action that fills in real dates.
-import { useMemo, useState } from "react";
+// Phase 12: the dates step's search box (src/data/programCalendars.ts,
+// providers + universities in one dataset) is the one action that fills in
+// real dates.
+//
+// Phase 25: the optional host-university and home-university steps were
+// removed at Parker's request. The fields stay on OnboardingResult so the
+// user_settings schema is unchanged; whatever an account already saved is
+// passed through on save rather than wiped.
+import { useState } from "react";
 import Link from "next/link";
 import { HOMES } from "@/data/homes";
 import { EUROPEAN_CITIES } from "@/data/europeanCities";
 import { lookupCity, resolveHome } from "@/lib/resolveHome";
-import { universityProgramNames } from "@/data/programCalendars";
 import { smartDefaultSemester, type Term } from "@/lib/calc/onboarding";
 import type { SemesterConfig } from "@/lib/calc/semester";
 import SemesterDatesForm from "@/components/SemesterDatesForm";
@@ -109,8 +106,6 @@ export default function OnboardingFlow({
   const [manualLat, setManualLat] = useState("");
   const [manualLon, setManualLon] = useState("");
 
-  const [hostUniversity, setHostUniversity] = useState(initial.hostUniversity);
-  const [homeUniversity, setHomeUniversity] = useState(initial.homeUniversity);
   const [term, setTerm] = useState<Term>(initial.term);
 
   const [semester, setSemester] = useState<SemesterConfig>(initial.semester);
@@ -125,8 +120,6 @@ export default function OnboardingFlow({
   // that banner never lies about where the current dates actually came
   // from.
   const [pickerKey, setPickerKey] = useState(0);
-
-  const uniNames = useMemo(() => universityProgramNames(), []);
 
   async function handleAddCity() {
     const q = cityInput.trim();
@@ -165,8 +158,8 @@ export default function OnboardingFlow({
   function finish() {
     onComplete({
       host: { city: hostCity, country: hostCountry, lat: hostLat, lon: hostLon },
-      hostUniversity: hostUniversity.trim(),
-      homeUniversity: homeUniversity.trim(),
+      hostUniversity: initial.hostUniversity,
+      homeUniversity: initial.homeUniversity,
       term,
       semester,
       studyingInEurope,
@@ -307,43 +300,7 @@ export default function OnboardingFlow({
 
       {(layout === "single-page" || step === 2) && (
         <section className="space-y-2">
-          <h3 className="font-heading text-sm font-semibold text-ink">
-            2. Host university <span className="font-sans font-normal text-muted">(optional)</span>
-          </h3>
-          <input
-            type="text"
-            list="host-university-options"
-            value={hostUniversity}
-            onChange={(e) => setHostUniversity(e.target.value)}
-            placeholder="Start typing…"
-            className="w-full max-w-sm rounded-md border border-border bg-surface-muted px-3 py-1.5 text-sm text-ink placeholder:text-muted"
-          />
-          <datalist id="host-university-options">
-            {uniNames.map((n) => (
-              <option key={n} value={n} />
-            ))}
-          </datalist>
-        </section>
-      )}
-
-      {(layout === "single-page" || step === 3) && (
-        <section className="space-y-2">
-          <h3 className="font-heading text-sm font-semibold text-ink">
-            3. Home university <span className="font-sans font-normal text-muted">(optional)</span>
-          </h3>
-          <input
-            type="text"
-            value={homeUniversity}
-            onChange={(e) => setHomeUniversity(e.target.value)}
-            placeholder="Your home-campus school"
-            className="w-full max-w-sm rounded-md border border-border bg-surface-muted px-3 py-1.5 text-sm text-ink placeholder:text-muted"
-          />
-        </section>
-      )}
-
-      {(layout === "single-page" || step === 4) && (
-        <section className="space-y-2">
-          <h3 className="font-heading text-sm font-semibold text-ink">4. Term</h3>
+          <h3 className="font-heading text-sm font-semibold text-ink">2. Term</h3>
           <div className="flex gap-2">
             {(["fall", "spring", "winter"] as Term[]).map((t) => (
               <button
@@ -359,9 +316,9 @@ export default function OnboardingFlow({
         </section>
       )}
 
-      {(layout === "single-page" || step === 5) && (
+      {(layout === "single-page" || step === 3) && (
         <section className="space-y-2">
-          <h3 className="font-heading text-sm font-semibold text-ink">5. Confirm semester dates</h3>
+          <h3 className="font-heading text-sm font-semibold text-ink">3. Confirm semester dates</h3>
 
           <ProgramSearchPicker
             key={pickerKey}
@@ -438,12 +395,12 @@ export default function OnboardingFlow({
     );
   }
 
-  const canNext = step === 1 ? !!hostCity && !addingCity : step === 4 ? !!term : true;
+  const canNext = step === 1 ? !!hostCity && !addingCity : step === 2 ? !!term : true;
 
   return (
     <div className="space-y-6">
       <div className="flex gap-1.5">
-        {[1, 2, 3, 4, 5].map((s) => (
+        {[1, 2, 3].map((s) => (
           <div key={s} className={`h-1 flex-1 rounded-full ${s <= step ? "bg-primary" : "bg-surface-muted"}`} />
         ))}
       </div>
@@ -459,13 +416,8 @@ export default function OnboardingFlow({
         >
           Back
         </button>
-        {step < 5 ? (
+        {step < 3 ? (
           <div className="flex gap-2">
-            {(step === 2 || step === 3) && (
-              <button type="button" onClick={() => setStep((s) => s + 1)} className="btn btn-secondary btn-lg">
-                Skip
-              </button>
-            )}
             <button type="button" onClick={() => setStep((s) => s + 1)} disabled={!canNext} className="btn btn-primary btn-lg">
               Next
             </button>

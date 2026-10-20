@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Plan } from "@/lib/store/plan";
-import { generateSlots } from "@/lib/calc/semester";
+import { generateSlots, planWithoutStPatricks } from "@/lib/calc/semester";
 import { fetchProfileEmails } from "./profiles";
 
 export interface PlanRow {
@@ -19,7 +19,9 @@ export interface PlanRow {
 }
 
 export function rowToPlan(row: PlanRow, emails: Map<string, string>): Plan {
-  return {
+  // Phase 25: drop the old automatic St. Patrick's window from a synced copy
+  // too, or a remote version winning the merge would bring it back.
+  return planWithoutStPatricks({
     id: row.id,
     name: row.name,
     ...row.data,
@@ -38,7 +40,7 @@ export function rowToPlan(row: PlanRow, emails: Map<string, string>): Plan {
     collaboratorIds: row.collaborator_ids ?? [],
     lastEditedBy: row.last_edited_by ? (emails.get(row.last_edited_by) ?? null) : null,
     lastEditedAt: row.last_edited_at ? new Date(row.last_edited_at).getTime() : null,
-  };
+  });
 }
 
 /** Resolves the emails a PlanRow needs (owner, collaborators, last editor)

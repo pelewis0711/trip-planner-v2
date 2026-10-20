@@ -1,7 +1,7 @@
 "use client";
 
 // Shared "search your program/university, auto-fill real dates" box --
-// used by both the onboarding wizard's Step 5 (sets the DEFAULT semester
+// used by both the onboarding wizard's dates step (sets the DEFAULT semester
 // for future new plans) and the Plans tab's per-plan Semester panel (sets
 // THIS plan's actual weekends). Previously this only existed inline inside
 // OnboardingFlow, which meant the one place that actually changes an

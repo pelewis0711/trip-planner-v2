@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { legEstimate } from "../routing";
 import { pricedLegs } from "../pricing";
 import { schengenDays } from "../schengen";
-import { generateSlots, getSlotsForPlan, DEFAULT_SEMESTER, describeTerm } from "../semester";
+import { generateSlots, getSlotsForPlan, DEFAULT_SEMESTER, describeTerm, planWithoutStPatricks, withoutStPatricks } from "../semester";
 import { smartDefaultSemester, postFinalsBreak } from "../onboarding";
 import type { Placements, Stop } from "../types";
 import type { Plan } from "@/lib/store/plan";
@@ -133,7 +133,8 @@ describe("Phase 6: dynamic semester slots", () => {
 
   it("generateSlots produces the exact same dates as the historical hardcoded slots for the AAU default (migration safety)", () => {
     const generated = generateSlots(DEFAULT_SEMESTER);
-    for (const legacy of LEGACY_SLOTS) {
+    // sSP (St. Patrick's) is deliberately no longer generated -- Phase 25
+    for (const legacy of LEGACY_SLOTS.filter((s) => s.id !== "sSP")) {
       const match = generated.find((s) => s.s[0] === legacy.s[0] && s.s[1] === legacy.s[1] && s.e[0] === legacy.e[0] && s.e[1] === legacy.e[1]);
       expect(match, `no generated slot matches legacy ${legacy.id} (${legacy.date})`).toBeTruthy();
     }
@@ -469,9 +470,9 @@ describe("Phase 9 step 4: migrating a pre-existing plan onto dynamic slots witho
     expect(migrated.semester).toEqual(DEFAULT_SEMESTER);
     expect(migrated.slots?.length).toBeGreaterThan(0);
 
-    // the St. Patrick's placement must land on whichever new slot covers
-    // Mar 16-18, and the Weekend 1 placement on whichever covers Jan 30-31
-    // -- not necessarily the same ids as the old static file
+    // the St. Patrick's placement keeps a slot covering Mar 16-18 (its
+    // legacy one, since Phase 25 no longer generates it), and the Weekend 1
+    // placement lands on whichever new slot covers Jan 30-31
     const spSlot = migrated.slots!.find((s) => s.s[0] === 3 && s.s[1] === 16 && s.e[0] === 3 && s.e[1] === 18)!;
     const w1Slot = migrated.slots!.find((s) => s.s[0] === 1 && s.s[1] === 30 && s.e[0] === 1 && s.e[1] === 31)!;
     expect(spSlot).toBeTruthy();
@@ -811,5 +812,52 @@ describe("Hardening: safe plan import (untrusted JSON files)", () => {
     const [imported] = parsePlanFile(text);
     expect(imported.placements!.w1.stops).toHaveLength(1);
     expect(imported.placements!.w1.stops[0].tripId).toBe("rome");
+  });
+});
+
+describe("Phase 25: no automatic St. Patrick's window", () => {
+  const OLD_AAU = {
+    start: "2027-01-24",
+    end: "2027-05-24",
+    breaks: [
+      { id: "sp", label: "St. Patrick's ☘", start: "2027-03-16", end: "2027-03-18", kind: "special" as const },
+      { id: "brk", label: "SPRING BREAK", start: "2027-03-26", end: "2027-04-04", kind: "break" as const },
+      { id: "post", label: "POST-FINALS", start: "2027-05-15", end: "2027-05-24", kind: "post" as const },
+    ],
+  };
+
+  it("the default semester and generated slots no longer include it", () => {
+    expect(DEFAULT_SEMESTER.breaks.some((b) => /patrick/i.test(b.label))).toBe(false);
+    expect(generateSlots(DEFAULT_SEMESTER).some((s) => /patrick/i.test(s.label))).toBe(false);
+  });
+
+  it("an empty St. Patrick's window is removed from a saved plan, leaving every other slot alone", () => {
+    const slots = generateSlots(OLD_AAU);
+    const rome = { stops: [{ tripId: "rome", nights: 2, act: [], sig: [], l: 0, fd: 0 }] };
+    const plan = { semester: OLD_AAU, slots, placements: { w1: rome, cb_sp: { stops: [] } } } as unknown as Plan;
+    const cleaned = planWithoutStPatricks(plan);
+    expect(cleaned.slots!.map((s) => s.id)).toEqual(slots.filter((s) => s.id !== "cb_sp").map((s) => s.id));
+    expect(cleaned.semester!.breaks.map((b) => b.id)).toEqual(["brk", "post"]);
+    expect(cleaned.placements.w1).toBe(rome);
+    expect("cb_sp" in cleaned.placements).toBe(false);
+  });
+
+  it("a St. Patrick's window with a trip placed in it is kept", () => {
+    const plan = {
+      semester: OLD_AAU,
+      slots: generateSlots(OLD_AAU),
+      placements: { cb_sp: { stops: [{ tripId: "dublin", nights: 2, act: [], sig: [], l: 0, fd: 0 }] } },
+    } as unknown as Plan;
+    expect(planWithoutStPatricks(plan)).toBe(plan);
+  });
+
+  it("a plan without one comes back as the same object (no churn)", () => {
+    const plan = { semester: DEFAULT_SEMESTER, slots: generateSlots(DEFAULT_SEMESTER), placements: {} } as unknown as Plan;
+    expect(planWithoutStPatricks(plan)).toBe(plan);
+  });
+
+  it("saved onboarding defaults lose it, so new plans aren't seeded with it", () => {
+    expect(withoutStPatricks(OLD_AAU).breaks.map((b) => b.id)).toEqual(["brk", "post"]);
+    expect(withoutStPatricks(undefined)).toBeUndefined();
   });
 });

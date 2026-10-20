@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { SemesterConfig } from "@/lib/calc/semester";
+import { withoutStPatricks, type SemesterConfig } from "@/lib/calc/semester";
 import type { Currency, OnboardingResult, OnboardingValues } from "@/components/onboarding/OnboardingFlow";
 
 export interface UserSettingsRow {
@@ -24,7 +24,9 @@ export function rowToOnboardingValues(row: UserSettingsRow): OnboardingValues {
     hostUniversity: row.host_university ?? "",
     homeUniversity: row.home_university ?? "",
     term: row.term,
-    semester: row.default_semester,
+    // Phase 25: saved settings from before the change may still carry the
+    // old automatic St. Patrick's window -- new plans are seeded from this.
+    semester: withoutStPatricks(row.default_semester),
     studyingInEurope: row.studying_in_europe,
     currency: row.currency,
   };
