@@ -24,6 +24,7 @@ const NAV = [
   { href: "/calendar", label: "My Calendar" },
   { href: "/itinerary", label: "Itinerary & Totals" },
   { href: "/plans", label: "Plans & Compare" },
+  { href: "/profile", label: "Profile" },
   { href: "/settings", label: "Settings" },
 ];
 

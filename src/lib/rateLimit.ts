@@ -139,6 +139,9 @@ export const GEOCODE_IP_LIMITER = new FixedWindowLimiter(6, MINUTE);
  * that matters for not getting banned. */
 export const GEOCODE_GLOBAL_LIMITER = new FixedWindowLimiter(30, MINUTE);
 
+/** Account deletion, per user. Retries after a failure are fine; a loop is not. */
+export const ACCOUNT_DELETE_LIMITER = new FixedWindowLimiter(5, 10 * MINUTE);
+
 /** Fixed key for the global limiter -- one shared bucket, not per-caller. */
 export const GLOBAL_KEY = "__global__";
 

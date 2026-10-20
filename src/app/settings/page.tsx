@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuthStore } from "@/lib/store/auth";
@@ -67,6 +68,17 @@ export default function SettingsPage() {
           create. Doesn&apos;t change plans you&apos;ve already made; edit an individual plan&apos;s dates from its
           card on the Plans tab instead.
         </p>
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <Link href="/profile" className="rounded-card border border-border bg-surface p-4 hover:border-primary">
+          <span className="block text-sm font-bold text-ink">Your profile</span>
+          <span className="mt-0.5 block text-xs text-muted">Name, username, photo, interests</span>
+        </Link>
+        <Link href="/settings/privacy" className="rounded-card border border-border bg-surface p-4 hover:border-primary">
+          <span className="block text-sm font-bold text-ink">Privacy &amp; notifications</span>
+          <span className="mt-0.5 block text-xs text-muted">What people can see, who can find you</span>
+        </Link>
       </div>
 
       <div className="mt-4 rounded-card border border-border bg-surface p-5">

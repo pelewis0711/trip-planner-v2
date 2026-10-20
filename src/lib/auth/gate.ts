@@ -32,6 +32,9 @@ export const PUBLIC_ROUTES = [
   "/favicon.ico",
   "/_next",
   "/trips", // trip photos
+  // Vercel's scheduler has no session. Every route under here checks a
+  // CRON_SECRET bearer token itself and refuses everything without one.
+  "/api/cron",
 ] as const;
 
 /** JSON body for a signed-out API call (proxy and the routes themselves). */
