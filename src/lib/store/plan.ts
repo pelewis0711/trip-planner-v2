@@ -90,22 +90,6 @@ function defaultStop(t: Trip): Stop {
   };
 }
 
-export type ActivityPreset = "none" | "highlights" | "balanced" | "everything";
-
-// Highlights/Balanced both read as "top N in authored priority order" -- city
-// activity lists are authored must-do-first. Returns the picked activity ids
-// (Phase 26). Temporary: the presets are replaced by the activity browser in
-// Phase 26 step 3.
-export function presetActivityIds(t: Trip, preset: ActivityPreset): string[] {
-  const count = t.a.length;
-  const n =
-    preset === "none" ? 0
-    : preset === "highlights" ? Math.min(3, count)
-    : preset === "balanced" ? Math.ceil(count / 2)
-    : count;
-  return t.a.slice(0, n).map(([, , id]) => id);
-}
-
 const DEFAULT_ID = "p_default";
 // "" means "no home city chosen yet" -- deliberately NOT a real city, so a
 // brand-new visitor doesn't silently look like whoever built this app.
@@ -171,7 +155,9 @@ interface PlanStoreState {
   updateStop: (slotId: string, stopIndex: number, patch: Partial<Stop>) => void;
   toggleAct: (slotId: string, stopIndex: number, actId: string) => void;
   toggleSig: (slotId: string, stopIndex: number, sigIndex: number) => void;
-  applyActivityPreset: (slotId: string, stopIndex: number, preset: ActivityPreset) => void;
+  /** Adds activities to a stop, skipping any already picked (Phase 26 step 3:
+   * the "Add all must-dos" shortcut and picks carried in from the catalog). */
+  addActivities: (slotId: string, stopIndex: number, actIds: string[]) => void;
   moveStop: (slotId: string, from: number, to: number) => void;
   clearSlot: (slotId: string) => void;
   clearAll: () => void;
@@ -426,12 +412,13 @@ export const usePlanStore = create<PlanStoreState>()(
           }))
         ),
 
-      applyActivityPreset: (slotId, stopIndex, preset) =>
+      addActivities: (slotId, stopIndex, actIds) =>
         set((state) =>
           withActive(state, (p) => ({
             placements: withStop(p.placements, slotId, stopIndex, (s) => {
-              const t = TRIP_BY_ID.get(s.tripId);
-              return t ? { ...s, act: presetActivityIds(t, preset) } : s;
+              const act = migrateAct(s.tripId, s.act);
+              const add = actIds.filter((id, i) => !act.includes(id) && actIds.indexOf(id) === i);
+              return add.length ? { ...s, act: [...act, ...add] } : s;
             }),
           }))
         ),

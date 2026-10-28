@@ -6,7 +6,7 @@ import { generateSlots, getSlotsForPlan, DEFAULT_SEMESTER, describeTerm, planWit
 import { smartDefaultSemester, postFinalsBreak } from "../onboarding";
 import type { Placements, Stop } from "../types";
 import type { Plan } from "@/lib/store/plan";
-import { usePlanStore, presetActivityIds, migratePlanToSlots, slotsToBeLost } from "@/lib/store/plan";
+import { usePlanStore, migratePlanToSlots, slotsToBeLost } from "@/lib/store/plan";
 import { useCustomHomesStore } from "@/lib/store/customHomes";
 import { resolveHome, isKnownCity } from "@/lib/resolveHome";
 import { HOMES } from "@/data/homes";
@@ -540,30 +540,6 @@ describe("Phase 7: trip price range", () => {
     const allActivityCost = rome.a.reduce((s, [, price]) => s + price, 0);
     expect(range.ceiling - range.floor).toBe(allActivityCost);
     expect(range.ceiling).toBeGreaterThanOrEqual(range.floor);
-  });
-});
-
-describe("Phase 7: activity presets", () => {
-  // Phase 26: presets return picked activity ids, not booleans by position.
-  const trip = (n: number) => ({
-    ...TRIPS.find((t) => t.id === "rome")!,
-    a: Array.from({ length: n }, (_, i) => [`A${i}`, 10, `rome.a${i}`] as [string, number, string]),
-  });
-
-  it("highlights/balanced/everything/none pick the right number of activities", () => {
-    expect(presetActivityIds(trip(20), "none")).toHaveLength(0);
-    expect(presetActivityIds(trip(20), "highlights")).toHaveLength(3);
-    expect(presetActivityIds(trip(20), "balanced")).toHaveLength(10);
-    expect(presetActivityIds(trip(20), "everything")).toHaveLength(20);
-  });
-
-  it("highlights never exceeds the actual activity count for a short list", () => {
-    expect(presetActivityIds(trip(2), "highlights")).toHaveLength(2);
-    expect(presetActivityIds(trip(0), "highlights")).toHaveLength(0);
-  });
-
-  it("presets pick the first N in authored order (priority order), not an arbitrary subset", () => {
-    expect(presetActivityIds(trip(6), "balanced")).toEqual(["rome.a0", "rome.a1", "rome.a2"]);
   });
 });
 

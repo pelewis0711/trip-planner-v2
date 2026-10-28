@@ -244,6 +244,20 @@ describe("migrating saved plans (localStorage, synced rows, exported files)", ()
     expect(stopAfterAdd().act).toEqual([added]);
   });
 
+  it("addActivities appends new ids once, keeps existing picks, and ignores repeats", () => {
+    usePlanStore.setState((s) => ({
+      plans: { [s.activeId]: { ...s.plans[s.activeId], home: "Prague", semester: DEFAULT_SEMESTER, slots, placements: {} } as Plan },
+    }));
+    const { addStop, toggleAct, addActivities } = usePlanStore.getState();
+    addStop(slots[0].id, "paris");
+    const paris = TRIPS.find((t) => t.id === "paris")!;
+    const [a, b, c] = paris.a.map(([, , id]) => id);
+    toggleAct(slots[0].id, 0, b);
+    addActivities(slots[0].id, 0, [a, b, a, c]);
+    const s = usePlanStore.getState();
+    expect(s.plans[s.activeId].placements[slots[0].id].stops[0].act).toEqual([b, a, c]);
+  });
+
   it("a newly placed trip starts with no picks", () => {
     usePlanStore.setState((s) => ({
       plans: { [s.activeId]: { ...s.plans[s.activeId], home: "Prague", semester: DEFAULT_SEMESTER, slots, placements: {} } as Plan },
