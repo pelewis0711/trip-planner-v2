@@ -3,8 +3,8 @@ export const CHAT_REACTIONS=['👍','❤️','😂','😮','😢','🎉'] as con
 export const CHAT_PHOTO_MAX=1600;
 export const MAX_MESSAGE_LENGTH=2000;
 export const CHAT_PHOTO_BYTES=5*1024*1024;
-export interface ChatSummary {id:string;kind:'dm'|'group'|'weekend';title:string;person:ProfileView|null;accepted:boolean;muted:boolean;last_message_at:string|null;last_message:{kind:string;body:string}|null;unread_count:number;seen_at:string|null;active_now:boolean}
-export interface ChatMessage {id:string;conversation_id:string;sender_id:string;kind:'text'|'photo'|'trip_card'|'poll'|'system';body:string;payload:{path?:string;options?:string[];share_token?:string;slot_id?:string;title?:string};created_at:string;edited_at:string|null;deleted_at:string|null}
+export interface ChatSummary {id:string;kind:'dm'|'group'|'weekend';title:string;group_id?:string|null;group_name?:string|null;trip_id?:string|null;person:ProfileView|null;accepted:boolean;muted:boolean;last_message_at:string|null;last_message:{kind:string;body:string}|null;unread_count:number;seen_at:string|null;active_now:boolean}
+export interface ChatMessage {id:string;conversation_id:string;sender_id:string|null;kind:'text'|'photo'|'trip_card'|'poll'|'system';body:string;payload:{path?:string;options?:string[];share_token?:string;slot_id?:string;title?:string};created_at:string;edited_at:string|null;deleted_at:string|null}
 export interface Reaction {message_id:string;user_id:string;emoji:string;active:boolean}
 export interface PollVote {message_id:string;user_id:string;option_index:number}
 export function groupedBubble(previous:ChatMessage|undefined,current:ChatMessage) {return !!previous && !previous.deleted_at && !current.deleted_at && previous.sender_id===current.sender_id && current.kind!=='system' && previous.kind!=='system' && new Date(current.created_at).getTime()-new Date(previous.created_at).getTime()>=0 && new Date(current.created_at).getTime()-new Date(previous.created_at).getTime()<300000;}

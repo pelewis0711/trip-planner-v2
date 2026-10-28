@@ -7,6 +7,7 @@ import { getSlotsForPlan } from "@/lib/calc/semester";
 import { makeCtx } from "@/lib/calc/context";
 import { travelersFor } from "@/lib/calc/costs";
 import { schengenDays, schengenStatus } from "@/lib/calc/schengen";
+import CalendarGroupTrips from "@/components/groups/CalendarGroupTrips";
 import TripTray from "@/components/calendar/TripTray";
 import SlotCard from "@/components/calendar/SlotCard";
 import MonthGrid from "@/components/calendar/MonthGrid";
@@ -109,6 +110,7 @@ function CalendarPageInner() {
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6">
+      <CalendarGroupTrips />
       <div className="rounded-card border border-border bg-surface p-5">
         <h2 className="font-heading text-xl font-semibold text-ink">My Calendar</h2>
         <p className="mt-1 text-sm text-muted">

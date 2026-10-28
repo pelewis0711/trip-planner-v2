@@ -28,8 +28,8 @@ export function hostelworldUrl(city: string, checkIn: string, checkOut: string, 
   return `https://www.hostelworld.com/search?search_keywords=${enc(city)}&from=${checkIn}&to=${checkOut}&number_of_guests=${guests}`;
 }
 
-export function bookingComUrl(city: string, checkIn: string, checkOut: string, guests = 1): string {
-  return `https://www.booking.com/searchresults.html?ss=${enc(city)}&checkin=${checkIn}&checkout=${checkOut}&group_adults=${guests}`;
+export function bookingComUrl(city: string, checkIn: string, checkOut: string, guests = 1, rooms?: number): string {
+  return `https://www.booking.com/searchresults.html?ss=${enc(city)}&checkin=${checkIn}&checkout=${checkOut}&group_adults=${guests}${rooms ? `&no_rooms=${rooms}` : ""}`;
 }
 
 export function airbnbUrl(city: string, checkIn: string, checkOut: string, guests = 1): string {

@@ -7,6 +7,7 @@ import { useAuthStore } from '@/lib/store/auth';
 import { useActivePlan } from '@/lib/store/plan';
 import { freeWeekends,overlaps,weekendLabel,schoolLine,type Connection,type FreeWeekend } from '@/lib/social/friends';
 import Avatar from '@/components/social/Avatar';
+import CreateWeekend from '@/components/groups/CreateWeekend';
 import MessageButton from '@/components/social/MessageButton';
 import FriendActions from '@/components/social/FriendActions';
 import { Chip,cardClass } from '@/components/social/controls';
@@ -14,6 +15,7 @@ import { Chip,cardClass } from '@/components/social/controls';
 export default function FriendsPage() {
   const user=useAuthStore(s=>s.user);const plan=useActivePlan();
   const [rows,setRows]=useState<Connection[]>([]);const [dates,setDates]=useState<(FreeWeekend & {user_id:string})[]>([]);
+  const [planning,setPlanning]=useState(false);
   const [tab,setTab]=useState('friends');const [selected,setSelected]=useState(0);
   const [error,setError]=useState('');const [loaded,setLoaded]=useState(false);const [version,setVersion]=useState(0);
   useEffect(()=>{if(!user)return;let live=true;(async()=>{
@@ -34,9 +36,10 @@ export default function FriendsPage() {
       {!weekends.length?<p className="text-sm text-muted">Add weekend slots to your calendar to find shared free time.</p>:<>
         <div className="my-4 flex -space-x-2">{available.map(f=><Link key={f.id} href={f.profile?`/u/${f.profile.username}`:'/people'} aria-label={f.profile?.display_name??'Friend'} className="rounded-full border-2 border-surface"><Avatar path={f.profile?.avatar_path} name={f.profile?.display_name??'Friend'} size={40}/></Link>)}</div>
         <p className="mb-3 text-sm text-muted">{available.length?available.map(f=>f.profile?.display_name??'Friend').join(', '):'No friends sharing this weekend yet.'}</p>
-        {!!available.length&&<Link href="/calendar" className="btn btn-primary btn-md">Plan this weekend with them</Link>}
+        {!!available.length&&<button className="btn btn-primary btn-md" onClick={()=>setPlanning(v=>!v)}>Plan this weekend with them</button>}
       </>}
     </section>
+    {planning&&weekend&&<CreateWeekend key={weekend.start_date} start={weekend.start_date} end={weekend.end_date} friends={available.map(f=>({id:f.id,name:f.profile?.display_name??'Friend'}))} onCancel={()=>setPlanning(false)}/>}
     <div role="tablist" aria-label="Friend lists" className="flex gap-2">{[['friends',`Friends (${friends.length})`],['requests',`Requests (${requests.length})`]].map(([id,label])=><button key={id} role="tab" aria-selected={tab===id} className={`btn btn-md ${tab===id?'btn-primary':'btn-secondary'}`} onClick={()=>setTab(id)}>{label}</button>)}</div>
     {error&&<p role="alert" className="text-danger">{error}<button onClick={refresh} className="btn btn-ghost btn-md">Retry</button></p>}
     {!loaded&&!error&&<p role="status">Loading…</p>}
