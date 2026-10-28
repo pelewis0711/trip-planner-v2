@@ -16,6 +16,19 @@ import { makeCtx } from "@/lib/calc/context";
 import FilterPanel from "@/components/FilterPanel";
 import TripCard from "@/components/TripCard";
 import SetupWizardModal from "@/components/onboarding/SetupWizardModal";
+import ActivitySearch from "@/components/activities/ActivitySearch";
+import { usePlanStore } from "@/lib/store/plan";
+import { useActivityDescriptions } from "@/lib/activityDescriptions";
+import { activityMatchesFor, MIN_ACTIVITY_QUERY } from "@/lib/activityBrowser";
+import type { Trip } from "@/data/trips";
+
+type CatalogView = "cities" | "activities";
+
+// True when the search matched the city itself, not one of its activities.
+function matchesPlace(t: Trip, query: string): boolean {
+  const q = query.toLowerCase();
+  return t.n.toLowerCase().includes(q) || t.c.toLowerCase().includes(q) || t.reg.toLowerCase().includes(q);
+}
 
 export default function CatalogPage() {
   const activePlan = useActivePlan();
@@ -24,6 +37,13 @@ export default function CatalogPage() {
   const [query, setQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
+  // Phase 26 step 4: Cities (the trip cards) or Activities (search every
+  // city's activities at once).
+  const [view, setView] = useState<CatalogView>("cities");
+  const currency = usePlanStore((s) => s.defaultCurrency);
+  // Descriptions are matched too, so load them once a search is long enough
+  // to look inside activities, or the Activities view is open.
+  const descriptions = useActivityDescriptions(view === "activities" || query.trim().length >= MIN_ACTIVITY_QUERY);
 
   // same "never configured at all" signal Calendar/Itinerary already use --
   // catalog never got this gate, so an unconfigured visitor's filters/prices
@@ -57,10 +77,18 @@ export default function CatalogPage() {
   };
 
   const visible = useMemo(
-    () => TRIPS.filter((t) => tripMatches(t, filters, query, homeCoord, coordsOf)),
+    () => TRIPS.filter((t) => tripMatches(t, filters, query, homeCoord, coordsOf, descriptions)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [filters, query, home]
+    [filters, query, home, descriptions]
   );
+  // Activities view: the city filters narrow which cities are searched; the
+  // text goes to the activity search instead.
+  const filteredCities = useMemo(
+    () => TRIPS.filter((t) => tripMatches(t, filters, "", homeCoord, coordsOf)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [filters, home]
+  );
+  const priceRange = (t: Trip) => tripPriceRange(t, ctx);
 
   const activeCount = activeFilterCount(filters, query);
 
@@ -85,13 +113,34 @@ export default function CatalogPage() {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
       <div className="rounded-card border border-border bg-surface p-5">
-        <h2 className="font-heading text-xl font-semibold text-ink">
-          Trip Catalog <span className="font-sans text-sm font-normal text-muted">— {visible.length} of {TRIPS.length} options</span>
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-heading text-xl font-semibold text-ink">
+            Trip Catalog
+            {view === "cities" && (
+              <span className="font-sans text-sm font-normal text-muted"> — {visible.length} of {TRIPS.length} options</span>
+            )}
+          </h2>
+          <div role="tablist" aria-label="Browse by" className="inline-flex rounded-lg border border-border bg-surface-muted p-0.5">
+            {(["cities", "activities"] as const).map((v) => (
+              <button
+                key={v}
+                type="button"
+                role="tab"
+                aria-selected={view === v}
+                onClick={() => setView(v)}
+                className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
+                  view === v ? "bg-surface text-primary shadow-sm" : "text-muted hover:text-ink"
+                }`}
+              >
+                {v === "cities" ? "Cities" : "Activities"}
+              </button>
+            ))}
+          </div>
+        </div>
         <p className="mt-1 text-sm text-muted">
           Prices are per person, round-trip from {home || "your home city (not set yet)"}, mid-range
-          estimates. Head to{" "}
-          <b className="text-ink">My Calendar</b> to drop a trip onto a slot.
+          estimates. Tap a trip to pick activities and add it to a weekend, or switch to{" "}
+          <b className="text-ink">Activities</b> to search every city at once.
         </p>
       </div>
 
@@ -100,7 +149,12 @@ export default function CatalogPage() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="🔎 Search city, country, or region…"
+          placeholder={
+            view === "cities"
+              ? "🔎 Search a city, country, region or activity…"
+              : "🔎 Search activities in every city (kayak, cooking class…)"
+          }
+          aria-label={view === "cities" ? "Search cities" : "Search activities"}
           className="w-full min-w-[220px] flex-1 rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-muted sm:w-auto"
         />
         <button type="button" onClick={() => setShowFilters((s) => !s)} className="btn btn-secondary btn-sm">
@@ -119,7 +173,15 @@ export default function CatalogPage() {
         </div>
       )}
 
-      {visible.length === 0 ? (
+      {view === "activities" ? (
+        <ActivitySearch
+          trips={filteredCities}
+          text={query}
+          onSuggest={setQuery}
+          priceRange={priceRange}
+          currency={currency}
+        />
+      ) : visible.length === 0 ? (
         <div className="mt-8 rounded-card border-2 border-dashed border-border p-10 text-center text-muted">
           No trips match those filters. Try clearing a few.
         </div>
@@ -127,7 +189,8 @@ export default function CatalogPage() {
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visible.map((t) => {
             const { floor, ceiling } = tripPriceRange(t, ctx);
-            return <TripCard key={t.id} trip={t} floor={floor} ceiling={ceiling} />;
+            const matches = query && !matchesPlace(t, query) ? activityMatchesFor(t, query, descriptions) : [];
+            return <TripCard key={t.id} trip={t} floor={floor} ceiling={ceiling} matches={matches} />;
           })}
         </div>
       )}

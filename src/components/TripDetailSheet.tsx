@@ -21,11 +21,14 @@ export default function TripDetailSheet({
   trip,
   floor,
   ceiling,
+  initialPicked = [],
   onClose,
 }: {
   trip: Trip;
   floor: number;
   ceiling: number;
+  /** Activities already picked when the sheet opens (Catalog's activity search). */
+  initialPicked?: string[];
   onClose: () => void;
 }) {
   const currency = usePlanStore((s) => s.defaultCurrency);
@@ -43,7 +46,7 @@ export default function TripDetailSheet({
   const [wizardOpen, setWizardOpen] = useState(false);
   // Activities picked here before the trip is placed; "Add to weekend"
   // carries them into the new stop (Phase 26 step 3).
-  const [picked, setPicked] = useState<string[]>([]);
+  const [picked, setPicked] = useState<string[]>(initialPicked);
   const togglePick = (id: string) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
   const addPicks = (ids: string[]) => setPicked((p) => [...p, ...ids.filter((id) => !p.includes(id))]);
 

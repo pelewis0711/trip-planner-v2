@@ -1,8 +1,21 @@
-// Phase 26 step 3: search, filters and sort behind the activity browser.
+// Phase 26 steps 3-4: search, filters and sort behind the activity browser,
+// the cross-city activity search and the catalog's activity matching.
 import { describe, expect, it } from "vitest";
 import { TRIPS, type Trip } from "@/data/trips";
 import DESCRIPTIONS from "@/data/activityDescriptions.json";
-import { browserItems, categoryCounts, EMPTY_QUERY, queryItems, type BrowserQuery } from "@/lib/activityBrowser";
+import {
+  activityMatchesFor,
+  browserItems,
+  categoryCounts,
+  EMPTY_QUERY,
+  matchesText,
+  MIN_ACTIVITY_QUERY,
+  queryItems,
+  searchAcrossTrips,
+  searchWords,
+  type BrowserQuery,
+} from "@/lib/activityBrowser";
+import { emptyFilters, tripMatches } from "@/lib/filters";
 import type { ActivityDescriptions } from "@/lib/activityDescriptions";
 
 const rome = TRIPS.find((t) => t.id === "rome")!;
@@ -101,5 +114,94 @@ describe("activity browser: sort", () => {
   it("ties keep the catalog's own order", () => {
     const free = q({ quick: ["free"], sort: "price" }).map((it) => it.index);
     expect(free).toEqual([...free].sort((x, y) => x - y));
+  });
+});
+
+// ---- Phase 26 step 4: search across the whole catalog ----
+
+describe("activity search: word matching", () => {
+  it("splits into lowercase words without accents", () => {
+    expect(searchWords("Café-crawl in Kraków!")).toEqual(["cafe", "crawl", "in", "krakow"]);
+    expect(searchWords("   ")).toEqual([]);
+  });
+
+  it("each query word must start a word (kayak finds kayaking; art doesn't find party)", () => {
+    const item = { id: "x", index: 0, name: "Sunset kayaking party", price: 0, meta: null, description: "" };
+    expect(matchesText(item, "kayak")).toBe(true);
+    expect(matchesText(item, "KAYAK sun")).toBe(true);
+    expect(matchesText(item, "art")).toBe(false);
+    expect(matchesText(item, "kayak wine")).toBe(false);
+    expect(matchesText(item, "")).toBe(true);
+  });
+});
+
+describe("activity search: every city at once", () => {
+  const all = (text: string, extra: Partial<BrowserQuery> = {}) =>
+    searchAcrossTrips(TRIPS, { ...EMPTY_QUERY, text, ...extra }, descs);
+
+  it("an empty query returns nothing (the page asks for a search instead)", () => {
+    expect(all("")).toEqual([]);
+  });
+
+  it("kayak finds cities whose names don't mention it, grouped by city", () => {
+    const groups = all("kayak");
+    expect(groups.length).toBeGreaterThan(10);
+    expect(new Set(groups.map((g) => g.trip.id)).size).toBe(groups.length);
+    for (const g of groups) {
+      expect(g.items.length).toBeGreaterThan(0);
+      expect(g.items.every((it) => it.id.startsWith(`${g.trip.id}.`))).toBe(true);
+    }
+    expect(groups.some((g) => !g.trip.n.toLowerCase().includes("kayak"))).toBe(true);
+  });
+
+  it("chips alone work without text, and narrow every city", () => {
+    const groups = all("", { quick: ["free", "evening"] });
+    expect(groups.length).toBeGreaterThan(0);
+    expect(groups.every((g) => g.items.every((it) => it.price === 0 && it.meta?.when === "night"))).toBe(true);
+  });
+
+  it("cities are ordered by their best match under the sort, then by match count", () => {
+    const groups = all("wine", { sort: "price" });
+    const firsts = groups.map((g) => g.items[0].price);
+    expect(firsts).toEqual([...firsts].sort((a, b) => a - b));
+    const byMust = all("food");
+    for (let i = 1; i < byMust.length; i++) {
+      const [a, b] = [byMust[i - 1], byMust[i]];
+      const am = Number(!!a.items[0].meta?.mustDo), bm = Number(!!b.items[0].meta?.mustDo);
+      expect(am >= bm).toBe(true);
+      if (am === bm) expect(a.items.length).toBeGreaterThanOrEqual(b.items.length);
+    }
+  });
+
+  it("only searches the cities it's given (Catalog's filters)", () => {
+    const italy = TRIPS.filter((t) => t.c === "Italy");
+    expect(searchAcrossTrips(italy, { ...EMPTY_QUERY, text: "wine" }, descs).every((g) => g.trip.c === "Italy")).toBe(true);
+  });
+});
+
+describe("catalog city search matches activities", () => {
+  const home: [number, number] = [50.08, 14.43];
+  const coords = (id: string) => TRIPS.find((t) => t.id === id)?.co;
+  const cities = (q: string) => TRIPS.filter((t) => tripMatches(t, emptyFilters(), q, home, coords, descs));
+
+  it("kayak shows cities even though kayak isn't in their name", () => {
+    const hits = cities("kayak");
+    expect(hits.length).toBeGreaterThan(10);
+    expect(hits.every((t) => activityMatchesFor(t, "kayak", descs).length > 0)).toBe(true);
+  });
+
+  it("a city still matches by its own name, country or region", () => {
+    expect(cities("Rome").map((t) => t.id)).toContain("rome");
+    expect(cities("Croatia").every((t) => t.c === "Croatia" || activityMatchesFor(t, "Croatia", descs).length > 0)).toBe(true);
+  });
+
+  it(`activity matching waits for ${MIN_ACTIVITY_QUERY}+ letters, so typing "r" doesn't match every city`, () => {
+    expect(activityMatchesFor(rome, "co", descs)).toEqual([]);
+    expect(cities("r").every((t) => [t.n, t.c, t.reg].join(" ").toLowerCase().includes("r"))).toBe(true);
+    expect(activityMatchesFor(rome, "colosseum", descs)).toContain(rome.a[0][0]);
+  });
+
+  it("works before descriptions load (names and categories only)", () => {
+    expect(activityMatchesFor(rome, "colosseum")).toContain(rome.a[0][0]);
   });
 });

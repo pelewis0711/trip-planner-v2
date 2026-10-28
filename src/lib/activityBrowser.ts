@@ -5,6 +5,9 @@
 // An activity without tags (a trip not tagged yet) still shows up and still
 // matches a text search on its name; it just can't match a tag filter or a
 // category, and sorts last by length.
+//
+// Step 4 adds the cross-city search (searchAcrossTrips) and the activity
+// matching behind the catalog's city search (activityMatchesFor).
 import type { Trip } from "@/data/trips";
 import {
   ACTIVITY_CATEGORIES,
@@ -63,11 +66,24 @@ function categoryLabel(key: ActivityCategory): string {
   return ACTIVITY_CATEGORIES.find((c) => c.key === key)?.label ?? key;
 }
 
-function matchesText(item: BrowserItem, text: string): boolean {
-  const q = text.trim().toLowerCase();
-  if (!q) return true;
-  const hay = [item.name, item.description, item.meta ? categoryLabel(item.meta.category) : ""].join(" ").toLowerCase();
-  return q.split(/\s+/).every((word) => hay.includes(word));
+/** Lowercase words with accents removed ("Café-crawl" -> ["cafe", "crawl"]). */
+export function searchWords(text: string): string[] {
+  return text
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter(Boolean);
+}
+
+/** True if every query word starts some word of the activity's name,
+ * description or category ("kayak" finds "Kayaking"; "art" finds "Museums
+ * & art" but not "party"). An empty query matches everything. */
+export function matchesText(item: BrowserItem, text: string): boolean {
+  const q = searchWords(text);
+  if (!q.length) return true;
+  const hay = searchWords([item.name, item.description, item.meta ? categoryLabel(item.meta.category) : ""].join(" "));
+  return q.every((w) => hay.some((h) => h.startsWith(w)));
 }
 
 function matchesQuick(item: BrowserItem, quick: QuickFilter[]): boolean {
@@ -86,6 +102,19 @@ function matchesQuick(item: BrowserItem, quick: QuickFilter[]): boolean {
   return true;
 }
 
+// Sort order without the catalog-order tiebreak (shared with the
+// cross-city search, where items from different cities are compared).
+const SORT_KEY: Record<ActivitySort, (a: BrowserItem, b: BrowserItem) => number> = {
+  must: (a, b) => Number(!!b.meta?.mustDo) - Number(!!a.meta?.mustDo),
+  price: (a, b) => a.price - b.price,
+  length: (a, b) => (a.meta ? LENGTH_RANK[a.meta.duration] : 99) - (b.meta ? LENGTH_RANK[b.meta.duration] : 99),
+};
+
+/** True when the query narrows anything (text, a chip or a category). */
+export function isFiltering(query: BrowserQuery): boolean {
+  return searchWords(query.text).length > 0 || query.quick.length > 0 || query.categories.length > 0;
+}
+
 /** The items that match the query, in the query's sort order. */
 export function queryItems(items: BrowserItem[], query: BrowserQuery): BrowserItem[] {
   const cats = new Set(query.categories);
@@ -95,14 +124,46 @@ export function queryItems(items: BrowserItem[], query: BrowserQuery): BrowserIt
       matchesQuick(it, query.quick) &&
       (cats.size === 0 || (it.meta !== null && cats.has(it.meta.category)))
   );
-  const byIndex = (a: BrowserItem, b: BrowserItem) => a.index - b.index;
-  const sorters: Record<ActivitySort, (a: BrowserItem, b: BrowserItem) => number> = {
-    must: (a, b) => Number(!!b.meta?.mustDo) - Number(!!a.meta?.mustDo) || byIndex(a, b),
-    price: (a, b) => a.price - b.price || byIndex(a, b),
-    length: (a, b) =>
-      (a.meta ? LENGTH_RANK[a.meta.duration] : 99) - (b.meta ? LENGTH_RANK[b.meta.duration] : 99) || byIndex(a, b),
-  };
-  return [...hits].sort(sorters[query.sort]);
+  return [...hits].sort((a, b) => SORT_KEY[query.sort](a, b) || a.index - b.index);
+}
+
+export interface TripActivityGroup {
+  trip: Trip;
+  /** Matching activities, in the query's sort order. */
+  items: BrowserItem[];
+}
+
+/** Step 4: the same query run over every trip, grouped by city. Cities are
+ * ordered by their best match under the query's sort, then by number of
+ * matches, then catalog order. A query that narrows nothing returns no
+ * groups (the UI asks for a search instead of listing all ~3,200). */
+export function searchAcrossTrips(
+  trips: readonly Trip[],
+  query: BrowserQuery,
+  descriptions: ActivityDescriptions | null = null
+): TripActivityGroup[] {
+  if (!isFiltering(query)) return [];
+  const groups = trips
+    .map((trip, order) => ({ trip, order, items: queryItems(browserItems(trip, descriptions), query) }))
+    .filter((g) => g.items.length > 0);
+  groups.sort(
+    (a, b) => SORT_KEY[query.sort](a.items[0], b.items[0]) || b.items.length - a.items.length || a.order - b.order
+  );
+  return groups.map(({ trip, items }) => ({ trip, items }));
+}
+
+/** Shortest catalog search that also looks inside activities; shorter text
+ * ("r" while typing "Rome") would match nearly every city. */
+export const MIN_ACTIVITY_QUERY = 3;
+
+/** Names of a trip's activities that match a catalog search (name,
+ * description or category; same word matching as above), in catalog order.
+ * Empty for a query under MIN_ACTIVITY_QUERY letters. */
+export function activityMatchesFor(t: Trip, text: string, descriptions: ActivityDescriptions | null = null): string[] {
+  if (searchWords(text).join("").length < MIN_ACTIVITY_QUERY) return [];
+  return browserItems(t, descriptions)
+    .filter((it) => matchesText(it, text))
+    .map((it) => it.name);
 }
 
 /** Categories present in this trip, in the standard order, with counts. */

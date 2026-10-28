@@ -12,10 +12,14 @@ export default function TripCard({
   trip,
   floor,
   ceiling,
+  matches = [],
 }: {
   trip: Trip;
   floor: number;
   ceiling: number;
+  /** Activity names that made this city match the search (Phase 26 step 4);
+   * empty when the city matched by its own name, country or region. */
+  matches?: string[];
 }) {
   const tier = tierOf(trip.ci);
   const currency = usePlanStore((s) => s.defaultCurrency);
@@ -54,6 +58,13 @@ export default function TripCard({
             </span>
           ))}
         </div>
+
+        {matches.length > 0 && (
+          <p className="mt-2 text-[12px] text-primary">
+            <b>Matches:</b> {matches.slice(0, 2).join(", ")}
+            {matches.length > 2 && ` +${matches.length - 2} more`}
+          </p>
+        )}
 
         <p className="mt-2 flex-1 text-[12.5px] text-muted">{trip.w}</p>
 

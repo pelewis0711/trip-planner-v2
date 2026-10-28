@@ -40,16 +40,22 @@ export function loadActivityDescriptions(): Promise<ActivityDescriptions> {
 }
 
 function subscribe(listener: () => void) {
-  listeners.add(listener);
   // Start loading as soon as a component wants them; failures just leave
   // descriptions hidden (retried on the next subscribe).
   loadActivityDescriptions().catch(() => {});
+  return subscribeOnly(listener);
+}
+
+function subscribeOnly(listener: () => void) {
+  listeners.add(listener);
   return () => listeners.delete(listener);
 }
 
-/** Descriptions for every tagged trip, or null while they're loading. */
-export function useActivityDescriptions(): ActivityDescriptions | null {
-  return useSyncExternalStore(subscribe, () => loaded, () => null);
+/** Descriptions for every tagged trip, or null while they're loading. With
+ * `load` false nothing is fetched, but descriptions already loaded (or
+ * loaded later by something else) are still returned. */
+export function useActivityDescriptions(load = true): ActivityDescriptions | null {
+  return useSyncExternalStore(load ? subscribe : subscribeOnly, () => loaded, () => null);
 }
 
 /** The description for the activity at `index` in trip.a ("" if none). */

@@ -4,6 +4,8 @@ import type { Trip } from "@/data/trips";
 import { TRIPS } from "@/data/trips";
 import { tierOf } from "./calc/cost";
 import { travelHours } from "./calc/routing";
+import { activityMatchesFor } from "./activityBrowser";
+import type { ActivityDescriptions } from "./activityDescriptions";
 
 export type FilterKey =
   | "region"
@@ -42,7 +44,10 @@ export function tripMatches(
   filters: FilterState,
   query: string,
   homeCoord: [number, number],
-  coordsOf: (tripId: string) => [number, number] | undefined
+  coordsOf: (tripId: string) => [number, number] | undefined,
+  // Phase 26 step 4: a city also matches through its activities' names,
+  // descriptions and categories (3+ letters; see activityMatchesFor).
+  descriptions: ActivityDescriptions | null = null
 ): boolean {
   if (query) {
     const q = query.toLowerCase();
@@ -50,7 +55,8 @@ export function tripMatches(
       !(
         t.n.toLowerCase().includes(q) ||
         t.c.toLowerCase().includes(q) ||
-        t.reg.toLowerCase().includes(q)
+        t.reg.toLowerCase().includes(q) ||
+        activityMatchesFor(t, query, descriptions).length > 0
       )
     )
       return false;
