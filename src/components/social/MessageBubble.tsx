@@ -9,6 +9,7 @@ import ChatPhoto from './ChatPhoto';
 export default function MessageBubble({message:m,mine,grouped,userId,name,avatar,reactions,votes,canSend,onChange}:{message:ChatMessage;mine:boolean;grouped:boolean;userId:string;name:string;avatar?:string|null;reactions:Reaction[];votes:PollVote[];canSend:boolean;onChange:()=>void}){
  const [error,setError]=useState('');const [busy,setBusy]=useState(false);const [editing,setEditing]=useState(false);const [draft,setDraft]=useState(m.body);
  async function action(rpc:string,args:Record<string,unknown>){setBusy(true);setError('');try{await chatRpc(createClient(),rpc,{p_message:m.id,...args});setEditing(false);onChange();}catch(e){setError(e instanceof Error?e.message:'Could not save.');}finally{setBusy(false);}}
+ if(m.kind==='system')return <p className="my-4 rounded-xl bg-primary-soft px-4 py-3 text-center text-sm text-muted">{m.body}</p>;
  const options=m.payload.options??[];const total=votes.length;
  return <div className={`flex gap-2 ${mine?'justify-end':'justify-start'} ${grouped?'mt-1':'mt-4'}`}>
  {!mine&&<div className="w-8 shrink-0">{!grouped&&<Avatar path={avatar} name={name} size={32}/>}</div>}
