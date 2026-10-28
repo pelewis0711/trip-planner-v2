@@ -10,6 +10,8 @@ import { formatMoney } from "@/lib/calc/currency";
 import { TYPE_LABEL, TYPE_STYLE, TIER_LABEL, TIER_STYLE, tierOf, MO_SHORT } from "@/lib/tripDisplay";
 import TripPhoto from "./TripPhoto";
 import SetupWizardModal from "./onboarding/SetupWizardModal";
+import ActivityBrowser from "./activities/ActivityBrowser";
+import { pickedActivityTotal } from "@/lib/calc/activities";
 
 /** Click-to-expand detail view for a trip -- photo, blurb, full activity/
  * food lists, price range, and an "Add to weekend" picker so a trip can be
@@ -33,11 +35,17 @@ export default function TripDetailSheet({
   const activePlan = useActivePlan();
   const addStop = usePlanStore((s) => s.addStop);
   const updateStop = usePlanStore((s) => s.updateStop);
+  const addActivities = usePlanStore((s) => s.addActivities);
   const slots = useMemo(() => getSlotsForPlan(activePlan), [activePlan]);
 
   const [nights, setNights] = useState(trip.g);
   const [addedTo, setAddedTo] = useState<{ slotId: string; label: string; date: string } | null>(null);
   const [wizardOpen, setWizardOpen] = useState(false);
+  // Activities picked here before the trip is placed; "Add to weekend"
+  // carries them into the new stop (Phase 26 step 3).
+  const [picked, setPicked] = useState<string[]>([]);
+  const togglePick = (id: string) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
+  const addPicks = (ids: string[]) => setPicked((p) => [...p, ...ids.filter((id) => !p.includes(id))]);
 
   function handleAddToSlot(slotId: string) {
     addStop(slotId, trip.id);
@@ -45,10 +53,12 @@ export default function TripDetailSheet({
     // follow up with an extra store write if the picked nights differ from
     // that suggestion, reusing the existing updateStop action rather than
     // giving addStop a new parameter.
-    if (nights !== trip.g) {
-      const freshStops = usePlanStore.getState().plans[usePlanStore.getState().activeId]?.placements[slotId]?.stops ?? [];
-      const newIndex = freshStops.length - 1;
-      if (newIndex >= 0) updateStop(slotId, newIndex, { nights });
+    // The new stop is the last one in that slot.
+    const state = usePlanStore.getState();
+    const newIndex = (state.plans[state.activeId]?.placements[slotId]?.stops.length ?? 0) - 1;
+    if (newIndex >= 0) {
+      if (nights !== trip.g) updateStop(slotId, newIndex, { nights });
+      if (picked.length) addActivities(slotId, newIndex, picked);
     }
     const slot = slots.find((s) => s.id === slotId);
     if (slot) setAddedTo({ slotId, label: slot.label, date: slot.date });
@@ -113,17 +123,15 @@ export default function TripDetailSheet({
           <span className="ml-1.5 text-xs text-muted">per person, depending on activities picked</span>
         </div>
 
-        <div className="mt-4">
-          <h3 className="text-xs font-semibold tracking-wide text-muted uppercase">🎟️ Activities</h3>
-          <ul className="mt-1.5 space-y-1 text-sm text-ink">
-            {trip.a.map(([name, price]) => (
-              <li key={name} className="flex items-center justify-between gap-2">
-                <span>{name}</span>
-                <span className="shrink-0 text-muted">{formatMoney(price, currency)}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ActivityBrowser
+          trip={trip}
+          picked={picked}
+          onToggle={togglePick}
+          onAddMany={addPicks}
+          currency={currency}
+          current={floor + pickedActivityTotal(trip, picked)}
+          currentLabel="With your picks"
+        />
 
         <div className="mt-4">
           <h3 className="text-xs font-semibold tracking-wide text-muted uppercase">🍽️ Bucket list (free)</h3>

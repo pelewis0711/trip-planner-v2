@@ -1,7 +1,7 @@
 "use client";
 
 import type { Slot } from "@/data/slots";
-import { useActivePlan, usePlanStore, type ActivityPreset } from "@/lib/store/plan";
+import { useActivePlan, usePlanStore } from "@/lib/store/plan";
 import { useAuthStore } from "@/lib/store/auth";
 import type { PlannerCtx } from "@/lib/calc/context";
 import { daysOf, foodTiers, lodgingTiers } from "@/lib/calc/cost";
@@ -10,15 +10,8 @@ import { stopDates, iso } from "@/lib/calc/dates";
 import LiveHotelPrice from "@/components/itinerary/LiveHotelPrice";
 import SlotCollab from "./SlotCollab";
 import { formatMoney } from "@/lib/calc/currency";
-import { pickedActivities } from "@/lib/calc/activities";
 import type { Currency } from "@/components/onboarding/OnboardingFlow";
-
-const PRESETS: [ActivityPreset, string][] = [
-  ["none", "None"],
-  ["highlights", "Highlights"],
-  ["balanced", "Balanced"],
-  ["everything", "Everything"],
-];
+import ActivityBrowser from "@/components/activities/ActivityBrowser";
 
 export default function EditModal({
   slot,
@@ -38,7 +31,7 @@ export default function EditModal({
   const updateStop = usePlanStore((s) => s.updateStop);
   const toggleAct = usePlanStore((s) => s.toggleAct);
   const toggleSig = usePlanStore((s) => s.toggleSig);
-  const applyActivityPreset = usePlanStore((s) => s.applyActivityPreset);
+  const addActivities = usePlanStore((s) => s.addActivities);
   const moveStop = usePlanStore((s) => s.moveStop);
   const setTravelersFor = usePlanStore((s) => s.setTravelersFor);
   const currency = usePlanStore((s) => s.defaultCurrency);
@@ -101,9 +94,6 @@ export default function EditModal({
             const days = daysOf(st.nights);
             const range = tripPriceRange(t, ctx);
             const current = stopCurrentEstimate(t, st, ctx, travelers);
-            const picked = pickedActivities(t, st.act);
-            const pickedIds = new Set(picked.map((a) => a.id));
-            const unlisted = picked.filter((a) => !a.listed);
 
             return (
               <div key={i} className="rounded-card border border-border bg-surface-muted p-3.5">
@@ -215,48 +205,17 @@ export default function EditModal({
                   currency={currency}
                 />
 
-                {t.a.length > 0 && (
-                  <>
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {PRESETS.map(([preset, label]) => (
-                        <button
-                          key={preset}
-                          type="button"
-                          onClick={() => applyActivityPreset(slot.id, i, preset)}
-                          className="rounded-full border border-border px-2.5 py-0.5 text-[11px] font-semibold text-muted hover:border-primary/50 hover:text-primary"
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                    <CheckList
-                      label="🎟️ Activities"
-                      items={t.a.map(([name, price]) => [name, price])}
-                      checked={t.a.map(([, , id]) => pickedIds.has(id))}
-                      onToggle={(idx) => toggleAct(slot.id, i, t.a[idx][2])}
-                      currency={currency}
-                    />
-                  </>
-                )}
-                {/* Picks whose activity has left the catalog: kept, not
-                    counted, removable by hand (Phase 26). */}
-                {unlisted.length > 0 && (
-                  <div className="mt-2 space-y-1">
-                    {unlisted.map((a) => (
-                      <div key={a.id} className="flex items-center gap-2 px-2 text-xs text-muted">
-                        <span className="flex-1 italic">{a.name} (no longer listed, not counted)</span>
-                        <button
-                          type="button"
-                          onClick={() => toggleAct(slot.id, i, a.id)}
-                          className="text-muted hover:text-danger"
-                          aria-label={`Remove ${a.name}`}
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {/* Phase 26 step 3: the activity browser. With several cities
+                    in one weekend, each list starts closed. */}
+                <ActivityBrowser
+                  key={`${st.tripId}-${i}`}
+                  trip={t}
+                  picked={st.act}
+                  onToggle={(id) => toggleAct(slot.id, i, id)}
+                  onAddMany={(ids) => addActivities(slot.id, i, ids)}
+                  currency={currency}
+                  defaultOpen={stops.length === 1}
+                />
                 {t.f.length > 0 && (
                   <CheckList
                     label="🍜 Signature food (bucket list — free, doesn't count toward totals)"
