@@ -213,7 +213,8 @@ function Weekend({ id }: { id: string }) {
       <WeekendLodging trip={trip} onChange={refresh} />
       <section className={cardClass}>
         <h2 className="font-heading text-xl">Split costs</h2>
-        <p className="text-sm text-muted">Coming soon in Phase 30.</p>
+        <p className="text-sm text-muted">Add shared costs and see who owes whom.</p>
+        <Link className="btn btn-primary btn-md mt-3" href={`/weekends/${id}/split`}>Open split</Link>
       </section>
       {!trip.group_id && (
         <button
