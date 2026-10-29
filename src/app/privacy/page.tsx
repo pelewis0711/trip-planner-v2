@@ -22,8 +22,8 @@ export default function PrivacyPage() {
             <b className="text-ink">Your plans live on your device and in your account.</b>{" "}Your setup
             answers (host city, universities, semester dates), trips, and budgets are saved in your
             browser (so the app works offline) and synced to a private database tied to your account,
-            so you can pick up where you left off on another device. That&apos;s everything we keep, and
-            nobody else can see it unless you share a plan. Signing
+            so you can pick up where you left off on another device. Nobody else can see those plans
+            unless you share them. Signing
             out doesn&apos;t erase the copy saved in that browser, so be careful on a shared computer.
           </p>
           <p>
@@ -38,6 +38,13 @@ export default function PrivacyPage() {
             detail &mdash; photo, bio, universities, interests and the rest &mdash; stays hidden until
             you turn it on in Privacy &amp; settings, where you also choose who sees it. Your email
             address is never shown to anyone.
+          </p>
+          <p>
+            <b className="text-ink">Shared weekend costs are visible to people on that trip.</b>{" "}
+            We store descriptions, amounts, who paid, each person&apos;s share and repayments marked
+            as settled. WhereNext does not move money or store payment credentials. Leaving a trip
+            or changing your RSVP keeps recorded shares. If you delete your account, shared accounting
+            entries remain without your profile so the other members&apos; balances stay correct.
           </p>
           <p>
             <b className="text-ink">We don&apos;t sell or share your data</b>{" "}with third parties.
